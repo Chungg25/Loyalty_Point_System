@@ -1,73 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        form {
-            display: flex;
-            flex-direction: column;
-            width: 200px;
-        }
-        input {
-            margin-bottom: 10px;
-        }
-        button {
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to right, #f9f9f9, #e6f0ff);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 320px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.6rem;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #3a78c2;
+    }
+  </style>
 </head>
 <body>
-    <h2>Login</h2>
+  <div class="login-container">
+    <h2>Đăng nhập</h2>
     <form id="loginForm">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
-        <br>
-        <button type="submit">Login</button>
+      <label for="username">Tên đăng nhập</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="password">Mật khẩu</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit">Đăng nhập</button>
     </form>
+  </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-            try {
-                const response = await fetch('/user/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-                console.log('Response:', data);
-
-                const queryParams = new URLSearchParams(data.user).toString();
-                console.log('Query Params:', queryParams);
-
-                if (data.success) {
-                    console.log('Login successful:', data);
-                    if (data.user.role === 'Customer') {
-                        window.location.href = `/user/customer?${queryParams}`;
-                    } else if (data.user.role === 'Brand') {
-                        window.location.href = `/user/brand?${queryParams}`;
-                    } else if (data.user.role === 'Mall') {
-                        window.location.href = `/user/mall?${queryParams}`;
-                    }
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                alert('Đã xảy ra lỗi khi đăng nhập.');
-            }
+      try {
+        const response = await fetch('/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
         });
-    </script>
+
+        const data = await response.json();
+        const queryParams = new URLSearchParams(data.user).toString();
+
+        if (data.success) {
+          if (data.user.role === 'Customer') {
+            window.location.href = `/user/customer?${queryParams}`;
+          } else if (data.user.role === 'Brand') {
+            window.location.href = `/user/brand?${queryParams}`;
+          } else if (data.user.role === 'Mall') {
+            window.location.href = `/user/mall?${queryParams}`;
+          }
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        alert('Đã xảy ra lỗi khi đăng nhập.');
+      }
+    });
+  </script>
 </body>
 </html>
