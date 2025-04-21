@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+        }
+        input {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/user/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                console.log('Response:', data);
+
+                const queryParams = new URLSearchParams(data.user).toString();
+                console.log('Query Params:', queryParams);
+
+                if (data.success) {
+                    console.log('Login successful:', data);
+                    if (data.user.role === 'Customer') {
+                        window.location.href = `/user/customer?${queryParams}`;
+                    } else if (data.user.role === 'Brand') {
+                        window.location.href = `/user/brand?${queryParams}`;
+                    } else if (data.user.role === 'Mall') {
+                        window.location.href = `/user/mall?${queryParams}`;
+                    }
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Đã xảy ra lỗi khi đăng nhập.');
+            }
+        });
+    </script>
+</body>
+</html>
