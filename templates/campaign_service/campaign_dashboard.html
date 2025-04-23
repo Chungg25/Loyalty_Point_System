@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Chiến Dịch (Tailwind)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font globally */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom styles for alert levels if needed, supplementing Tailwind */
+        .alert.high {
+            background-color: #e6f9ec;
+            /* Tailwind: bg-green-50 */
+            border-left-color: #28a745;
+            /* Tailwind: border-l-green-600 */
+            color: #155724;
+            /* Tailwind: text-green-800 */
+        }
+
+        .alert.medium {
+            background-color: #fffce6;
+            /* Tailwind: bg-yellow-50 */
+            border-left-color: #ffc107;
+            /* Tailwind: border-l-yellow-500 */
+            color: #856404;
+            /* Tailwind: text-yellow-800 */
+        }
+
+        .alert.low {
+            background-color: #ffe6e6;
+            /* Tailwind: bg-red-50 */
+            border-left-color: #dc3545;
+            /* Tailwind: border-l-red-600 */
+            color: #721c24;
+            /* Tailwind: text-red-800 */
+        }
+
+        /* Ensure canvas is responsive */
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container mx-auto max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-indigo-100 p-4 rounded-lg text-indigo-800">
+                <p class="text-sm">Chiến dịch đang hoạt động</p>
+                <p class="text-2xl font-bold" id="totalCampaigns">{{total_campaigns}}</p>
+            </div>
+            <div class="bg-green-100 p-4 rounded-lg text-green-800">
+                <p class="text-sm">Tổng lượt redeem</p>
+                <p class="text-2xl font-bold" id="totalRedeem">{{total_redeem}}</p>
+            </div>
+            <div class="bg-yellow-100 p-4 rounded-lg text-yellow-800">
+                <p class="text-sm">Hiệu suất cao nhất</p>
+                <p class="text-2xl font-bold" id="topCampaign">{{top_redeem_count}}</p>
+            </div>
+        </div>
+
+
+        <div class="filters mb-8 flex flex-wrap gap-4 items-center">
+            <div class="flex-grow min-w-[150px]">
+                <label for="brandFilter" class="block text-sm font-medium text-gray-700 mb-1">Lọc theo thương
+                    hiệu:</label>
+                <select id="brandFilter" onchange="fetchAndRender()"
+                    class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    <option value="">Tất cả</option>
+                    <option value="LV">LV</option>
+                    <option value="Chanel">Chanel</option>
+                    <option value="Dior">Dior</option>
+                    <option value="Prada">Prada</option>
+                    <option value="Celine">Celine</option>
+                </select>
+            </div>
+            <div class="flex-grow min-w-[150px]">
+                <label for="fromDate" class="block text-sm font-medium text-gray-700 mb-1">Từ ngày:</label>
+                <input type="date" id="fromDate" onchange="fetchAndRender()"
+                    class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+            </div>
+            <div class="flex-grow min-w-[150px]">
+                <label for="toDate" class="block text-sm font-medium text-gray-700 mb-1">Đến ngày:</label>
+                <input type="date" id="toDate" onchange="fetchAndRender()"
+                    class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+            </div>
+        </div>
+
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">📊 Hiệu quả các chiến dịch</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <canvas id="campaignChart"></canvas>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">🔔 Thông báo đánh giá</h3>
+            <div id="alerts" class="space-y-3">
+                <div class="alert high p-4 border-l-4 rounded-md"> <strong>Placeholder High
+                        Alert</strong><br><small>Details about the high alert.</small>
+                </div>
+                <div class="alert medium p-4 border-l-4 rounded-md"> <strong>Placeholder Medium
+                        Alert</strong><br><small>Details about the medium alert.</small>
+                </div>
+                <div class="alert low p-4 border-l-4 rounded-md"> <strong>Placeholder Low
+                        Alert</strong><br><small>Details about the low alert.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Store the chart instance globally
+        let campaignChartInstance = null;
+
+        // Function to fetch data and update the dashboard
+        function fetchAndRender() {
+
+            const brand = document.getElementById("brandFilter").value;
+            const from = document.getElementById("fromDate").value;
+            const to = document.getElementById("toDate").value;
+
+            // --- MOCK DATA FOR DEMONSTRATION ---
+            // Replace this with your actual fetch call:
+            const url = `/campaign/campaigns/insights?brand=${brand}&from=${from}&to=${to}`;
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    processData(data);
+                })
+                .catch(error => {
+                    console.error("Error fetching campaign data:", error);
+                    // Display an error message to the user
+                    const alertDiv = document.getElementById("alerts");
+                    alertDiv.innerHTML = `<div class="alert low p-4 border-l-4 rounded-md"><strong>Lỗi tải dữ liệu:</strong><br><small>${error.message}</small></div>`;
+                    // Optionally clear the chart or show an error state
+                    if (campaignChartInstance) {
+                        campaignChartInstance.destroy();
+                        campaignChartInstance = null;
+                    }
+                });
+
+
+        }
+        // Function to process the fetched data and render UI elements
+        function processData(data) {
+            const labels = [];
+            const values = [];
+            const alertDiv = document.getElementById("alerts");
+            alertDiv.innerHTML = ""; // Clear previous alerts
+
+            if (!data || data.length === 0) {
+                alertDiv.innerHTML = `<div class="p-4 text-sm text-gray-700 bg-gray-100 rounded-md">Không có dữ liệu cho lựa chọn hiện tại.</div>`;
+                // Clear the chart if no data
+                if (campaignChartInstance) {
+                    campaignChartInstance.destroy();
+                    campaignChartInstance = null;
+                }
+                return; // Exit if no data
+            }
+
+
+            data.forEach(campaign => {
+                labels.push(campaign.title);
+                values.push(campaign.total_redeem);
+
+                // Create alert box using Tailwind classes where possible
+                const alertBox = document.createElement("div");
+                // Add base classes and specific level class
+                alertBox.className = `alert ${campaign.level} p-4 border-l-4 rounded-md shadow-sm`; // Added shadow-sm
+                alertBox.innerHTML = `<strong class="font-semibold">${campaign.message}</strong><br><small class="text-sm text-gray-600">${campaign.detail}</small>`; // Adjusted text styles
+                alertDiv.appendChild(alertBox);
+            });
+
+            renderChart(labels, values);
+        }
+
+
+        // Function to render the bar chart
+        function renderChart(labels, values) {
+            const ctx = document.getElementById("campaignChart").getContext("2d");
+
+            // Destroy the previous chart instance if it exists
+            if (campaignChartInstance) {
+                campaignChartInstance.destroy();
+            }
+
+            // Create the new chart instance
+            campaignChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượt redeem',
+                        data: values,
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)', // Tailwind blue-500 with opacity
+                        borderColor: 'rgba(59, 130, 246, 1)', // Tailwind blue-500
+                        borderWidth: 1,
+                        borderRadius: 5, // Add rounded corners to bars
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow chart to adjust height based on container
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(209, 213, 219, 0.5)', // Tailwind gray-300 with opacity
+                            },
+                            ticks: {
+                                color: '#4b5563' // Tailwind gray-600
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false // Hide vertical grid lines
+                            },
+                            ticks: {
+                                color: '#4b5563' // Tailwind gray-600
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // Keep legend hidden as per original
+                        },
+                        title: {
+                            display: true,
+                            text: 'Lượt đổi quà theo chiến dịch',
+                            font: {
+                                size: 16, // Slightly larger title
+                                weight: '600' // Bolder title
+                            },
+                            color: '#1f2937' // Tailwind gray-800
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker tooltip
+                            titleFont: { weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 4,
+                            displayColors: false // Hide color box in tooltip
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial load of data when the page loads
+        window.onload = fetchAndRender;
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Chiến Dịch Mới</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.6);
+        }
+
+        .input-error {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 1px #e53e3e;
+        }
+
+        .error-message {
+            color: #c53030;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <nav class="bg-gray-800 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-xl font-semibold">Brand Dashboard</div>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-gray-300">Xem Thông tin</a>
+                <a href="#" class="text-white font-bold border-b-2 border-blue-500 pb-1">Tạo chiến dịch</a>
+                <a href="#" class="hover:text-gray-300">Lịch sử thanh toán</a>
+                <a href="#" class="hover:text-gray-300">Đăng Xuất</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 p-4 sm:p-6">
+        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
+            <h1 class="text-2xl font-bold mb-6 text-gray-800">Tạo Chiến Dịch Mới</h1>
+
+            <form id="createCampaignForm" novalidate>
+                <div class="mb-4">
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề chiến dịch <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="title" name="title" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                        placeholder="Ví dụ: Giảm giá mùa hè">
+                    <p id="title-error" class="error-message hidden"></p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Mô tả <span
+                            class="text-red-500">*</span></label>
+                    <textarea id="description" name="description" rows="3" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                        placeholder="Mô tả chi tiết về chiến dịch"></textarea>
+                    <p id="description-error" class="error-message hidden"></p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="points_required" class="block text-sm font-medium text-gray-700 mb-1">Điểm yêu cầu <span
+                            class="text-red-500">*</span></label>
+                    <input type="number" id="points_required" name="points_required" required min="0"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                        placeholder="Ví dụ: 100">
+                    <p id="points_required-error" class="error-message hidden"></p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="reward" class="block text-sm font-medium text-gray-700 mb-1">Phần thưởng <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="reward" name="reward" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                        placeholder="Ví dụ: Voucher giảm 10%, Cafe miễn phí">
+                    <p id="reward-error" class="error-message hidden"></p>
+                </div>
+
+                <div class="mb-4">
+                    <label for="start_at" class="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu <span
+                            class="text-red-500">*</span></label>
+                    <input type="datetime-local" id="start_at" name="start_at" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                    <p id="start_at-error" class="error-message hidden"></p>
+                </div>
+
+                <div class="mb-6">
+                    <label for="end_at" class="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc <span
+                            class="text-red-500">*</span></label>
+                    <input type="datetime-local" id="end_at" name="end_at" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                    <p id="end_at-error" class="error-message hidden"></p>
+                </div>
+
+                <div id="messageArea" class="mb-4 text-sm font-medium"></div>
+
+                <div class="flex justify-end">
+                    <button type="submit" id="submitButton"
+                        class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                        Tạo Chiến Dịch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('createCampaignForm');
+        const messageArea = document.getElementById('messageArea');
+        const submitButton = document.getElementById('submitButton');
+        const inputs = form.querySelectorAll('input[required], textarea[required]');
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            if (field && errorElement) {
+                field.classList.add('input-error');
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        function clearError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            if (field && errorElement) {
+                field.classList.remove('input-error');
+                errorElement.textContent = '';
+                errorElement.classList.add('hidden');
+            }
+        }
+
+        function validateForm() {
+            let isValid = true;
+            messageArea.textContent = '';
+            messageArea.className = 'mb-4 text-sm font-medium';
+
+            inputs.forEach(input => {
+                clearError(input.id);
+                if (!input.value.trim()) {
+                    showError(input.id, 'Trường này là bắt buộc.');
+                    isValid = false;
+                } else if (input.type === 'number' && input.min !== '' && parseFloat(input.value) < parseFloat(input.min)) {
+                    showError(input.id, `Giá trị phải lớn hơn hoặc bằng ${input.min}.`);
+                    isValid = false;
+                }
+            });
+
+            const startDateInput = document.getElementById('start_at');
+            const endDateInput = document.getElementById('end_at');
+            clearError('end_at');
+
+            if (startDateInput.value && endDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                if (endDate <= startDate) {
+                    showError('end_at', 'Ngày kết thúc phải sau ngày bắt đầu.');
+                    isValid = false;
+                }
+            } else {
+                if (!startDateInput.value) { showError('start_at', 'Trường này là bắt buộc.'); isValid = false; }
+                if (!endDateInput.value) { showError('end_at', 'Trường này là bắt buộc.'); isValid = false; }
+            }
+            return isValid;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value.trim()) { clearError(input.id); }
+                if (input.id === 'start_at' || input.id === 'end_at') {
+                    const start = document.getElementById('start_at').value;
+                    const end = document.getElementById('end_at').value;
+                    if (start && end && new Date(end) > new Date(start)) {
+                        clearError('end_at');
+                    }
+                }
+            });
+            input.addEventListener('blur', () => { validateForm(); });
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!validateForm()) {
+                messageArea.textContent = 'Vui lòng sửa các lỗi trong form.';
+                messageArea.classList.add('text-red-600');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Đang xử lý...';
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+            console.log('Sending data:', JSON.stringify(data));
+
+            try {
+                // Gọi API để tạo chiến dịch
+                const createResponse = await fetch('/campaign/campaigns', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                let createResult;
+                try {
+                    createResult = await createResponse.json();
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON response:', jsonError);
+                    messageArea.textContent = `Lỗi máy chủ hoặc phản hồi không hợp lệ (Status: ${createResponse.status}).`;
+                    messageArea.className = 'mb-4 text-sm font-medium text-red-600';
+                    return;
+                }
+
+                if (createResponse.ok) {
+                    const campaignId = createResult.campaign_id; // Lấy campaign_id từ phản hồi
+                    messageArea.textContent = `Chiến dịch đã được tạo thành công! Mã giảm giá: ${createResult.redemption_code || 'N/A'}`;
+                    messageArea.className = 'mb-4 text-sm font-medium text-green-600';
+
+                    // Gọi API để gửi chiến dịch đi duyệt
+                    try {
+                        const submitResponse = await fetch(`/campaigns/${campaignId}/submit`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({}) // Không cần gửi dữ liệu vì API không yêu cầu
+                        });
+
+                        let submitResult;
+                        try {
+                            submitResult = await submitResponse.json();
+                        } catch (jsonError) {
+                            console.error('Failed to parse JSON response from submit:', jsonError);
+                            messageArea.textContent += ` Nhưng lỗi khi gửi duyệt: Phản hồi không hợp lệ (Status: ${submitResponse.status}).`;
+                            messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
+                            return;
+                        }
+
+                        if (submitResponse.ok) {
+                            messageArea.textContent += ' Đã gửi chiến dịch đi duyệt thành công.';
+                            messageArea.className = 'mb-4 text-sm font-medium text-green-600';
+                        } else {
+                            messageArea.textContent += ` Nhưng lỗi khi gửi duyệt: ${submitResult.error || 'Không thể gửi duyệt.'}`;
+                            messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
+                        }
+                    } catch (submitError) {
+                        console.error('Submit error:', submitError);
+                        messageArea.textContent += ' Nhưng lỗi khi gửi duyệt: Lỗi kết nối hoặc máy chủ.';
+                        messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
+                    }
+
+                    form.reset();
+                    inputs.forEach(input => clearError(input.id));
+                    clearError('end_at');
+                } else {
+                    if (createResponse.status === 401) {
+                        messageArea.textContent = `Lỗi (${createResponse.status}): ${createResult.error || 'Bạn cần đăng nhập để tạo chiến dịch.'}`;
+                    } else {
+                        messageArea.textContent = `Lỗi (${createResponse.status}): ${createResult.error || 'Không thể tạo chiến dịch.'}`;
+                    }
+                    messageArea.className = 'mb-4 text-sm font-medium text-red-600';
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                messageArea.textContent = 'Lỗi kết nối mạng hoặc lỗi máy chủ. Vui lòng thử lại.';
+                messageArea.className = 'mb-4 text-sm font-medium text-red-600';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Tạo Chiến Dịch';
+            }
+        });
+    </script>
+
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'934c9fbc5b00675e',t:'MTc0NTQwMzU4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
