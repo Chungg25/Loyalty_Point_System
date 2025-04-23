@@ -19,27 +19,39 @@
 
         .input-error {
             border-color: #e53e3e;
+            /* red-600 */
             box-shadow: 0 0 0 1px #e53e3e;
         }
 
         .error-message {
             color: #c53030;
+            /* red-700 */
             font-size: 0.875rem;
+            /* text-sm */
             margin-top: 0.25rem;
+            /* mt-1 */
         }
     </style>
 </head>
 
 <body class="bg-gray-100">
 
-    <nav class="bg-gray-800 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="text-xl font-semibold">Brand Dashboard</div>
-            <div class="flex space-x-6">
-                <a href="#" class="hover:text-gray-300">Xem Thông tin</a>
-                <a href="#" class="text-white font-bold border-b-2 border-blue-500 pb-1">Tạo chiến dịch</a>
-                <a href="#" class="hover:text-gray-300">Lịch sử thanh toán</a>
-                <a href="#" class="hover:text-gray-300">Đăng Xuất</a>
+    <nav class="bg-gray-800 text-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-end items-center h-10 text-sm">
+                <span>Xin chào, <span id="usernamePlaceholder" class="font-medium">{{user_name}}</span>!</span>
+            </div>
+            <div class="flex justify-between items-center h-12 border-t border-gray-700">
+                <div class="text-xl font-semibold">Brand Dashboard</div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Xem Thông tin</a>
+                    <a href="#" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+                        aria-current="page">Tạo chiến dịch</a>
+                    <a href="#" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Lịch sử thanh
+                        toán</a>
+                    <a href="/user/logout" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Đăng
+                        Xuất</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -106,7 +118,7 @@
                 <div class="flex justify-end">
                     <button type="submit" id="submitButton"
                         class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
-                        Tạo Chiến Dịch
+                        Tạo Chiến Dịch & Gửi Duyệt
                     </button>
                 </div>
             </form>
@@ -118,6 +130,14 @@
         const messageArea = document.getElementById('messageArea');
         const submitButton = document.getElementById('submitButton');
         const inputs = form.querySelectorAll('input[required], textarea[required]');
+        // Placeholder for username - replace 'Brand User' dynamically
+        const usernamePlaceholder = document.getElementById('usernamePlaceholder');
+        // Example: Set username dynamically if available (e.g., from session storage or server)
+        // const loggedInUsername = sessionStorage.getItem('username'); // Example
+        // if (loggedInUsername) {
+        //    usernamePlaceholder.textContent = loggedInUsername;
+        // }
+
 
         function showError(fieldId, message) {
             const field = document.getElementById(fieldId);
@@ -157,7 +177,7 @@
 
             const startDateInput = document.getElementById('start_at');
             const endDateInput = document.getElementById('end_at');
-            clearError('end_at');
+            clearError('end_at'); // Clear specific date error first
 
             if (startDateInput.value && endDateInput.value) {
                 const startDate = new Date(startDateInput.value);
@@ -167,26 +187,31 @@
                     isValid = false;
                 }
             } else {
+                // Check individual date fields only if the combined check failed or wasn't performed
                 if (!startDateInput.value) { showError('start_at', 'Trường này là bắt buộc.'); isValid = false; }
                 if (!endDateInput.value) { showError('end_at', 'Trường này là bắt buộc.'); isValid = false; }
             }
             return isValid;
         }
 
+        // Add event listeners for validation
         inputs.forEach(input => {
             input.addEventListener('input', () => {
+                // Clear error only for the field being typed in
                 if (input.value.trim()) { clearError(input.id); }
+                // Re-validate date range if either date changes
                 if (input.id === 'start_at' || input.id === 'end_at') {
                     const start = document.getElementById('start_at').value;
                     const end = document.getElementById('end_at').value;
                     if (start && end && new Date(end) > new Date(start)) {
-                        clearError('end_at');
+                        clearError('end_at'); // Clear error if dates become valid
                     }
                 }
             });
-            input.addEventListener('blur', () => { validateForm(); });
+            input.addEventListener('blur', () => { validateForm(); }); // Validate on losing focus
         });
 
+        // Handle form submission
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!validateForm()) {
@@ -197,16 +222,20 @@
 
             submitButton.disabled = true;
             submitButton.textContent = 'Đang xử lý...';
+            messageArea.textContent = ''; // Clear previous messages
+            messageArea.className = 'mb-4 text-sm font-medium'; // Reset message style
 
             const formData = new FormData(form);
             const data = {};
             formData.forEach((value, key) => { data[key] = value; });
 
-            console.log('Sending data:', JSON.stringify(data));
+            console.log('Sending data for creation:', JSON.stringify(data));
 
+            let campaignId = null; // Variable to store the created campaign ID
+
+            // Step 1: Create the campaign
             try {
-                // Gọi API để tạo chiến dịch
-                const createResponse = await fetch('/campaign/campaigns', {
+                const createResponse = await fetch('/campaign/campaigns', { // Ensure this endpoint is correct for your setup
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -219,75 +248,78 @@
                 try {
                     createResult = await createResponse.json();
                 } catch (jsonError) {
-                    console.error('Failed to parse JSON response:', jsonError);
-                    messageArea.textContent = `Lỗi máy chủ hoặc phản hồi không hợp lệ (Status: ${createResponse.status}).`;
-                    messageArea.className = 'mb-4 text-sm font-medium text-red-600';
-                    return;
+                    console.error('Failed to parse JSON from create response:', jsonError);
+                    throw new Error(`Lỗi máy chủ hoặc phản hồi không hợp lệ khi tạo (Status: ${createResponse.status}).`); // Throw error to be caught below
                 }
 
-                if (createResponse.ok) {
-                    const campaignId = createResult.campaign_id; // Lấy campaign_id từ phản hồi
-                    messageArea.textContent = `Chiến dịch đã được tạo thành công! Mã giảm giá: ${createResult.redemption_code || 'N/A'}`;
-                    messageArea.className = 'mb-4 text-sm font-medium text-green-600';
-
-                    // Gọi API để gửi chiến dịch đi duyệt
-                    try {
-                        const submitResponse = await fetch(`/campaigns/${campaignId}/submit`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({}) // Không cần gửi dữ liệu vì API không yêu cầu
-                        });
-
-                        let submitResult;
-                        try {
-                            submitResult = await submitResponse.json();
-                        } catch (jsonError) {
-                            console.error('Failed to parse JSON response from submit:', jsonError);
-                            messageArea.textContent += ` Nhưng lỗi khi gửi duyệt: Phản hồi không hợp lệ (Status: ${submitResponse.status}).`;
-                            messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
-                            return;
-                        }
-
-                        if (submitResponse.ok) {
-                            messageArea.textContent += ' Đã gửi chiến dịch đi duyệt thành công.';
-                            messageArea.className = 'mb-4 text-sm font-medium text-green-600';
-                        } else {
-                            messageArea.textContent += ` Nhưng lỗi khi gửi duyệt: ${submitResult.error || 'Không thể gửi duyệt.'}`;
-                            messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
-                        }
-                    } catch (submitError) {
-                        console.error('Submit error:', submitError);
-                        messageArea.textContent += ' Nhưng lỗi khi gửi duyệt: Lỗi kết nối hoặc máy chủ.';
-                        messageArea.className = 'mb-4 text-sm font-medium text-yellow-600';
-                    }
-
-                    form.reset();
-                    inputs.forEach(input => clearError(input.id));
-                    clearError('end_at');
-                } else {
-                    if (createResponse.status === 401) {
-                        messageArea.textContent = `Lỗi (${createResponse.status}): ${createResult.error || 'Bạn cần đăng nhập để tạo chiến dịch.'}`;
-                    } else {
-                        messageArea.textContent = `Lỗi (${createResponse.status}): ${createResult.error || 'Không thể tạo chiến dịch.'}`;
-                    }
-                    messageArea.className = 'mb-4 text-sm font-medium text-red-600';
+                if (!createResponse.ok) {
+                    // Throw an error with the message from the backend if available
+                    throw new Error(`Lỗi tạo (${createResponse.status}): ${createResult.error || 'Không thể tạo chiến dịch.'}`);
                 }
+
+                // Creation successful, store campaign ID and show initial success message
+                campaignId = createResult.campaign_id; // Make sure backend returns campaign_id
+                if (!campaignId) {
+                    throw new Error('Backend did not return a campaign_id after creation.');
+                }
+                messageArea.textContent = `Đã tạo chiến dịch (ID: ${campaignId})! Mã giảm giá: ${createResult.redemption_code || 'N/A'}. Đang gửi duyệt...`;
+                messageArea.className = 'mb-4 text-sm font-medium text-blue-600'; // Indicate processing next step
 
             } catch (error) {
-                console.error('Submission error:', error);
-                messageArea.textContent = 'Lỗi kết nối mạng hoặc lỗi máy chủ. Vui lòng thử lại.';
+                // Handle errors during creation (network, server, JSON parsing, logical)
+                console.error('Campaign creation error:', error);
+                messageArea.textContent = error.message || 'Lỗi khi tạo chiến dịch. Vui lòng thử lại.';
                 messageArea.className = 'mb-4 text-sm font-medium text-red-600';
+                submitButton.disabled = false; // Re-enable button on failure
+                submitButton.textContent = 'Tạo Chiến Dịch & Gửi Duyệt';
+                return; // Stop the process if creation failed
+            }
+
+            // Step 2: Submit the campaign for approval (only if creation was successful)
+            try {
+                console.log(`Submitting campaign ID: ${campaignId} for approval`);
+                const submitResponse = await fetch(`/campaign/campaigns/${campaignId}/submit`, { // Use correct endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({}) // Empty body as per backend requirement
+                });
+
+                let submitResult;
+                try {
+                    submitResult = await submitResponse.json();
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON from submit response:', jsonError);
+                    throw new Error(`Lỗi máy chủ hoặc phản hồi không hợp lệ khi gửi duyệt (Status: ${submitResponse.status}).`);
+                }
+
+                if (!submitResponse.ok) {
+                    throw new Error(`Lỗi gửi duyệt (${submitResponse.status}): ${submitResult.error || 'Không thể gửi chiến dịch đi duyệt.'}`);
+                }
+
+                // Both steps successful
+                messageArea.textContent = `Chiến dịch (ID: ${campaignId}) đã được tạo và gửi đi duyệt thành công!`;
+                messageArea.className = 'mb-4 text-sm font-medium text-green-600';
+                form.reset();
+                inputs.forEach(input => clearError(input.id));
+                clearError('end_at');
+
+            } catch (error) {
+                // Handle errors during submission step
+                console.error('Campaign submission error:', error);
+                // Update message area to show creation was okay, but submission failed
+                messageArea.textContent = `Đã tạo chiến dịch (ID: ${campaignId}), nhưng ${error.message || 'lỗi khi gửi duyệt.'}`;
+                messageArea.className = 'mb-4 text-sm font-medium text-yellow-600'; // Use yellow for partial success/warning
             } finally {
+                // Re-enable button regardless of submission success/failure, as creation part finished
                 submitButton.disabled = false;
-                submitButton.textContent = 'Tạo Chiến Dịch';
+                submitButton.textContent = 'Tạo Chiến Dịch & Gửi Duyệt';
             }
         });
     </script>
 
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'934c9fbc5b00675e',t:'MTc0NTQwMzU4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
 
 </html>

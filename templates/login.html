@@ -102,23 +102,18 @@
         });
 
         const data = await response.json();
-        const queryParams = new URLSearchParams(data.user).toString();
 
         if (data.success) {
-          if (data.user.role === 'Customer') {
-            window.location.href = `/user/customer?${queryParams}`;
-          } else if (data.user.role === 'Brand') {
-            window.location.href = `/user/brand?${queryParams}`;
-          } else if (data.user.role === 'Mall') {
-            window.location.href = `/user/mall?${queryParams}`;
-          }
+          // Chuyển hướng theo link được gửi từ server
+          window.location.href = data.redirect;
         } else {
           alert(data.message);
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi đăng nhập.');
+        alert('❌ Đã xảy ra lỗi khi đăng nhập.');
       }
     });
+
   </script>
 </body>
 
