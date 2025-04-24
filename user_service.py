@@ -12,6 +12,7 @@ def get_db_connection():
         password="",
         database="user_service"
     )
+
 @user_bp.route('/login', methods=['GET'])
 def login_page():
     return render_template("login.html")

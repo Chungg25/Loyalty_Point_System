@@ -80,23 +80,18 @@ use Notification_Service
 
 CREATE TABLE Notification
 (
-  notification_id INT NOT NULL,
+  notification_id INT AUTO_INCREMENT NOT NULL,
   title VARCHAR(100) NOT NULL,
   message VARCHAR(100) NOT NULL,
   created_at datetime NOT NULL,
   end_at datetime,
+  status bit NOT NULL,
   PRIMARY KEY (notification_id)
 );
 
 create database Point_Service
 go
 use Point_Service
-
-CREATE DATABASE Point_Service;
-GO
-
-USE Point_Service;
-
 -- Ví: Ví điểm của từng user
 CREATE TABLE PointWallet (
   point_wallet_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -119,24 +114,6 @@ CREATE TABLE Point_Log (
   FOREIGN KEY (point_wallet_id) REFERENCES PointWallet(point_wallet_id)
 );
 
--- CREATE TABLE TransactionReference (
---   transaction_id INT PRIMARY KEY,
---   user_id INT NOT NULL,
---   invoice_code VARCHAR(50) NOT NULL,
---   amount DECIMAL(10, 2) NOT NULL,
---   points_earned INT NOT NULL,
---   brand_id INT NOT NULL,
---   status VARCHAR(20) NOT NULL DEFAULT 'SUCCESS', -- PENDING / SUCCESS / REVERSED
---   created_at DATETIME NOT NULL DEFAULT GETDATE()
--- );
-
--- CREATE TABLE CampaignRedemptionReference (
---   redemption_id INT IDENTITY(1,1) PRIMARY KEY,
---   campaign_id INT NOT NULL,
---   brand_name VARCHAR(50) NOT NULL,
---   title VARCHAR(100) NOT NULL
--- );
-
 create database Transaction_Service
 go
 use Transaction_Service
@@ -149,9 +126,9 @@ CREATE TABLE Transactions
   invoice_code VARCHAR(50) NOT NULL,
   amount decimal(10, 2) NOT NULL,
   created_at datetime NOT NULL,
+  user_snapshot NVARCHAR(MAX),
   PRIMARY KEY (transaction_id)
 );
-
 
 create database Advertising_Service
 go
@@ -168,7 +145,32 @@ CREATE TABLE Ad
   PRIMARY KEY (ad_id)
 );
 
+create database Voucher_Service
+go
+use Voucher_Service
+CREATE TABLE Voucher 
+(
+  voucher_id INT AUTO_INCREMENT PRIMARY KEY,
+  brand_id INT DEFAULT NULL,
+  title VARCHAR(255),
+  description TEXT,
+  points_required INT,
+  discount_amount DECIMAL(10,2),
+  created_at DATETIME,
+  start_at DATETIME,
+  end_at DATETIME,
+  approval_comment TEXT
+);
 
+CREATE TABLE Voucher_Redemption (
+  redemption_id INT AUTO_INCREMENT PRIMARY KEY,
+  voucher_id INT,
+  user_id INT,
+  points_spent INT,
+  redeemed_at DATETIME,
+  redemption_code VARCHAR(100),
+  user_snapshot NVARCHAR(MAX)
+);
 
 -- Insert người dùng vào bảng Users với vai trò Customer
 INSERT INTO Users (user_id, username, password, role, created_at, status)
