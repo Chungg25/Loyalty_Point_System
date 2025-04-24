@@ -186,6 +186,7 @@ CREATE TABLE Ad
   created_at datetime NOT NULL,
   PRIMARY KEY (ad_id)
 );
+
 -- Insert dữ liệu mẫu cho bảng Users
 INSERT INTO Users (user_id, username, password, created_at, status) VALUES
 (1, 'john_doe', 'pass123', '2025-04-23 18:06:13', 1),
