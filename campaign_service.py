@@ -148,13 +148,20 @@ def review_campaign(campaign_id):
         cursor.close()
         conn.close()
 
-@campaign_bp.route('/campaigns/<int:campaign_id>', methods=['GET'])
-def get_campaign(campaign_id):
+@campaign_bp.route('/get_campaign_page', methods=['GET'])
+def get_campaign_page():
+    if 'brand_id' not in session:
+        return redirect('/user/login')
+    user_name = session.get('user_name', '')
+    return render_template("campaign_service/get_campaign.html", user_name=user_name, brand_id=session['brand_id'])
+
+@campaign_bp.route('/get_campaign/<int:brand_id>', methods=['GET'])
+def get_campaign(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM Campaign WHERE campaign_id=%s", (campaign_id,))
-        campaign = cursor.fetchone()
+        cursor.execute("SELECT * FROM Campaign WHERE brand_id=%s", (brand_id,))
+        campaign = cursor.fetchall()
         if not campaign:
             return jsonify({"error": "Campaign not found"}), 404
         return jsonify(campaign)
@@ -417,3 +424,70 @@ def campaign_dashboard():
         top_campaign=top_campaign,
         top_redeem_count=top_redeem_count
     )
+
+@campaign_bp.route('/brand_transaction_history_data', methods=['GET']) # Hoặc đặt trong transaction_bp
+def get_brand_transaction_history_data():
+    """API endpoint to get transaction history related to the logged-in brand's campaigns."""
+    if 'brand_id' not in session:
+        return jsonify({"error": "Unauthorized: Brand not logged in or session invalid."}), 401
+
+    logged_in_brand_id = session['brand_id']
+    if not logged_in_brand_id:
+         return jsonify({"error": "Invalid Brand ID in session."}), 401
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection() # Make sure this connects to the correct DB if transactions are separate
+        cursor = conn.cursor(dictionary=True)
+
+        # Query to get redemption history for campaigns belonging to this brand
+        # You might need to JOIN with user tables to get customer names if desired
+        query = """
+            SELECT
+                cr.campaign_redemption_id,
+                cr.user_id,  -- ID của khách hàng đổi quà
+                cr.points_spent,
+                cr.redeemed_at,
+                c.title AS campaign_title,
+                c.campaign_id
+                -- Optional: Join with user_service.Users or user_service.User_Profile if needed
+                -- u.username AS customer_username
+            FROM Campaign_Redemption cr
+            JOIN Campaign c ON cr.campaign_id = c.campaign_id
+            -- Optional JOIN:
+            -- LEFT JOIN user_service.Users u ON cr.user_id = u.user_id
+            WHERE c.brand_id = %s
+            ORDER BY cr.redeemed_at DESC
+        """
+        cursor.execute(query, (logged_in_brand_id,))
+        transactions = cursor.fetchall()
+
+        # Convert datetime objects to ISO format strings
+        for tx in transactions:
+            if tx.get('redeemed_at'):
+                tx['redeemed_at'] = tx['redeemed_at'].isoformat()
+            # Add default values for potentially missing joined fields
+            # tx['customer_username'] = tx.get('customer_username', 'N/A')
+
+        return jsonify(transactions)
+
+    except mysql.connector.Error as err:
+        print(f"Database error fetching brand transaction history: {err}")
+        return jsonify({"error": f"Database error: {err}"}), 500
+    except Exception as e:
+        print(f"Error fetching brand transaction history: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn and conn.is_connected(): conn.close()
+
+# Route để render trang HTML lịch sử thanh toán
+# Đặt trong campaign_bp hoặc service phù hợp
+@campaign_bp.route('/payment_history', methods=['GET'])
+def payment_history_page():
+    """Renders the HTML page for the brand's payment/transaction history."""
+    if 'brand_id' not in session:
+        return redirect('/user/login')
+    user_name = session.get('user_name', '')
+    return render_template("campaign_service/brand_payment_history.html", user_name=user_name)
