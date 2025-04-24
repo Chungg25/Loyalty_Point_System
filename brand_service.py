@@ -29,6 +29,7 @@ def get_brand():
         return jsonify(brands), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+
 @brand_bp.route('/get_brand_id/<brand_id>', methods=['GET'])
 def get_brand_by_id(brand_id):
     try:
@@ -44,6 +45,7 @@ def get_brand_by_id(brand_id):
         return jsonify(brand), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+
 @brand_bp.route('/update_brand', methods=['POST'])
 def update_brand():
     data = request.get_json()

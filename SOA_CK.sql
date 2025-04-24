@@ -109,24 +109,23 @@ use Notification_Service
 
 CREATE TABLE Notification
 (
+<<<<<<< HEAD
+  notification_id INT AUTO_INCREMENT NOT NULL,
+=======
   notification_id INT NOT NULL,
   user_id INT NOT NULL,
+>>>>>>> 7dee5e481f144bf5a1191117fa3f6ee683e28096
   title VARCHAR(100) NOT NULL,
   message VARCHAR(100) NOT NULL,
   created_at datetime NOT NULL,
   end_at datetime,
+  status bit NOT NULL,
   PRIMARY KEY (notification_id)
 );
 
 create database Point_Service
 go
 use Point_Service
-
-CREATE DATABASE Point_Service;
-GO
-
-USE Point_Service;
-
 -- Ví: Ví điểm của từng user
 CREATE TABLE PointWallet (
   point_wallet_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -165,12 +164,18 @@ CREATE TABLE Transactions (
   user_id INT NOT NULL,
   brand_id INT NOT NULL,
   invoice_code VARCHAR(50) NOT NULL,
+<<<<<<< HEAD
+  amount decimal(10, 2) NOT NULL,
+  created_at datetime NOT NULL,
+  user_snapshot NVARCHAR(MAX),
+  PRIMARY KEY (transaction_id)
+=======
   amount DECIMAL(10,2) NOT NULL,
   created_at DATETIME NOT NULL,
   user_snapshot_id INT,
   FOREIGN KEY (user_snapshot_id) REFERENCES user_snapshot(user_snapshot_id)
+>>>>>>> 7dee5e481f144bf5a1191117fa3f6ee683e28096
 );
-
 
 create database Advertising_Service
 go
@@ -419,5 +424,30 @@ LEFT JOIN Point_Log pl
   ON pl.source_id = t.transaction_id AND pl.source_type = 'TRANSACTION' AND pl.type = 'EARN'
 WHERE pl.point_log_id IS NULL;
 
+create database Voucher_Service
+go
+use Voucher_Service
+CREATE TABLE Voucher 
+(
+  voucher_id INT AUTO_INCREMENT PRIMARY KEY,
+  brand_id INT DEFAULT NULL,
+  title VARCHAR(255),
+  description TEXT,
+  points_required INT,
+  discount_amount DECIMAL(10,2),
+  created_at DATETIME,
+  start_at DATETIME,
+  end_at DATETIME,
+  approval_comment TEXT
+);
 
+CREATE TABLE Voucher_Redemption (
+  redemption_id INT AUTO_INCREMENT PRIMARY KEY,
+  voucher_id INT,
+  user_id INT,
+  points_spent INT,
+  redeemed_at DATETIME,
+  redemption_code VARCHAR(100),
+  user_snapshot NVARCHAR(MAX)
+);
 
