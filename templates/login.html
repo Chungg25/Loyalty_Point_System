@@ -104,13 +104,12 @@
         const data = await response.json();
 
         if (data.success) {
-          // Chuyển hướng theo link được gửi từ server
           window.location.href = data.redirect;
         } else {
           alert(data.message);
         }
       } catch (error) {
-        alert('❌ Đã xảy ra lỗi khi đăng nhập.');
+        alert('Đã xảy ra lỗi khi đăng nhập.');
       }
     });
 

@@ -57,7 +57,7 @@ def login():
         session['role'] = 'brand'
         session['brand_id'] = brand['brand_id']
         session['user_name'] = username
-        return jsonify({"success": True, "role": "brand", "redirect": f"/user/brand?user_id={user_id}&username={username}"})
+        return jsonify({"success": True, "role": "brand", "redirect": f"/user/brand?user_id={user_id}&username={username}&brand_id={brand['brand_id']}"})
 
     cursor.execute("SELECT * FROM mall WHERE user_id = %s", (user_id,))
     if cursor.fetchone():
@@ -81,7 +81,9 @@ def customer_page():
 @user_bp.route('/brand')
 def brand_page():
     user_id = request.args.get('user_id')
-    user_name = session.get('user_name', '')
+    user_name = request.args.get('username')
+    brand_id = request.args.get('brand_id')
+    # user_name = session.get('user_name', '')
 
     if not user_id:
         return jsonify({"error": "Thiếu user_id"}), 400
@@ -93,16 +95,15 @@ def brand_page():
     conn.close()
 
     if not brand:
-        session['brand_id'] = None
         return jsonify({"error": "Không tìm thấy thương hiệu cho user_id này"}), 404
 
-    session['brand_id'] = brand['brand_id']
-    return render_template("user_service/brand.html", user={"user_id": user_id, "user_name": user_name, "brand_id": session['brand_id']})
+    return render_template("user_service/brand.html", user={"user_id": user_id, "user_name": user_name, "brand_id": brand_id})
 
 @user_bp.route('/mall')
 def mall_page():
-    user_id = request.args.get('user_id')
-    user_name = session.get('user_name', '')
+    data = request.args
+    user_id = data.get('user_id')
+    user_name = data.get('username')
     return render_template("user_service/mall.html", user={"user_id": user_id, "user_name": user_name})
 
 # API lấy thông tin người dùng
@@ -132,3 +133,75 @@ def logout():
 @user_bp.route('/debug_session')
 def debug_session():
     return jsonify(dict(session))
+
+@user_bp.route('/manage_account', methods=['GET'])
+def manage_account():
+    return render_template("user_service/mall_manage_account.html")
+
+@user_bp.route('/account_customer', methods=['GET'])
+def account_customer():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join customer on users.user_id = customer.user_id")
+    user = cursor.fetchall()
+    conn.close()
+    return jsonify({"user": user}), 200
+
+@user_bp.route('/account_brand', methods=['GET'])
+def account_brand():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join brand on users.user_id = brand.user_id")
+    user = cursor.fetchall()
+    conn.close()
+    return jsonify({"user": user}), 200
+
+@user_bp.route('/account_mall', methods=['GET'])
+def account_mall():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join mall on users.user_id = mall.user_id")
+    user = cursor.fetchall()
+    conn.close()
+    return jsonify({"user": user}), 200
+
+@user_bp.route('/update_status/<int:user_id>/<int:status>', methods=['POST'])
+def update_status(user_id, status):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET status = %s WHERE user_id = %s", (status, user_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"success": True, "message": "Cập nhật trạng thái thành công!"}), 200
+
+
+# Quản lý brand
+@user_bp.route('/manage_brand', methods=['GET'])
+def manage_brand():
+    return render_template("user_service/manage_brand.html")
+
+# Quản lý điểm
+@user_bp.route('/manage_point', methods=['GET'])
+def manage_point():
+    return render_template("user_service/manage_point.html")
+
+# Quản lý chiến dịch
+@user_bp.route('/manage_campaign', methods=['GET'])
+def manage_campaign():
+    return render_template("user_service/manage_campaign.html")
+
+# Quản lý ưu đãi
+@user_bp.route('/manage_discount', methods=['GET'])
+def manage_discount():
+    return render_template("user_service/manage_discount.html")
+
+# Quản lý thông báo
+@user_bp.route('/manage_notification', methods=['GET'])
+def manage_notification():
+    return render_template("user_service/manage_notification.html")
+
+# Báo cáo
+@user_bp.route('/report', methods=['GET'])
+def report():
+    return render_template("user_service/report.html")
