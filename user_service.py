@@ -136,7 +136,9 @@ def debug_session():
 
 @user_bp.route('/manage_account', methods=['GET'])
 def manage_account():
-    return render_template("user_service/mall_manage_account.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/mall_manage_account.html", user={"user_id": user_id, "user_name": user_name})
 
 @user_bp.route('/account_customer', methods=['GET'])
 def account_customer():
@@ -179,29 +181,41 @@ def update_status(user_id, status):
 # Quản lý brand
 @user_bp.route('/manage_brand', methods=['GET'])
 def manage_brand():
-    return render_template("user_service/manage_brand.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/manage_brand.html", user={"user_id": user_id, "user_name": user_name})
 
 # Quản lý điểm
 @user_bp.route('/manage_point', methods=['GET'])
 def manage_point():
-    return render_template("user_service/manage_point.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/manage_point.html", user={"user_id": user_id, "user_name": user_name})
 
 # Quản lý chiến dịch
 @user_bp.route('/manage_campaign', methods=['GET'])
 def manage_campaign():
-    return render_template("user_service/manage_campaign.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/manage_campaign.html", user={"user_id": user_id, "user_name": user_name})
 
 # Quản lý ưu đãi
 @user_bp.route('/manage_discount', methods=['GET'])
 def manage_discount():
-    return render_template("user_service/manage_discount.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/manage_discount.html", user={"user_id": user_id, "user_name": user_name})
 
 # Quản lý thông báo
 @user_bp.route('/manage_notification', methods=['GET'])
 def manage_notification():
-    return render_template("user_service/manage_notification.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/manage_notification.html", user={"user_id": user_id, "user_name": user_name})
 
 # Báo cáo
 @user_bp.route('/report', methods=['GET'])
 def report():
-    return render_template("user_service/report.html")
+    user_id = request.args.get('user_id')
+    user_name = request.args.get('user_name')
+    return render_template("user_service/report.html", user={"user_id": user_id, "user_name": user_name})
