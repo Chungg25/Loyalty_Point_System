@@ -13,10 +13,6 @@ def get_db_connection():
         database="user_service"
     )
 
-<<<<<<< HEAD
-=======
-# Trang đăng nhập (GET)
->>>>>>> 7dee5e481f144bf5a1191117fa3f6ee683e28096
 @user_bp.route('/login', methods=['GET'])
 def login_page():
     return render_template("login.html")
