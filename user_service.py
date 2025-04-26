@@ -76,7 +76,7 @@ def login():
 def customer_page():
     user_id = request.args.get('user_id')
     user_name = session.get('user_name', '')
-    return render_template("user_service/customer.html", user={"user_id": user_id, "user_name": user_name})
+    return render_template("customer.html", user={"user_id": user_id, "user_name": user_name})
 
 @user_bp.route('/brand')
 def brand_page():
@@ -97,14 +97,14 @@ def brand_page():
     if not brand:
         return jsonify({"error": "Không tìm thấy thương hiệu cho user_id này"}), 404
 
-    return render_template("user_service/brand.html", user={"user_id": user_id, "user_name": user_name, "brand_id": brand_id})
+    return render_template("brand.html", user={"user_id": user_id, "user_name": user_name, "brand_id": brand_id})
 
 @user_bp.route('/mall')
 def mall_page():
     data = request.args
     user_id = data.get('user_id')
     user_name = data.get('username')
-    return render_template("user_service/mall.html", user={"user_id": user_id, "user_name": user_name})
+    return render_template("mall.html", user={"user_id": user_id, "user_name": user_name})
 
 # API lấy thông tin người dùng
 @user_bp.route('/infor', methods=['POST'])

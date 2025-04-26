@@ -9,6 +9,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        #profileDropdown {
+            position: absolute;
+            right: 0;
+            top: 100%; /* Đảm bảo dropdown hiển thị ngay dưới nút profile */
+            width: 12rem; /* Độ rộng cố định */
+            margin-right: 1rem; /* Thêm khoảng cách để tránh bị ép sát */
+            z-index: 1000;
+        }
+
+        #profileDropdown a {
+            display: block;
+            padding: 0.5rem 1rem;
+            text-align: left;
+            width: 100%;
+        }
+
         .gradient-bg {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
@@ -233,6 +249,7 @@
                     <div class="relative group">
                         <button id="profileBtn" class="flex items-center space-x-2">
                             <span class="font-medium hidden md:block">Admin Mall</span>
+                            <i class="fas fa-chevron-down"></i> 
                         </button>
                         <div id="profileDropdown"
                             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
@@ -247,7 +264,7 @@
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
                             </div>
                             <div class="py-1 border-t">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
+                                <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
                                     xuất</a>
                             </div>
                         </div>
@@ -1644,6 +1661,20 @@
                     }
                 }
             });
+        }
+    });
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+        profileDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!profileDropdown.classList.contains('hidden')) {
+            profileDropdown.classList.add('hidden');
         }
     });
 </script>
