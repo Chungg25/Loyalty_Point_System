@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Dashboard - Hệ Thống Tích Điểm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #1e40af;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-crown text-2xl"></i>
+                <h1 class="text-2xl font-bold">LoyaltyBrand</h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="relative group">
+                    <button class="flex items-center space-x-2">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-10 h-10 rounded-full">
+                    <span class="font-medium">Admin Brand</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Banner -->
+        <div class="gradient-bg rounded-xl text-white p-6 mb-8 shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Xin chào, Admin Brand!</h2>
+                    <p class="mb-4">Hệ thống giúp bạn tạo chiến dịch ưu đãi, theo dõi thanh toán và tương tác với khách
+                        hàng qua cơ chế tích điểm linh hoạt.</p>
+                    <button
+                        class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all">
+                        <i class="fas fa-plus mr-2"></i> Tạo chiến dịch mới
+                    </button>
+                </div>
+                <div class="hidden md:block">
+                    <img src="https://via.placeholder.com/250" alt="Loyalty Illustration" class="w-64">
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Tổng điểm đã tích</p>
+                        <h3 class="text-2xl font-bold mt-2">12,450</h3>
+                    </div>
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                        <i class="fas fa-coins text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 12% so với tháng trước</p>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Chiến dịch đang chạy</p>
+                        <h3 class="text-2xl font-bold mt-2">5</h3>
+                    </div>
+                    <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                        <i class="fas fa-rocket text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm mt-4">2 chiến dịch sắp kết thúc</p>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Khách hàng tham gia</p>
+                        <h3 class="text-2xl font-bold mt-2">1,245</h3>
+                    </div>
+                    <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 8% so với tháng trước</p>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Đổi quà thành công</p>
+                        <h3 class="text-2xl font-bold mt-2">87</h3>
+                    </div>
+                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
+                        <i class="fas fa-gift text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm mt-4">5 đơn đang chờ xử lý</p>
+            </div>
+        </div>
+
+        <!-- Statistics Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Biểu đồ điểm tích lũy theo tháng -->
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold">Điểm tích lũy theo tháng</h3>
+                    <div class="flex space-x-2">
+                        <button class="text-xs bg-gray-100 px-2 py-1 rounded">6 tháng</button>
+                        <button class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">12 tháng</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pointsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Biểu đồ phân bố khách hàng theo hạng -->
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <h3 class="text-lg font-bold mb-4">Phân bố khách hàng theo hạng</h3>
+                <div class="chart-container">
+                    <canvas id="tierChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Charts Row 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Biểu đồ chiến dịch hiệu quả -->
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <h3 class="text-lg font-bold mb-4">Hiệu quả chiến dịch</h3>
+                <div class="chart-container">
+                    <canvas id="campaignChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Biểu đồ phần thưởng được đổi -->
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <h3 class="text-lg font-bold mb-4">Phần thưởng được đổi nhiều nhất</h3>
+                <div class="chart-container">
+                    <canvas id="rewardChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Tabs -->
+        <div class="mb-8">
+            <div class="flex border-b">
+                <button class="tab-button px-6 py-3 font-medium text-gray-500 tab-active" data-tab="campaigns">
+                    <i class="fas fa-bullhorn mr-2"></i> Chiến dịch
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="payments">
+                    <i class="fas fa-money-bill-wave mr-2"></i> Thanh toán
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="customers">
+                    <i class="fas fa-users mr-2"></i> Khách hàng
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="rewards">
+                    <i class="fas fa-gift mr-2"></i> Phần thưởng
+                </button>
+            </div>
+        </div>
+
+        <div id="campaigns" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Chiến dịch hiện tại</h3>
+                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
+                    <i class="fas fa-plus mr-2"></i> Thêm chiến dịch
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Campaign Card 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            Đang hoạt động
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg">Mua 1 tặng 1</h4>
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tích điểm</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Mua 1 sản phẩm bất kỳ được tặng 1 sản phẩm tương tự</p>
+                        <div class="flex justify-between text-sm text-gray-500 mb-4">
+                            <span><i class="far fa-calendar-alt mr-1"></i> 15/06 - 30/06</span>
+                            <span><i class="fas fa-users mr-1"></i> 245 KH</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Đã đạt 75%</span>
+                            <span>Mục tiêu: 500 KH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaign Card 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            Đang hoạt động
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg">Tích điểm đổi quà</h4>
+                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Đổi quà</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Tích đủ 100 điểm được đổi 1 voucher giảm 20%</p>
+                        <div class="flex justify-between text-sm text-gray-500 mb-4">
+                            <span><i class="far fa-calendar-alt mr-1"></i> 01/06 - 30/06</span>
+                            <span><i class="fas fa-users mr-1"></i> 532 KH</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Đã đạt 45%</span>
+                            <span>Mục tiêu: 1,000 KH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaign Card 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                            Sắp bắt đầu
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg">Sinh nhật thương hiệu</h4>
+                            <span class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">Khuyến mãi</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Giảm 30% cho tất cả sản phẩm trong ngày sinh nhật</p>
+                        <div class="flex justify-between text-sm text-gray-500 mb-4">
+                            <span><i class="far fa-calendar-alt mr-1"></i> 05/07 - 05/07</span>
+                            <span><i class="fas fa-users mr-1"></i> 0 KH</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Chưa bắt đầu</span>
+                            <span>Mục tiêu: 300 KH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-xl font-bold mb-6">Chiến dịch đã kết thúc</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Tên chiến dịch</th>
+                                <th class="py-3 px-4 text-left">Loại</th>
+                                <th class="py-3 px-4 text-left">Thời gian</th>
+                                <th class="py-3 px-4 text-left">Tham gia</th>
+                                <th class="py-3 px-4 text-left">Trạng thái</th>
+                                <th class="py-3 px-4 text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-3 px-4">Ngày vàng 8/3</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tích điểm</span>
+                                </td>
+                                <td class="py-3 px-4">01/03 - 08/03</td>
+                                <td class="py-3 px-4">687 KH</td>
+                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
+                                        kết thúc</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">Black Friday</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Đổi quà</span>
+                                </td>
+                                <td class="py-3 px-4">20/11 - 30/11</td>
+                                <td class="py-3 px-4">1,245 KH</td>
+                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
+                                        kết thúc</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">Tết Nguyên Đán</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">Khuyến mãi</span>
+                                </td>
+                                <td class="py-3 px-4">20/01 - 05/02</td>
+                                <td class="py-3 px-4">2,134 KH</td>
+                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
+                                        kết thúc</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="payments" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Lịch sử thanh toán</h3>
+                <div class="flex space-x-2">
+                    <button
+                        class="bg-white border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all">
+                        <i class="fas fa-filter mr-2"></i> Lọc
+                    </button>
+                    <button
+                        class="bg-white border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all">
+                        <i class="fas fa-download mr-2"></i> Xuất Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Mã giao dịch</th>
+                                <th class="py-3 px-4 text-left">Khách hàng</th>
+                                <th class="py-3 px-4 text-left">Ngày</th>
+                                <th class="py-3 px-4 text-left">Số tiền</th>
+                                <th class="py-3 px-4 text-left">Điểm tích</th>
+                                <th class="py-3 px-4 text-left">Trạng thái</th>
+                                <th class="py-3 px-4 text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-3 px-4">#INV-2023-001</td>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/30" alt="Avatar"
+                                        class="w-8 h-8 rounded-full mr-2">
+                                    Nguyễn Văn A
+                                </td>
+                                <td class="py-3 px-4">15/06/2023</td>
+                                <td class="py-3 px-4 font-medium">1,250,000đ</td>
+                                <td class="py-3 px-4 text-green-500">+125</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">#INV-2023-002</td>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/30" alt="Avatar"
+                                        class="w-8 h-8 rounded-full mr-2">
+                                    Trần Thị B
+                                </td>
+                                <td class="py-3 px-4">14/06/2023</td>
+                                <td class="py-3 px-4 font-medium">850,000đ</td>
+                                <td class="py-3 px-4 text-green-500">+85</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">#INV-2023-003</td>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/30" alt="Avatar"
+                                        class="w-8 h-8 rounded-full mr-2">
+                                    Lê Văn C
+                                </td>
+                                <td class="py-3 px-4">13/06/2023</td>
+                                <td class="py-3 px-4 font-medium">2,500,000đ</td>
+                                <td class="py-3 px-4 text-green-500">+250</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Đang xử
+                                        lý</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">#INV-2023-004</td>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/30" alt="Avatar"
+                                        class="w-8 h-8 rounded-full mr-2">
+                                    Phạm Thị D
+                                </td>
+                                <td class="py-3 px-4">12/06/2023</td>
+                                <td class="py-3 px-4 font-medium">1,750,000đ</td>
+                                <td class="py-3 px-4 text-green-500">+175</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-6 py-4 border-t flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Hiển thị 1-4 của 24 giao dịch</span>
+                    <div class="flex space-x-1">
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">1</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">2</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">3</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers Tab Content (Hidden by default) -->
+        <div id="customers" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Danh sách khách hàng</h3>
+                <div class="flex space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Tìm kiếm khách hàng..."
+                            class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
+                        <i class="fas fa-plus mr-2"></i> Thêm KH
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Tổng khách hàng</p>
+                            <h3 class="text-2xl font-bold mt-2">1,245</h3>
+                        </div>
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Khách hàng mới (30 ngày)</p>
+                            <h3 class="text-2xl font-bold mt-2">87</h3>
+                        </div>
+                        <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                            <i class="fas fa-user-plus text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500">Khách VIP</p>
+                            <h3 class="text-2xl font-bold mt-2">32</h3>
+                        </div>
+                        <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+                            <i class="fas fa-crown text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Khách hàng</th>
+                                <th class="py-3 px-4 text-left">Số điện thoại</th>
+                                <th class="py-3 px-4 text-left">Tổng điểm</th>
+                                <th class="py-3 px-4 text-left">Lần cuối</th>
+                                <th class="py-3 px-4 text-left">Hạng</th>
+                                <th class="py-3 px-4 text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar"
+                                        class="w-10 h-10 rounded-full mr-3">
+                                    <div>
+                                        <p class="font-medium">Nguyễn Văn A</p>
+                                        <p class="text-sm text-gray-500">ID: KH-001</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">0987654321</td>
+                                <td class="py-3 px-4 font-medium text-blue-600">1,250</td>
+                                <td class="py-3 px-4">15/06/2023</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Vàng</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar"
+                                        class="w-10 h-10 rounded-full mr-3">
+                                    <div>
+                                        <p class="font-medium">Trần Thị B</p>
+                                        <p class="text-sm text-gray-500">ID: KH-002</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">0912345678</td>
+                                <td class="py-3 px-4 font-medium text-blue-600">850</td>
+                                <td class="py-3 px-4">14/06/2023</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Bạc</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar"
+                                        class="w-10 h-10 rounded-full mr-3">
+                                    <div>
+                                        <p class="font-medium">Lê Văn C</p>
+                                        <p class="text-sm text-gray-500">ID: KH-003</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">0905123456</td>
+                                <td class="py-3 px-4 font-medium text-blue-600">2,500</td>
+                                <td class="py-3 px-4">13/06/2023</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Kim
+                                        cương</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar"
+                                        class="w-10 h-10 rounded-full mr-3">
+                                    <div>
+                                        <p class="font-medium">Phạm Thị D</p>
+                                        <p class="text-sm text-gray-500">ID: KH-004</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">0978123456</td>
+                                <td class="py-3 px-4 font-medium text-blue-600">1,750</td>
+                                <td class="py-3 px-4">12/06/2023</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Vàng</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800"><i
+                                            class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-6 py-4 border-t flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Hiển thị 1-4 của 1,245 khách hàng</span>
+                    <div class="flex space-x-1">
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">1</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">2</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">3</button>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rewards Tab Content (Hidden by default) -->
+        <div id="rewards" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Danh sách phần thưởng</h3>
+                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
+                    <i class="fas fa-plus mr-2"></i> Thêm phần thưởng
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Reward Card 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            Đang hoạt động
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-lg mb-2">Voucher giảm 20%</h4>
+                        <p class="text-gray-600 mb-4">Giảm 20% cho đơn hàng tiếp theo</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">100 điểm</span>
+                            <span class="text-sm text-gray-500">Còn lại: 45/100</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
+                                    class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reward Card 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            Đang hoạt động
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-lg mb-2">Tặng ly sứ cao cấp</h4>
+                        <p class="text-gray-600 mb-4">Ly sứ in logo thương hiệu</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">250 điểm</span>
+                            <span class="text-sm text-gray-500">Còn lại: 12/50</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 24%"></div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
+                                    class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reward Card 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                    <div class="relative">
+                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                            Tạm ngừng
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-lg mb-2">Voucher giảm 50%</h4>
+                        <p class="text-gray-600 mb-4">Giảm 50% cho đơn hàng từ 500K</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">500 điểm</span>
+                            <span class="text-sm text-gray-500">Còn lại: 0/30</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
+                                    class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('tab-active', 'text-blue-600');
+                    btn.classList.add('text-gray-500');
+                });
+
+                // Add active class to clicked button
+                button.classList.add('tab-active', 'text-blue-600');
+                button.classList.remove('text-gray-500');
+
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+
+                // Show the selected tab content
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+
+        // Initialize Charts
+        function initCharts() {
+            // Biểu đồ đường - Điểm tích lũy theo tháng
+            const pointsCtx = document.getElementById('pointsChart').getContext('2d');
+            const pointsChart = new Chart(pointsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'],
+                    datasets: [{
+                        label: 'Điểm tích lũy',
+                        data: [850, 920, 1020, 1150, 1250, 1340, 1480, 1560, 1420, 1350, 1620, 1840],
+                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                        borderColor: '#1e40af',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ tròn - Phân bố khách hàng theo hạng
+            const tierCtx = document.getElementById('tierChart').getContext('2d');
+            const tierChart = new Chart(tierCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Kim cương', 'Vàng', 'Bạc', 'Đồng'],
+                    datasets: [{
+                        data: [32, 145, 568, 500],
+                        backgroundColor: [
+                            'rgba(30, 64, 175, 0.8)',
+                            'rgba(234, 179, 8, 0.8)',
+                            'rgba(156, 163, 175, 0.8)',
+                            'rgba(180, 83, 9, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ cột - Hiệu quả chiến dịch
+            const campaignCtx = document.getElementById('campaignChart').getContext('2d');
+            const campaignChart = new Chart(campaignCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mua 1 tặng 1', 'Tích điểm đổi quà', 'Sinh nhật thương hiệu', 'Black Friday', 'Tết Nguyên Đán'],
+                    datasets: [{
+                        label: 'Số KH tham gia',
+                        data: [245, 532, 0, 1245, 2134],
+                        backgroundColor: 'rgba(30, 64, 175, 0.7)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ ngang - Phần thưởng được đổi nhiều nhất
+            const rewardCtx = document.getElementById('rewardChart').getContext('2d');
+            const rewardChart = new Chart(rewardCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Voucher 20%', 'Ly sứ cao cấp', 'Voucher 50%', 'Bộ quà tặng', 'Phiếu mua hàng'],
+                    datasets: [{
+                        label: 'Số lần đổi',
+                        data: [55, 38, 30, 22, 18],
+                        backgroundColor: [
+                            'rgba(30, 64, 175, 0.7)',
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(129, 140, 248, 0.7)',
+                            'rgba(165, 180, 252, 0.7)'
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initCharts);
+    </script>
+</body>
+
+</html>

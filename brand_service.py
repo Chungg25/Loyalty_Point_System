@@ -19,16 +19,33 @@ def get_brand():
     try: 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM Brand")
+        cursor.execute("SELECT * FROM brand")
         brands = cursor.fetchall()
         cursor.close()
         conn.close()
 
         if not brands:
             return jsonify({"error": "No brands found"}), 404
-        return jsonify(brands), 200
+        return jsonify({"brands": brands}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@brand_bp.route('/get_contract/<int:brand_id>', methods=['GET'])
+def get_contract(brand_id):
+    try: 
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM contract join brand on contract.brand_id = brand.brand_id where brand.brand_id = %s", (brand_id,))
+        contract = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if not contract:
+            return jsonify({"error": "No contract found"}), 404
+        return jsonify({"contract": contract}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
 
 @brand_bp.route('/get_brand_id/<brand_id>', methods=['GET'])
 def get_brand_by_id(brand_id):

@@ -29,7 +29,7 @@ def login():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+    cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s AND status = 1", (username, password))
     user = cursor.fetchone()
 
     if not user:
@@ -177,6 +177,19 @@ def update_status(user_id, status):
 
     return jsonify({"success": True, "message": "Cập nhật trạng thái thành công!"}), 200
 
+# Lấy thông tin user theo ID
+@user_bp.route('/get_user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        return jsonify({"success": True, "user": user}), 200
+    else:
+        return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
 
 # Quản lý brand
 @user_bp.route('/manage_brand', methods=['GET'])

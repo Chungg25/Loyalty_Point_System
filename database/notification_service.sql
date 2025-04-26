@@ -1,4 +1,18 @@
-INSERT INTO Notification (notification_id, title, message, created_at, end_at, status)VALUES
+create database Notification_Service;
+use Notification_Service;
+
+CREATE TABLE Notification
+(
+  notification_id INT IDENTITY(1,1) PRIMARY KEY,
+  title VARCHAR(100) NOT NULL,
+  message VARCHAR(100) NOT NULL,
+  created_at datetime NOT NULL,
+  end_at datetime,
+  status bit NOT NULL,
+  PRIMARY KEY (notification_id)
+);
+
+INSERT INTO Notification (notification_id, title, message, created_at, end_at, status) VALUES
 (1, 'Khuyến mãi đặc biệt', 'Nhận ngay 20% điểm thưởng cho đơn hàng đầu tiên!', '2025-04-21 10:00:00', '2025-05-21 10:00:00', 1),
 (2, 'Giảm giá mùa hè', 'Giảm giá 30% cho tất cả sản phẩm trong tháng 6!', '2025-04-22 11:00:00', '2025-06-30 11:00:00', 1),
 (3, 'Chương trình tích điểm', 'Tích lũy điểm thưởng cho mỗi giao dịch!', '2025-04-23 12:00:00', NULL, 1),

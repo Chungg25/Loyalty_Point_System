@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tài khoản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Reset Cơ bản --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- Kiểu dáng Body --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Kiểu dáng Thanh điều hướng (Navbar) --- */
+        .navbar {
+            background-color: #2c3e50;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 12px 18px;
+            display: inline-block;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.95em;
+            border-radius: 4px;
+            margin: 5px 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #34495e;
+            color: #ffffff;
+        }
+
+        /* --- Kiểu dáng Lời chào --- */
+        .greeting {
+            background-color: #ffffff;
+            color: #34495e;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 1.1em;
+        }
+
+        .greeting strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* --- Kiểu dáng Container Nội dung chính --- */
+        .container {
+            flex-grow: 1;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .account-details {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 1200px; /* Tăng kích thước tối đa */
+            overflow-x: auto; /* Thêm thanh cuộn ngang khi cần */
+        }
+
+        .account-details h2 {
+            color: #34495e;
+            font-size: 1.6em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            text-align: left;
+        }
+
+        #brand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; /* Để bo góc bảng */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #brand-table thead th {
+            background-color: #f0f0f0;
+            color: #2c3e50;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        #brand-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #brand-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #brand-table tbody tr:hover {
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+
+        #brand-table tbody td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        #contract-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; /* Để bo góc bảng */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #contract-table thead th {
+            background-color: #f0f0f0;
+            color: #2c3e50;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        #contract-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #contract-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #contract-table tbody tr:hover {
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+
+        #contract-table tbody td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        #brand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden; /* Để bo góc bảng */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #brand-table thead th {
+            background-color: #f0f0f0;
+            color: #2c3e50;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        #brand-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #brand-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #brand-table tbody tr:hover {
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+
+        #brand-table tbody td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            width: 100px; /* Kích thước cố định */
+            text-align: center;
+        }
+
+        .status-toggle.active {
+            background-color: #2ecc71;
+            color: #ffffff;
+        }
+
+        .status-toggle.inactive {
+            background-color: #e74c3c;
+            color: #ffffff;
+        }
+
+        .status-toggle:hover {
+            opacity: 0.8;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .navbar {
+                justify-content: space-around;
+            }
+
+            .navbar a {
+                padding: 10px 12px;
+                margin: 5px;
+                font-size: 0.9em;
+            }
+
+            .container h1 {
+                font-size: 1.8em;
+            }
+
+            .account-details {
+                padding: 20px;
+            }
+
+            #brand-table thead {
+                display: none; /* Ẩn tiêu đề bảng trên màn hình nhỏ */
+            }
+
+            #brand-table tbody td {
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding-left: 50%; /* Để có khoảng trống cho tiêu đề giả */
+                position: relative;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            #brand-table tbody td:before {
+                content: attr(data-label); /* Lấy giá trị từ thuộc tính data-label */
+                position: absolute;
+                left: 10px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            #brand-table tbody tr {
+                margin-bottom: 15px; /* Thêm khoảng cách giữa các hàng giả */
+                display: block;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            #brand-table tbody td:last-child {
+                border-bottom: none;
+            }
+
+            #brand-table thead {
+                display: none; /* Ẩn tiêu đề bảng trên màn hình nhỏ */
+            }
+
+            #brand-table tbody td {
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding-left: 50%; /* Để có khoảng trống cho tiêu đề giả */
+                position: relative;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            #brand-table tbody td:before {
+                content: attr(data-label); /* Lấy giá trị từ thuộc tính data-label */
+                position: absolute;
+                left: 10px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            #brand-table tbody tr {
+                margin-bottom: 15px; /* Thêm khoảng cách giữa các hàng giả */
+                display: block;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            #brand-table tbody td:last-child {
+                border-bottom: none;
+            }
+
+            #contract-table thead {
+                display: none; /* Ẩn tiêu đề bảng trên màn hình nhỏ */
+            }
+
+            #contract-table tbody td {
+                display: block;
+                width: 100%;
+                text-align: left;
+                padding-left: 50%; /* Để có khoảng trống cho tiêu đề giả */
+                position: relative;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            #contract-table tbody td:before {
+                content: attr(data-label); /* Lấy giá trị từ thuộc tính data-label */
+                position: absolute;
+                left: 10px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            #contract-table tbody tr {
+                margin-bottom: 15px; /* Thêm khoảng cách giữa các hàng giả */
+                display: block;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            #contract-table tbody td:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* --- Tab Styles --- */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            color: #333;
+            cursor: pointer;
+            margin: 0 10px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+
+        .tab-button.active {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/user/manage_account?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý tài khoản</a>
+        <a href="/user/manage_brand?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý Brand</a>
+        <a href="/user/manage_point?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý chính sách điểm</a>
+        <a href="/user/manage_campaign?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý chiến dịch</a>
+        <a href="/user/manage_discount?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý ưu đãi</a>
+        <a href="/user/manage_notification?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Quản lý thông báo</a>
+        <a href="/user/report?user_id={{ user.user_id }}&user_name={{ user.user_name }}">Báo cáo</a>
+        <a href="/user/logout">Đăng Xuất</a>
+    </div>
+
+    <div class="container">
+        <h1>Quản lý Tài khoản</h1>
+
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="brand">Thông tin brand</button>
+        </div>
+
+        <div class="account-details tab-content active" id="brand">
+            <h2>Danh sách Thông tin các brand</h2>
+            <table id="brand-table">
+                <thead>
+                    <tr>
+                        <th>Tên brand</th>
+                        <th>Email</th>
+                        <th>Hệ số</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="account-details tab-content active" id="contract">
+            <h2>Danh sách Thông tin hợp đồng</h2>
+            <table id="contract-table">
+                <thead>
+                    <tr>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Ngày tạo</th>
+                        <th>Người tạo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                button.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+
+                if (tabName === 'brand') {
+                    fetchBrands();
+                } else if (tabName === 'contract') {
+                    fetchBrands();
+                } else if (tabName === 'mall') {
+                    fetchMalls();
+                }
+            });
+        });
+
+        function switchToTab(tabName) {
+            tabButtons.forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tabName);
+            });
+            tabContents.forEach(c => {
+                c.classList.toggle('active', c.id === tabName);
+            });
+
+            if (tabName === 'brand') {
+                fetchBrands();
+            } else if (tabName === 'contract') {
+                if (selectedBrandId) {
+                    fetchContract(selectedBrandId);
+                }
+            } else if (tabName === 'mall') {
+                fetchMalls();
+            }
+        }
+
+
+        async function fetchBrands() {
+            try {
+                const response = await fetch('/brand/get_brand');
+                const data = await response.json();
+                const userTableBody = document.querySelector('#brand-table tbody');
+                userTableBody.innerHTML = '';
+
+                data.brands.forEach(brands => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-brand-id', brand.brand_id);
+                    row.innerHTML = `
+                        <td data-label="Tên đăng nhập">${brands.brandname}</td>
+                        <td data-label="Email">${brands.email}</td>
+                        <td data-label="Hệ số">${brands.coefficient}</td>
+                        <td data-label="Trạng thái">
+                            <button class="status-toggle ${brands.status == 1 ? 'active' : 'inactive'}" 
+                                    disabled>
+                                ${brands.status == 1 ? 'Hoạt động' : 'Ngừng hoạt động'}
+                            </button>
+                        </td>
+                    `;
+
+                    row.addEventListener('click', function () {
+                        selectedBrandId = brands.brand_id;
+                        switchToTab('contract');
+                    });
+                    userTableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Lỗi khi gọi API:', error);
+                alert('Đã xảy ra lỗi khi tải danh sách người dùng.');
+            }
+        }
+
+        async function fetchContract(brandId) {
+            try {
+                const response = await fetch(`/brand/get_contract/${brandId}`);
+                const data = await response.json();
+                const userTableBody = document.querySelector('#contract-table tbody');
+                userTableBody.innerHTML = '';
+
+                for (const contract of data.contract) {
+                    let userName = 'Không rõ';
+
+                    try {
+                        const userResponse = await fetch(`/user/get_user/${contract.user_id}`);
+                        const userData = await userResponse.json();
+                        if (userData.success) {
+                            userName = userData.user.username;
+                        }
+                    } catch (userError) {
+                        console.warn('Lỗi khi lấy user:', userError);
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td data-label="start_at">${contract.start_at}</td>
+                        <td data-label="end_at">${contract.end_at}</td>
+                        <td data-label="create_at">${contract.created_at}</td>
+                        <td data-label="user">${userName}</td>
+                    `;
+                    userTableBody.appendChild(row);
+                }
+
+            } catch (error) {
+                console.error('Lỗi khi gọi API:', error);
+                alert('Đã xảy ra lỗi khi tải danh sách người dùng.');
+            }
+        }
+
+        function attachStatusEvent() {
+            document.querySelectorAll('.status-toggle').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const userId = button.dataset.userId;
+                    const currentStatus = parseInt(button.dataset.status);
+                    const newStatus = currentStatus === 1 ? 0 : 1;
+
+                    try {
+                        const updateResponse = await fetch(`/user/update_status/${userId}/${newStatus}`, {
+                            method: 'POST',
+                        });
+
+                        if (updateResponse.ok) {
+                            button.dataset.status = newStatus;
+                            button.textContent = newStatus === 1 ? 'Hoạt động' : 'Ngừng hoạt động';
+                            button.classList.toggle('active', newStatus === 1);
+                            button.classList.toggle('inactive', newStatus === 0);
+                        } else {
+                            alert('Không thể cập nhật trạng thái người dùng.');
+                        }
+                    } catch (error) {
+                        console.error('Lỗi khi cập nhật trạng thái:', error);
+                        alert('Đã xảy ra lỗi khi cập nhật trạng thái người dùng.');
+                    }
+                });
+            });
+        }
+
+        window.onload = () => {
+            document.querySelector('[data-tab="brand"]').click();
+        };
+    </script>
+</body>
+</html>
