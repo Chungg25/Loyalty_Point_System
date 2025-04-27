@@ -1783,7 +1783,7 @@
             const response = await fetch(`/campaign/campaigns/${campaignId}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ decision, comment })
+                body: JSON.stringify({ decision })
             });
             const data = await response.json();
             if (response.ok) {
