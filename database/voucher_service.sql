@@ -11,7 +11,10 @@ CREATE TABLE Voucher
   created_at DATETIME,
   start_at DATETIME,
   end_at DATETIME,
-  approval_comment TEXT
+  approval_comment TEXT,
+  stock INT DEFAULT 100,
+  initial_stock INT DEFAULT 100;
+
 );
 
 CREATE TABLE Voucher_Redemption (

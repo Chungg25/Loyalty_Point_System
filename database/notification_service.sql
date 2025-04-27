@@ -3,7 +3,7 @@ use Notification_Service;
 
 CREATE TABLE Notification
 (
-  notification_id INT IDENTITY(1,1) PRIMARY KEY,
+  notification_id INT AUTO_INCREMENT,
   title VARCHAR(100) NOT NULL,
   message VARCHAR(100) NOT NULL,
   created_at datetime NOT NULL,

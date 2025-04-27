@@ -73,11 +73,27 @@ def login():
 
 # Trang tương ứng mỗi vai trò
 @user_bp.route('/customer')
+
 def customer_page():
     user_id = request.args.get('user_id')
     user_name = session.get('user_name', '')
-    return render_template("customer.html", user={"user_id": user_id, "user_name": user_name})
-
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT membertype FROM customer WHERE user_id = %s", (user_id,))
+    customer = cursor.fetchone()
+    conn.close()
+    # Map membertype to membership name
+    membertype_map = {
+        1: 'Thành viên Bạc',
+        2: 'Thành viên Vàng',
+        3: 'Thành viên Kim cương'
+    }
+    if customer and customer['membertype'] in membertype_map:
+        membership = membertype_map[customer['membertype']]
+    else:
+        membership = 'Thành viên'
+    return render_template("customer.html", user={"user_id": user_id, "user_name": user_name, "membership": membership})
 @user_bp.route('/brand')
 def brand_page():
     user_id = request.args.get('user_id')
@@ -274,3 +290,62 @@ def report():
     user_id = request.args.get('user_id')
     user_name = request.args.get('user_name')
     return render_template("user_service/report.html", user={"user_id": user_id, "user_name": user_name})
+
+@user_bp.route('/get_customers/<int:brand_id>', methods=['GET'])
+def get_customers(brand_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT up.user_id, up.fullname AS name, 
+                   CONCAT('KH-', LPAD(up.user_id, 3, '0')) AS customer_code, 
+                   up.phone, 
+                   COALESCE(pw.total_points, 0) AS total_points, 
+                   DATE_FORMAT(t.max_date, '%d/%m/%Y') AS last_transaction_date,
+                   CASE 
+                       WHEN c.membertype = 3 THEN 'Kim cương'
+                       WHEN c.membertype = 2 THEN 'Vàng'
+                       WHEN c.membertype = 1 THEN 'Bạc'
+                       ELSE 'Đồng'
+                   END AS tier
+            FROM user_profile up
+            JOIN customer c ON up.user_id = c.user_id
+            LEFT JOIN point_service.pointwallet pw ON up.user_id = pw.user_id
+            LEFT JOIN (
+                SELECT user_id, MAX(created_at) AS max_date
+                FROM point_service.transactions
+                WHERE brand_id = %s
+                GROUP BY user_id
+            ) t ON up.user_id = t.user_id
+            WHERE up.user_id IN (
+                SELECT DISTINCT user_id 
+                FROM point_service.transactions 
+                WHERE brand_id = %s
+            )
+            LIMIT 4 -- Match dashboard pagination
+        """, (brand_id, brand_id))
+        customers = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        if not customers:
+            return jsonify({"error": "No customers found"}), 404
+        return jsonify({"customers": customers}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+@user_bp.route('/get_total_customers/<int:brand_id>', methods=['GET'])
+def get_total_customers(brand_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT COUNT(DISTINCT t.user_id) AS total_customers
+            FROM point_service.transactions t
+            WHERE t.brand_id = %s
+        """, (brand_id,))
+        total_customers = cursor.fetchone()['total_customers']
+        cursor.close()
+        conn.close()
+        return jsonify({"total_customers": total_customers}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

@@ -28,8 +28,20 @@ CREATE TABLE User_Profile (
 CREATE TABLE Customer (
   membertype INT NOT NULL,
   user_id INT NOT NULL PRIMARY KEY,
-  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+  FOREIGN KEY (membertype) REFERENCES Users(membertype)
 );
+
+CREATE TABLE MemberTypeCoefficient (
+  membertype INT PRIMARY KEY,
+  member_coefficient FLOAT NOT NULL
+);
+
+-- Thêm hệ số cho từng hạng
+INSERT INTO MemberTypeCoefficient (membertype, member_coefficient) VALUES
+  (1, 1.0),   -- Thành viên Bạc
+  (2, 1.2),   -- Thành viên Vàng
+  (3, 1.5);   -- Thành viên Kim cương
+
 
 -- Bảng Mall
 CREATE TABLE Mall (
