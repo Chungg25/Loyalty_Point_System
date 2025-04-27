@@ -13,11 +13,8 @@
             position: absolute;
             right: 0;
             top: 100%;
-            /* Đảm bảo dropdown hiển thị ngay dưới nút profile */
             width: 12rem;
-            /* Độ rộng cố định */
             margin-right: 1rem;
-            /* Thêm khoảng cách để tránh bị ép sát */
             z-index: 1000;
         }
 
@@ -81,6 +78,70 @@
         .mobile-sidebar.open {
             transform: translateX(0);
         }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1e40af;
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 600px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
@@ -124,7 +185,7 @@
                         <i class="fas fa-coins w-6"></i>
                         <span>Chính sách điểm</span>
                     </a>
-                    <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg transition-all"
+                    <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg transition-all active"
                         data-target="campaigns">
                         <i class="fas fa-bullhorn w-6"></i>
                         <span>Chiến dịch</span>
@@ -147,6 +208,7 @@
                 </div>
             </nav>
         </div>
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden"></div>
     </div>
 
     <!-- Sidebar -->
@@ -182,7 +244,7 @@
                     <i class="fas fa-coins w-6"></i>
                     <span>Chính sách điểm</span>
                 </a>
-                <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg transition-all"
+                <a href="#" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg transition-all active"
                     data-target="campaigns">
                     <i class="fas fa-bullhorn w-6"></i>
                     <span>Chiến dịch</span>
@@ -251,16 +313,14 @@
                     </div>
                     <div class="relative group">
                         <button id="profileBtn" class="flex items-center space-x-2">
-                            <span class="font-medium hidden md:block"> {{user.user_name}}</span>
+                            <span class="font-medium hidden md:block">{{ user.user_name | default('Admin') }}</span>
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div id="profileDropdown"
                             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                             <div class="p-4 border-b">
-                                <h3 class="font-bold text-gray-800">{{user.user_name}}</h3>
-                                <p class="text-xs text-gray-500"><a href="/cdn-cgi/l/email-protection"
-                                        class="__cf_email__"
-                                        data-cfemail="044520292d2a04292528286a272b29">[email&#160;protected]</a></p>
+                                <h3 class="font-bold text-gray-800">{{ user.user_name | default('Admin') }}</h3>
+                                <p class="text-xs text-gray-500">admin@mallmanagement.com</p>
                             </div>
                             <div class="py-1">
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
@@ -268,8 +328,7 @@
                             </div>
                             <div class="py-1 border-t">
                                 <a href="/user/logout"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
-                                    xuất</a>
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
                             </div>
                         </div>
                     </div>
@@ -285,11 +344,11 @@
                 <div class="gradient-bg rounded-xl text-white p-6 mb-8 shadow-lg">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div>
-                            <h2 class="text-2xl font-bold mb-2">Xin chào, {{user.user_name}}!</h2>
+                            <h2 class="text-2xl font-bold mb-2">Xin chào, {{ user.user_name | default('Admin') }}!</h2>
                             <p class="mb-4">Hệ thống quản lý toàn diện cho trung tâm thương mại của bạn.</p>
-                            <button
+                            <button onclick="window.location.href='/campaign/create_campaign';"
                                 class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all">
-                                <i class="fas fa-plus mr-2"></i> Tạo chiến dịch mới
+                                <i class="fas fa-plus mr-2"></i> Tạo ưu đãi mới
                             </button>
                         </div>
                     </div>
@@ -508,9 +567,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Toàn quyền truy cập hệ thống</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        8
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Sửa</a>
@@ -523,9 +580,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Quản lý thông tin và hợp đồng Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        12
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Sửa</a>
@@ -538,9 +593,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Quản lý khách hàng</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        24
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Sửa</a>
@@ -722,21 +775,14 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        #CON12345
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12345
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Nike Store</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/05/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        14/05/2024
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        120 triệu/tháng
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/05/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14/05/2024</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">120 triệu/tháng</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
@@ -748,21 +794,14 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        #CON12344
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12344
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Starbucks</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        01/03/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        28/02/2024
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        85 triệu/tháng
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/03/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28/02/2024</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">85 triệu/tháng</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
@@ -774,21 +813,14 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        #CON12333
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12333
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Apple Store</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        10/01/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        09/01/2024
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        150 triệu/tháng
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10/01/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">09/01/2024</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">150 triệu/tháng</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
@@ -933,12 +965,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Tất cả Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        1,000đ = 1 điểm
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        01/01/2023 - 31/12/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1,000đ = 1 điểm</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/01/2023 -
+                                        31/12/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
@@ -956,12 +985,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Brand thời trang</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        800đ = 1 điểm
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/06/2023 - 15/09/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">800đ = 1 điểm</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/06/2023 -
+                                        15/09/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
@@ -979,12 +1005,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Brand F&B</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        500đ = 1 điểm
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        01/07/2023 - 31/08/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">500đ = 1 điểm</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/07/2023 -
+                                        31/08/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Đã
@@ -1007,7 +1030,8 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="" alt="Reward" class="w-full h-40 object-cover">
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=Voucher+100k" alt="Reward"
+                                class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Voucher 100k</h4>
                                 <p class="text-sm text-gray-500 mb-2">Giảm 100k cho hóa đơn từ 500k</p>
@@ -1020,7 +1044,8 @@
                             </div>
                         </div>
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="" alt="Reward" class="w-full h-40 object-cover">
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=Ly+Starbucks" alt="Reward"
+                                class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Ly Starbucks</h4>
                                 <p class="text-sm text-gray-500 mb-2">Ly cao cấp từ Starbucks</p>
@@ -1033,7 +1058,8 @@
                             </div>
                         </div>
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="" alt="Reward" class="w-full h-40 object-cover">
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=Túi+Vải" alt="Reward"
+                                class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Túi vải thời trang</h4>
                                 <p class="text-sm text-gray-500 mb-2">Túi vải cao cấp in logo mall</p>
@@ -1053,10 +1079,6 @@
             <div data-content id="campaigns">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold">Chiến dịch ưu đãi</h3>
-                    <button
-                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
-                        <i class="fas fa-plus mr-2"></i> Tạo chiến dịch
-                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -1136,12 +1158,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">32 Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        24/11/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        26/11/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24/11/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26/11/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
@@ -1162,29 +1180,21 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Tất cả Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/10/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/11/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/10/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/11/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
                                             chạy</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-green-600 font-medium">+15%
-                                        </div>
+                                        <div class="text-sm text-green-600 font-medium">+15%</div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
                                     </td>
-
                                 </tr>
-
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">Giáng sinh</div>
@@ -1192,12 +1202,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Tất cả Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        24/12/2023
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        26/12/2023
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24/12/2023</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26/12/2023</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
@@ -1206,13 +1212,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">-</div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
                                     </td>
                                 </tr>
-
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">Tết Nguyên Đán</div>
@@ -1220,22 +1224,16 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">Tất cả Brand</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        01/01/2024
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        05/01/2024
-                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/01/2024</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/01/2024</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
                                             chạy</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-green-600 font-medium">+20%
-                                        </div>
+                                        <div class="text-sm text-green-600 font-medium">+20%</div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
                                         <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
@@ -1245,10 +1243,20 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Pending Campaigns Review -->
+                <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover mb-8">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Chiến dịch chờ duyệt</h3>
+                    <div id="pending-campaigns-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="loading-overlay">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Notifications Content -->
-            <div data-content id="notifications" class="hidden">
+            <div data-content id="notifications">
                 <div class="bg-white rounded-xl p-6 shadow-md">
                     <h3 class="text-xl font-bold mb-4">Thông báo</h3>
                     <div class="space-y-4">
@@ -1286,7 +1294,7 @@
             </div>
 
             <!-- Promotions Content -->
-            <div data-content id="promotions" class="hidden">
+            <div data-content id="promotions">
                 <div class="bg-white rounded-xl p-6 shadow-md">
                     <h3 class="text-xl font-bold mb-4">Ưu đãi</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1326,7 +1334,7 @@
             </div>
 
             <!-- Reports Content -->
-            <div data-content id="reports" class="hidden">
+            <div data-content id="reports">
                 <div class="bg-white rounded-xl p-6 shadow-md">
                     <h3 class="text-xl font-bold mb-4">Báo cáo</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1373,12 +1381,51 @@
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'935f9c3148aebd60',t:'MTc0NTYwMjY2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    <!-- Modal for Campaign Review -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Duyệt Chiến Dịch</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-campaign-details" class="mb-4">
+                <p><strong>Tên:</strong> <span id="modal-campaign-title"></span></p>
+                <p><strong>Mô tả:</strong> <span id="modal-campaign-description"></span></p>
+                <p><strong>Điểm yêu cầu:</strong> <span id="modal-campaign-points"></span></p>
+                <p><strong>Phần thưởng:</strong> <span id="modal-campaign-reward"></span></p>
+                <p><strong>Thời gian:</strong> <span id="modal-campaign-time"></span></p>
+            </div>
+            <form id="review-form" class="space-y-4">
+                <div>
+                    <label for="decision" class="block text-sm font-medium text-gray-700">Quyết định <span
+                            class="text-red-500">*</span></label>
+                    <select id="decision" name="decision" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <option value="">Chọn quyết định</option>
+                        <option value="APPROVED">Chấp thuận</option>
+                        <option value="REJECTED">Từ chối</option>
+                    </select>
+                </div>
+
+                <div id="modal-message" class="hidden"></div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeModal()"
+                        class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Hủy
+                    </button>
+                    <button type="submit"
+                        class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+                        <i class="fas fa-check mr-2"></i> Gửi quyết định
+                    </button>
+                </div>
+                </formLIB>
+        </div>
+    </div>
 
 </html>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Lấy các phần tử
@@ -1455,30 +1502,7 @@
         }
 
         // Khởi tạo biểu đồ trong phần báo cáo
-        const revenueReportCtx = document.getElementById('revenueReportChart')?.getContext('2d');
-        if (revenueReportCtx) {
-            const revenueReportChart = new Chart(revenueReportCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-                    datasets: [{
-                        label: 'Doanh thu',
-                        data: [100, 150, 200, 180, 220, 250],
-                        borderColor: '#1e40af',
-                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        }
+
     });
 
     const profileBtn = document.getElementById('profileBtn');
@@ -1571,7 +1595,6 @@
         try {
             const response = await fetch('/point/monthly_revenue');
             const data = await response.json();
-            console.log(data);
             const revenueCountElement = document.getElementById('monthly-revenue');
             revenueCountElement.textContent = data.total;
         } catch (error) {
@@ -1656,10 +1679,137 @@
                 return 'bg-gray-100 text-gray-800';
         }
     }
+    async function drawMonthlyRevenueChart() {
+        try {
+            const response = await fetch('/point/monthly_revenue_chart');
+            const data = await response.json();
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            // Đảo ngược để tháng cũ lên trước
+            const months = data.months.slice().reverse();
+            const totals = data.totals.slice().reverse();
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Doanh thu (VND)',
+                        data: totals,
+                        backgroundColor: 'rgba(30, 64, 175, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => value.toLocaleString('vi-VN')
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi vẽ biểu đồ doanh thu:', error);
+        }
+    }
+    async function loadPendingCampaigns() {
+        const container = document.getElementById('pending-campaigns-container');
+        container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+        try {
+            // Gọi API lấy danh sách chiến dịch chờ duyệt
+            const response = await fetch('/campaign/campaigns/pending');
+            const data = await response.json();
+
+            if (!data.campaigns || data.campaigns.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-8">Không có chiến dịch chờ duyệt.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            data.campaigns.forEach(campaign => {
+                const card = `
+                <div class="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg mb-2">${campaign.title}</h4>
+                        <p class="text-gray-600 mb-1">${campaign.description || ''}</p>
+                        <p class="text-sm text-gray-500 mb-1"><strong>Điểm yêu cầu:</strong> ${campaign.points_required}</p>
+                        <p class="text-sm text-gray-500 mb-1"><strong>Phần thưởng:</strong> ${campaign.reward}</p>
+                        <p class="text-sm text-gray-500 mb-1"><strong>Thời gian:</strong> ${campaign.start_at} - ${campaign.end_at}</p>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all" onclick="openReviewModal(${campaign.campaign_id})">
+                            Duyệt
+                        </button>
+                    </div>
+                </div>
+            `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        } catch (error) {
+            container.innerHTML = `<div class="error-message">Lỗi khi tải chiến dịch chờ duyệt.</div>`;
+            console.error('Lỗi khi tải chiến dịch chờ duyệt:', error);
+        }
+    }
+
+    function openReviewModal(campaignId) {
+        document.getElementById('review-form').setAttribute('data-campaign-id', campaignId);
+        document.getElementById('review-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('review-modal').style.display = 'none';
+    }
+
+    document.getElementById('review-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const campaignId = this.getAttribute('data-campaign-id');
+        const decision = document.getElementById('decision').value;
+        const messageDiv = document.getElementById('modal-message');
+        messageDiv.classList.add('hidden');
+
+        if (!decision) {
+            messageDiv.textContent = 'Vui lòng chọn quyết định!';
+            messageDiv.classList.remove('hidden');
+            messageDiv.classList.remove('success-message');
+            messageDiv.classList.add('error-message');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/campaign/campaigns/${campaignId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decision, comment })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                messageDiv.textContent = 'Cập nhật thành công!';
+                messageDiv.classList.remove('hidden', 'error-message');
+                messageDiv.classList.add('success-message');
+                setTimeout(() => {
+                    closeModal();
+                    loadPendingCampaigns();
+                }, 1000);
+            } else {
+                messageDiv.textContent = data.error || 'Có lỗi xảy ra!';
+                messageDiv.classList.remove('hidden', 'success-message');
+                messageDiv.classList.add('error-message');
+            }
+        } catch (error) {
+            messageDiv.textContent = 'Lỗi khi duyệt chiến dịch!';
+            messageDiv.classList.remove('hidden', 'success-message');
+            messageDiv.classList.add('error-message');
+        }
+    });
 
     // Gọi hàm khi trang được tải
     document.addEventListener('DOMContentLoaded', function () {
         fetchRunningCampaigns();
+        drawMonthlyRevenueChart();
         monthlyRevenue();
         fetchBrandCount();
         fetchCountUsers();
@@ -1667,5 +1817,6 @@
         fetchCountAmin();
         fetchCountUser();
         loadBrands();
+        loadPendingCampaigns();
     });
 </script>

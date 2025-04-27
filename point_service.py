@@ -104,7 +104,7 @@ def monthly_vevenue():
         cursor.execute("""
             SELECT  SUM(t.amount) AS total
             FROM Transactions t
-            GROUP BY MONTH(t.created_at)
+            WHERE MONTH(t.created_at) = MONTH(CURRENT_DATE())
         """)
         result = cursor.fetchone()
         cursor.close()

@@ -4,7 +4,6 @@ from user_service import user_bp
 from brand_service import brand_bp
 from campaign_service import campaign_bp
 from notification_service import notification_bp
-from transaction_service import transaction_bp
 from point_service import point_bp
 from voucher_service import voucher_bp
 
@@ -18,7 +17,6 @@ app.register_blueprint(user_bp, url_prefix="/user")
 app.register_blueprint(brand_bp, url_prefix="/brand")
 app.register_blueprint(campaign_bp, url_prefix="/campaign")
 app.register_blueprint(notification_bp, url_prefix="/notification")
-app.register_blueprint(transaction_bp, url_prefix="/transaction")
 app.register_blueprint(point_bp, url_prefix="/point")
 app.register_blueprint(voucher_bp, url_prefix="/voucher")
 

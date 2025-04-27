@@ -136,32 +136,46 @@ def submit_campaign(campaign_id):
     finally:
         cursor.close()
         conn.close()
-
+@campaign_bp.route('/campaigns/pending', methods=['GET'])
+def get_pending_campaigns():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT campaign_id, title, description, points_required, reward, start_at, end_at FROM Campaign WHERE status = 'Đang chờ duyệt'")
+        campaigns = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({"campaigns": campaigns}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @campaign_bp.route('/campaigns/<int:campaign_id>/review', methods=['POST'])
 def review_campaign(campaign_id):
     data = request.json
     decision = data.get('decision')
-    comment = data.get('comment', '')
 
     if decision not in ['APPROVED', 'REJECTED']:
         return jsonify({"error": "Invalid decision"}), 400
+
+    # Chuyển decision thành status phù hợp với DB
+    if decision == 'APPROVED':
+        status = 'Đang hoạt động'  # hoặc 'ĐANG HOẠT ĐỘNG' nếu bạn lưu tiếng Việt
+    else:
+        status = 'Từ chối'
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE Campaign SET status=%s, approval_comment=%s WHERE campaign_id=%s AND status='PENDING_APPROVAL'",
-            (decision, comment, campaign_id)
+            "UPDATE Campaign SET status=%s WHERE campaign_id=%s AND status='Đang chờ duyệt'",
+            (status, campaign_id)
         )
-        if cursor.rowcount == 0:
-            return jsonify({"error": "Campaign not found or not in PENDING_APPROVAL status"}), 400
         conn.commit()
-        return jsonify({"message": f"Campaign {decision.lower()} successfully."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
         cursor.close()
         conn.close()
+        return jsonify({"message": "Cập nhật thành công"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @campaign_bp.route('/get_campaign_page', methods=['GET'])
 def get_campaign_page():
