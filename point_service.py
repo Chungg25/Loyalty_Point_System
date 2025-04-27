@@ -95,3 +95,48 @@ def get_payments(brand_id):
         return jsonify({"payments": payments}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@point_bp.route('/monthly_revenue', methods=['GET'])
+def monthly_vevenue():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT  SUM(t.amount) AS total
+            FROM Transactions t
+            GROUP BY MONTH(t.created_at)
+        """)
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        total = result['total'] or 0
+        # Format thành chuỗi tiền tệ VND
+        formatted_total = "{:,.0f}".format(total)
+        return jsonify({"total": formatted_total}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    
+@point_bp.route('/monthly_revenue_chart', methods=['GET'])
+def monthly_revenue():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT 
+                DATE_FORMAT(t.created_at, '%m/%Y') AS month,
+                SUM(t.amount) AS total
+            FROM Transactions t
+            GROUP BY YEAR(t.created_at), MONTH(t.created_at)
+            ORDER BY YEAR(t.created_at) DESC, MONTH(t.created_at) DESC
+        """)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        # Trả về mảng các tháng và doanh thu
+        months = [row['month'] for row in results]
+        totals = [float(row['total']) for row in results]
+        return jsonify({"months": months, "totals": totals}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

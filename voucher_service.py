@@ -166,7 +166,9 @@ def get_rewards(brand_id):
                 CASE 
                     WHEN NOW() BETWEEN start_at AND end_at THEN 'Đang hoạt động'
                     ELSE 'Hết hạn'
-                END AS status
+                END AS status,
+                stock ,
+                initial_stock   
             FROM voucher
             WHERE brand_id = %s
         """, (brand_id,))

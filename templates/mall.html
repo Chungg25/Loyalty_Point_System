@@ -12,9 +12,12 @@
         #profileDropdown {
             position: absolute;
             right: 0;
-            top: 100%; /* Đảm bảo dropdown hiển thị ngay dưới nút profile */
-            width: 12rem; /* Độ rộng cố định */
-            margin-right: 1rem; /* Thêm khoảng cách để tránh bị ép sát */
+            top: 100%;
+            /* Đảm bảo dropdown hiển thị ngay dưới nút profile */
+            width: 12rem;
+            /* Độ rộng cố định */
+            margin-right: 1rem;
+            /* Thêm khoảng cách để tránh bị ép sát */
             z-index: 1000;
         }
 
@@ -248,13 +251,13 @@
                     </div>
                     <div class="relative group">
                         <button id="profileBtn" class="flex items-center space-x-2">
-                            <span class="font-medium hidden md:block">Admin Mall</span>
-                            <i class="fas fa-chevron-down"></i> 
+                            <span class="font-medium hidden md:block"> {{user.user_name}}</span>
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <div id="profileDropdown"
                             class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                             <div class="p-4 border-b">
-                                <h3 class="font-bold text-gray-800">Admin Mall</h3>
+                                <h3 class="font-bold text-gray-800">{{user.user_name}}</h3>
                                 <p class="text-xs text-gray-500"><a href="/cdn-cgi/l/email-protection"
                                         class="__cf_email__"
                                         data-cfemail="044520292d2a04292528286a272b29">[email&#160;protected]</a></p>
@@ -264,7 +267,8 @@
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
                             </div>
                             <div class="py-1 border-t">
-                                <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
+                                <a href="/user/logout"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
                                     xuất</a>
                             </div>
                         </div>
@@ -281,7 +285,7 @@
                 <div class="gradient-bg rounded-xl text-white p-6 mb-8 shadow-lg">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div>
-                            <h2 class="text-2xl font-bold mb-2">Xin chào, Admin Mall!</h2>
+                            <h2 class="text-2xl font-bold mb-2">Xin chào, {{user.user_name}}!</h2>
                             <p class="mb-4">Hệ thống quản lý toàn diện cho trung tâm thương mại của bạn.</p>
                             <button
                                 class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all">
@@ -297,7 +301,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Tổng số Brand</p>
-                                <h3 id="brand-count" class="text-2xl font-bold mt-2">86</h3>
+                                <h3 id="brand-count" class="text-2xl font-bold mt-2"></h3>
                             </div>
                             <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
                                 <i class="fas fa-store-alt text-xl"></i>
@@ -324,7 +328,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Khách hàng tham gia</p>
-                                <h3 id="user_count" class="text-2xl font-bold mt-2">15,245</h3>
+                                <h3 id="user_count" class="text-2xl font-bold mt-2"></h3>
                             </div>
                             <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
                                 <i class="fas fa-users text-xl"></i>
@@ -338,7 +342,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Doanh thu tháng</p>
-                                <h3 class="text-2xl font-bold mt-2">3.2 tỷ</h3>
+                                <h3 id="monthly-revenue" class="text-2xl font-bold mt-2"></h3>
                             </div>
                             <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
                                 <i class="fas fa-money-bill-wave text-xl"></i>
@@ -461,7 +465,7 @@
                                 data-tab="mall">Mall</button>
                         </nav>
                     </div>
-                
+
                     <!-- Table Container -->
                     <div class="overflow-x-auto">
                         <table id="data-table" class="min-w-full divide-y divide-gray-200">
@@ -560,21 +564,33 @@
 
                 <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
                     <div class="overflow-x-auto">
-                      <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                          <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tầng</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày hợp đồng</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
-                          </tr>
-                        </thead>
-                        <tbody id="brand-table-body" class="bg-white divide-y divide-gray-200">
-                          <!-- Data sẽ được thêm ở đây -->
-                        </tbody>
-                      </table>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Brand</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Loại</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tầng</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ngày hợp đồng</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Trạng thái</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brand-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Data sẽ được thêm ở đây -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -991,8 +1007,7 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="https://via.placeholder.com/300x200" alt="Reward"
-                                class="w-full h-40 object-cover">
+                            <img src="" alt="Reward" class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Voucher 100k</h4>
                                 <p class="text-sm text-gray-500 mb-2">Giảm 100k cho hóa đơn từ 500k</p>
@@ -1005,8 +1020,7 @@
                             </div>
                         </div>
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="https://via.placeholder.com/300x200" alt="Reward"
-                                class="w-full h-40 object-cover">
+                            <img src="" alt="Reward" class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Ly Starbucks</h4>
                                 <p class="text-sm text-gray-500 mb-2">Ly cao cấp từ Starbucks</p>
@@ -1019,8 +1033,7 @@
                             </div>
                         </div>
                         <div class="border rounded-lg overflow-hidden transition-all hover:shadow-md">
-                            <img src="https://via.placeholder.com/300x200" alt="Reward"
-                                class="w-full h-40 object-cover">
+                            <img src="" alt="Reward" class="w-full h-40 object-cover">
                             <div class="p-4">
                                 <h4 class="font-medium">Túi vải thời trang</h4>
                                 <p class="text-sm text-gray-500 mb-2">Túi vải cao cấp in logo mall</p>
@@ -1500,9 +1513,8 @@
         try {
             const response = await fetch('/campaign/count_campaigns');
             const data = await response.json();
-
             const campaignCountElement = document.getElementById('campaign-count');
-            campaignCountElement.textContent = data.total_campaigns;
+            campaignCountElement.textContent = data.total;
         } catch (error) {
             console.error('Lỗi khi gọi API:', error);
         }
@@ -1555,6 +1567,17 @@
             console.error('Lỗi khi gọi API:', error);
         }
     }
+    async function monthlyRevenue() {
+        try {
+            const response = await fetch('/point/monthly_revenue');
+            const data = await response.json();
+            console.log(data);
+            const revenueCountElement = document.getElementById('monthly-revenue');
+            revenueCountElement.textContent = data.total;
+        } catch (error) {
+            console.error('Lỗi khi gọi API:', error);
+        }
+    }
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -1566,23 +1589,23 @@
 
     async function loadBrands() {
         try {
-            const response = await fetch('/brand/get_brand'); 
+            const response = await fetch('/brand/get_brand');
             const brand = await response.json();
             const brands = brand.brands;
 
             const tbody = document.getElementById('brand-table-body');
-            tbody.innerHTML = ''; 
+            tbody.innerHTML = '';
 
             brands.forEach(brand => {
 
                 if (brand.status !== 1) {
-                    return; 
+                    return;
                 }
                 const statusColor = getStatusColor(brand.status);
 
                 const startDate = formatDate(brand.start_at);
                 const endDate = formatDate(brand.end_at);
-                
+
                 const row = `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -1618,25 +1641,26 @@
                 </tr>
                 `;
                 tbody.insertAdjacentHTML('beforeend', row);
-        });
+            });
 
         } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
+            console.error('Lỗi khi tải dữ liệu:', error);
         }
     }
 
     function getStatusColor(status) {
         switch (status) {
-        case '1':
-            return 'bg-green-100 text-green-800';
-        default:
-            return 'bg-gray-100 text-gray-800';
+            case '1':
+                return 'bg-green-100 text-green-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
         }
     }
 
     // Gọi hàm khi trang được tải
     document.addEventListener('DOMContentLoaded', function () {
         fetchRunningCampaigns();
+        monthlyRevenue();
         fetchBrandCount();
         fetchCountUsers();
         fetchCountTotalUser();
