@@ -9,920 +9,1383 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Gradient background for header and banner */
         .gradient-bg {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
 
+        /* Hover effect for cards */
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
+        /* Smooth transitions */
         .transition-all {
             transition: all 0.3s ease;
         }
 
+        /* Style for active tab */
         .tab-active {
             border-bottom: 3px solid #1e40af;
             color: #1e40af;
             font-weight: 600;
         }
 
+        /* Container for charts to ensure responsiveness */
         .chart-container {
             position: relative;
-            height: 100%;
+            height: 300px;
+            /* Adjust height as needed */
             width: 100%;
+        }
+
+        /* Placeholder for loading/error states */
+        .placeholder-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+            /* Adjust as needed */
+            color: #6b7280;
+            /* gray-500 */
+            font-style: italic;
+            text-align: center;
+        }
+
+        .error-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+            /* Adjust as needed */
+            color: #ef4444;
+            /* red-500 */
+            font-style: italic;
+            text-align: center;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1e40af;
+            /* blue-800 */
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
         }
     </style>
 </head>
 
 <body class="bg-gray-50 font-sans">
-    <!-- Header -->
-    <header class="gradient-bg text-white shadow-lg">
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <i class="fas fa-crown text-2xl"></i>
                 <h1 class="text-2xl font-bold">LoyaltyBrand</h1>
             </div>
             <div class="flex items-center space-x-6">
-                <div class="relative group">
-                    <button class="flex items-center space-x-2">
+                <!-- <div class="relative group">
+                    <button class="flex items-center space-x-2 focus:outline-none">
                         <i class="fas fa-bell text-xl"></i>
                         <span
                             class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                     </button>
-                </div>
+                </div> -->
                 <div class="flex items-center space-x-2">
-                    <img src="https://via.placeholder.com/40" alt="Avatar" class="w-10 h-10 rounded-full">
-                    <span class="font-medium">Admin Brand</span>
+                    <img src="https://placehold.co/40x40/e2e8f0/334155?text=A" alt="Avatar quản trị viên"
+                        class="w-10 h-10 rounded-full border-2 border-white">
+                    <span class="font-medium hidden sm:inline">{{user.user_name}}</span>
+                    <button class="text-gray-300 hover:text-white focus:outline-none ml-2">
+                        <a href="/user/logout" class="fas fa-sign-out-alt"></a>
+                    </button>
                 </div>
+
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <!-- Welcome Banner -->
-        <div class="gradient-bg rounded-xl text-white p-6 mb-8 shadow-lg">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                    <h2 class="text-2xl font-bold mb-2">Xin chào, Admin Brand!</h2>
-                    <p class="mb-4">Hệ thống giúp bạn tạo chiến dịch ưu đãi, theo dõi thanh toán và tương tác với khách
-                        hàng qua cơ chế tích điểm linh hoạt.</p>
+    <main class="container mx-auto px-4 py-8">
+        <section aria-labelledby="welcome-heading"
+            class="gradient-bg rounded-xl text-white p-6 mb-8 shadow-lg flex flex-col md:flex-row justify-between items-center">
+            <div class="flex-1 mb-4 md:mb-0 md:mr-6">
+                <h2 id="welcome-heading" class="text-2xl font-bold mb-2">Xin chào, Admin Brand!</h2>
+                <p class="mb-4">Hệ thống giúp bạn tạo chiến dịch ưu đãi, theo dõi thanh toán và tương tác với khách hàng
+                    qua cơ chế tích điểm linh hoạt.</p>
+                <button onclick="window.location.href='/campaign/create_campaign';"
+                    class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-700 focus:ring-white">
+                    <i class="fas fa-plus mr-2"></i> Tạo chiến dịch mới
+                </button>
+            </div>
+            <div class="flex-shrink-0">
+                <img src="https://placehold.co/256x160/ffffff/1e40af?text=Illustration"
+                    alt="Minh họa hệ thống tích điểm" class="w-64 h-40 object-contain rounded">
+            </div>
+        </section>
+
+        <section aria-labelledby="quick-stats-heading">
+            <h3 id="quick-stats-heading" class="sr-only">Thống kê nhanh</h3>
+            <div id="quick-stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[120px]">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[120px]">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[120px]">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[120px]">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="charts-heading" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <h3 id="charts-heading" class="sr-only">Biểu đồ thống kê</h3>
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <h4 class="text-lg font-bold mb-4 text-gray-800">Hiệu quả chiến dịch (Số KH tham gia)</h4>
+                <div class="chart-container" id="campaignChartContainer">
+                    <canvas id="campaignChart" style="display: none;"></canvas>
+                    <div class="placeholder-message loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="error-message hidden">Không thể tải dữ liệu biểu đồ.</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <h4 class="text-lg font-bold mb-4 text-gray-800">Phần thưởng được đổi nhiều nhất</h4>
+                <div class="chart-container" id="rewardChartContainer">
+                    <canvas id="rewardChart" style="display: none;"></canvas>
+                    <div class="placeholder-message loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="error-message hidden">Không thể tải dữ liệu biểu đồ.</div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-label="Khu vực quản lý chính">
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex -mb-px space-x-6" aria-label="Tabs">
                     <button
-                        class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all">
-                        <i class="fas fa-plus mr-2"></i> Tạo chiến dịch mới
-                    </button>
-                </div>
-                <div class="hidden md:block">
-                    <img src="https://via.placeholder.com/250" alt="Loyalty Illustration" class="w-64">
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-500">Tổng điểm đã tích</p>
-                        <h3 class="text-2xl font-bold mt-2">12,450</h3>
-                    </div>
-                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
-                        <i class="fas fa-coins text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 12% so với tháng trước</p>
-            </div>
-
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-500">Chiến dịch đang chạy</p>
-                        <h3 class="text-2xl font-bold mt-2">5</h3>
-                    </div>
-                    <div class="bg-green-100 text-green-600 p-3 rounded-lg">
-                        <i class="fas fa-rocket text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-gray-500 text-sm mt-4">2 chiến dịch sắp kết thúc</p>
-            </div>
-
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-500">Khách hàng tham gia</p>
-                        <h3 class="text-2xl font-bold mt-2">1,245</h3>
-                    </div>
-                    <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
-                        <i class="fas fa-users text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 8% so với tháng trước</p>
-            </div>
-
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-500">Đổi quà thành công</p>
-                        <h3 class="text-2xl font-bold mt-2">87</h3>
-                    </div>
-                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
-                        <i class="fas fa-gift text-xl"></i>
-                    </div>
-                </div>
-                <p class="text-gray-500 text-sm mt-4">5 đơn đang chờ xử lý</p>
-            </div>
-        </div>
-
-        <!-- Statistics Charts Row 1 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Biểu đồ điểm tích lũy theo tháng -->
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">Điểm tích lũy theo tháng</h3>
-                    <div class="flex space-x-2">
-                        <button class="text-xs bg-gray-100 px-2 py-1 rounded">6 tháng</button>
-                        <button class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">12 tháng</button>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="pointsChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Biểu đồ phân bố khách hàng theo hạng -->
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <h3 class="text-lg font-bold mb-4">Phân bố khách hàng theo hạng</h3>
-                <div class="chart-container">
-                    <canvas id="tierChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statistics Charts Row 2 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Biểu đồ chiến dịch hiệu quả -->
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <h3 class="text-lg font-bold mb-4">Hiệu quả chiến dịch</h3>
-                <div class="chart-container">
-                    <canvas id="campaignChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Biểu đồ phần thưởng được đổi -->
-            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                <h3 class="text-lg font-bold mb-4">Phần thưởng được đổi nhiều nhất</h3>
-                <div class="chart-container">
-                    <canvas id="rewardChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Tabs -->
-        <div class="mb-8">
-            <div class="flex border-b">
-                <button class="tab-button px-6 py-3 font-medium text-gray-500 tab-active" data-tab="campaigns">
-                    <i class="fas fa-bullhorn mr-2"></i> Chiến dịch
-                </button>
-                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="payments">
-                    <i class="fas fa-money-bill-wave mr-2"></i> Thanh toán
-                </button>
-                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="customers">
-                    <i class="fas fa-users mr-2"></i> Khách hàng
-                </button>
-                <button class="tab-button px-6 py-3 font-medium text-gray-500" data-tab="rewards">
-                    <i class="fas fa-gift mr-2"></i> Phần thưởng
-                </button>
-            </div>
-        </div>
-
-        <div id="campaigns" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Chiến dịch hiện tại</h3>
-                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
-                    <i class="fas fa-plus mr-2"></i> Thêm chiến dịch
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Campaign Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            Đang hoạt động
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg">Mua 1 tặng 1</h4>
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tích điểm</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Mua 1 sản phẩm bất kỳ được tặng 1 sản phẩm tương tự</p>
-                        <div class="flex justify-between text-sm text-gray-500 mb-4">
-                            <span><i class="far fa-calendar-alt mr-1"></i> 15/06 - 30/06</span>
-                            <span><i class="fas fa-users mr-1"></i> 245 KH</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500">
-                            <span>Đã đạt 75%</span>
-                            <span>Mục tiêu: 500 KH</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Campaign Card 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            Đang hoạt động
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg">Tích điểm đổi quà</h4>
-                            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Đổi quà</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Tích đủ 100 điểm được đổi 1 voucher giảm 20%</p>
-                        <div class="flex justify-between text-sm text-gray-500 mb-4">
-                            <span><i class="far fa-calendar-alt mr-1"></i> 01/06 - 30/06</span>
-                            <span><i class="fas fa-users mr-1"></i> 532 KH</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 45%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500">
-                            <span>Đã đạt 45%</span>
-                            <span>Mục tiêu: 1,000 KH</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Campaign Card 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Campaign" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                            Sắp bắt đầu
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-lg">Sinh nhật thương hiệu</h4>
-                            <span class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">Khuyến mãi</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Giảm 30% cho tất cả sản phẩm trong ngày sinh nhật</p>
-                        <div class="flex justify-between text-sm text-gray-500 mb-4">
-                            <span><i class="far fa-calendar-alt mr-1"></i> 05/07 - 05/07</span>
-                            <span><i class="fas fa-users mr-1"></i> 0 KH</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500">
-                            <span>Chưa bắt đầu</span>
-                            <span>Mục tiêu: 300 KH</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8">
-                <h3 class="text-xl font-bold mb-6">Chiến dịch đã kết thúc</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-3 px-4 text-left">Tên chiến dịch</th>
-                                <th class="py-3 px-4 text-left">Loại</th>
-                                <th class="py-3 px-4 text-left">Thời gian</th>
-                                <th class="py-3 px-4 text-left">Tham gia</th>
-                                <th class="py-3 px-4 text-left">Trạng thái</th>
-                                <th class="py-3 px-4 text-left"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="py-3 px-4">Ngày vàng 8/3</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tích điểm</span>
-                                </td>
-                                <td class="py-3 px-4">01/03 - 08/03</td>
-                                <td class="py-3 px-4">687 KH</td>
-                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
-                                        kết thúc</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4">Black Friday</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Đổi quà</span>
-                                </td>
-                                <td class="py-3 px-4">20/11 - 30/11</td>
-                                <td class="py-3 px-4">1,245 KH</td>
-                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
-                                        kết thúc</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4">Tết Nguyên Đán</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">Khuyến mãi</span>
-                                </td>
-                                <td class="py-3 px-4">20/01 - 05/02</td>
-                                <td class="py-3 px-4">2,134 KH</td>
-                                <td class="py-3 px-4"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Đã
-                                        kết thúc</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab Content -->
-        <div id="payments" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Lịch sử thanh toán</h3>
-                <div class="flex space-x-2">
-                    <button
-                        class="bg-white border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all">
-                        <i class="fas fa-filter mr-2"></i> Lọc
+                        class="tab-button px-1 py-3 font-medium text-gray-500 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent tab-active"
+                        data-tab="campaigns" role="tab" aria-controls="campaigns-panel" aria-selected="true">
+                        <i class="fas fa-bullhorn mr-2"></i> Chiến dịch
                     </button>
                     <button
-                        class="bg-white border border-gray-300 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all">
-                        <i class="fas fa-download mr-2"></i> Xuất Excel
+                        class="tab-button px-1 py-3 font-medium text-gray-500 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent"
+                        data-tab="payments" role="tab" aria-controls="payments-panel" aria-selected="false">
+                        <i class="fas fa-money-bill-wave mr-2"></i> Thanh toán
                     </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-3 px-4 text-left">Mã giao dịch</th>
-                                <th class="py-3 px-4 text-left">Khách hàng</th>
-                                <th class="py-3 px-4 text-left">Ngày</th>
-                                <th class="py-3 px-4 text-left">Số tiền</th>
-                                <th class="py-3 px-4 text-left">Điểm tích</th>
-                                <th class="py-3 px-4 text-left">Trạng thái</th>
-                                <th class="py-3 px-4 text-left"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="py-3 px-4">#INV-2023-001</td>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/30" alt="Avatar"
-                                        class="w-8 h-8 rounded-full mr-2">
-                                    Nguyễn Văn A
-                                </td>
-                                <td class="py-3 px-4">15/06/2023</td>
-                                <td class="py-3 px-4 font-medium">1,250,000đ</td>
-                                <td class="py-3 px-4 text-green-500">+125</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4">#INV-2023-002</td>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/30" alt="Avatar"
-                                        class="w-8 h-8 rounded-full mr-2">
-                                    Trần Thị B
-                                </td>
-                                <td class="py-3 px-4">14/06/2023</td>
-                                <td class="py-3 px-4 font-medium">850,000đ</td>
-                                <td class="py-3 px-4 text-green-500">+85</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4">#INV-2023-003</td>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/30" alt="Avatar"
-                                        class="w-8 h-8 rounded-full mr-2">
-                                    Lê Văn C
-                                </td>
-                                <td class="py-3 px-4">13/06/2023</td>
-                                <td class="py-3 px-4 font-medium">2,500,000đ</td>
-                                <td class="py-3 px-4 text-green-500">+250</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Đang xử
-                                        lý</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4">#INV-2023-004</td>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/30" alt="Avatar"
-                                        class="w-8 h-8 rounded-full mr-2">
-                                    Phạm Thị D
-                                </td>
-                                <td class="py-3 px-4">12/06/2023</td>
-                                <td class="py-3 px-4 font-medium">1,750,000đ</td>
-                                <td class="py-3 px-4 text-green-500">+175</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Hoàn thành</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="px-6 py-4 border-t flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Hiển thị 1-4 của 24 giao dịch</span>
-                    <div class="flex space-x-1">
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">1</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">2</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">3</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Customers Tab Content (Hidden by default) -->
-        <div id="customers" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Danh sách khách hàng</h3>
-                <div class="flex space-x-4">
-                    <div class="relative">
-                        <input type="text" placeholder="Tìm kiếm khách hàng..."
-                            class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    </div>
-                    <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
-                        <i class="fas fa-plus mr-2"></i> Thêm KH
+                    <button
+                        class="tab-button px-1 py-3 font-medium text-gray-500 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent"
+                        data-tab="customers" role="tab" aria-controls="customers-panel" aria-selected="false">
+                        <i class="fas fa-users mr-2"></i> Khách hàng
                     </button>
-                </div>
+                    <button
+                        class="tab-button px-1 py-3 font-medium text-gray-500 hover:text-blue-600 hover:border-blue-600 border-b-2 border-transparent"
+                        data-tab="rewards" role="tab" aria-controls="rewards-panel" aria-selected="false">
+                        <i class="fas fa-gift mr-2"></i> Phần thưởng
+                    </button>
+                </nav>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500">Tổng khách hàng</p>
-                            <h3 class="text-2xl font-bold mt-2">1,245</h3>
-                        </div>
-                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500">Khách hàng mới (30 ngày)</p>
-                            <h3 class="text-2xl font-bold mt-2">87</h3>
-                        </div>
-                        <div class="bg-green-100 text-green-600 p-3 rounded-lg">
-                            <i class="fas fa-user-plus text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500">Khách VIP</p>
-                            <h3 class="text-2xl font-bold mt-2">32</h3>
-                        </div>
-                        <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
-                            <i class="fas fa-crown text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-3 px-4 text-left">Khách hàng</th>
-                                <th class="py-3 px-4 text-left">Số điện thoại</th>
-                                <th class="py-3 px-4 text-left">Tổng điểm</th>
-                                <th class="py-3 px-4 text-left">Lần cuối</th>
-                                <th class="py-3 px-4 text-left">Hạng</th>
-                                <th class="py-3 px-4 text-left"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Avatar"
-                                        class="w-10 h-10 rounded-full mr-3">
-                                    <div>
-                                        <p class="font-medium">Nguyễn Văn A</p>
-                                        <p class="text-sm text-gray-500">ID: KH-001</p>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4">0987654321</td>
-                                <td class="py-3 px-4 font-medium text-blue-600">1,250</td>
-                                <td class="py-3 px-4">15/06/2023</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Vàng</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Avatar"
-                                        class="w-10 h-10 rounded-full mr-3">
-                                    <div>
-                                        <p class="font-medium">Trần Thị B</p>
-                                        <p class="text-sm text-gray-500">ID: KH-002</p>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4">0912345678</td>
-                                <td class="py-3 px-4 font-medium text-blue-600">850</td>
-                                <td class="py-3 px-4">14/06/2023</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Bạc</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Avatar"
-                                        class="w-10 h-10 rounded-full mr-3">
-                                    <div>
-                                        <p class="font-medium">Lê Văn C</p>
-                                        <p class="text-sm text-gray-500">ID: KH-003</p>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4">0905123456</td>
-                                <td class="py-3 px-4 font-medium text-blue-600">2,500</td>
-                                <td class="py-3 px-4">13/06/2023</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Kim
-                                        cương</span></td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="https://via.placeholder.com/40" alt="Avatar"
-                                        class="w-10 h-10 rounded-full mr-3">
-                                    <div>
-                                        <p class="font-medium">Phạm Thị D</p>
-                                        <p class="text-sm text-gray-500">ID: KH-004</p>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4">0978123456</td>
-                                <td class="py-3 px-4 font-medium text-blue-600">1,750</td>
-                                <td class="py-3 px-4">12/06/2023</td>
-                                <td class="py-3 px-4"><span
-                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Vàng</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800"><i
-                                            class="fas fa-eye"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="px-6 py-4 border-t flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Hiển thị 1-4 của 1,245 khách hàng</span>
-                    <div class="flex space-x-1">
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white">1</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">2</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-white text-gray-600 hover:bg-gray-100">3</button>
-                        <button
-                            class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200">
-                            <i class="fas fa-chevron-right"></i>
+            <div>
+                <div id="campaigns-panel" class="tab-content" role="tabpanel" aria-labelledby="campaigns-tab">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800">Quản lý Chiến dịch</h3>
+                        <button onclick="window.location.href='/campaign/create_campaign'" class=" bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all shadow
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Thêm chiến dịch
                         </button>
                     </div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-700">Chiến dịch hiện tại</h4>
+                    <div id="current-campaigns-container"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="placeholder-message col-span-full loading-overlay">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-700">Chiến dịch đã kết thúc</h4>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tên chiến dịch</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Loại</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Thời gian</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tham gia</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Trạng thái</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="past-campaigns-container">
+                                    <tr>
+                                        <td colspan="6" class="py-4 px-4 text-center">
+                                            <div class="placeholder-message loading-overlay">
+                                                <div class="spinner"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="payments-panel" class="tab-content hidden" role="tabpanel" aria-labelledby="payments-tab">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800">Lịch sử thanh toán</h3>
+                        <div class="flex space-x-2">
+                            <button
+                                class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
+                                <i class="fas fa-filter mr-2"></i> Lọc
+                            </button>
+                            <button
+                                class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
+                                <i class="fas fa-download mr-2"></i> Xuất Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Mã GD</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Khách hàng</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Ngày</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Số tiền</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Điểm tích</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Trạng thái</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="payments-table-container">
+                                    <tr>
+                                        <td colspan="7" class="py-4 px-4 text-center">
+                                            <div class="placeholder-message loading-overlay">
+                                                <div class="spinner"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <span class="text-sm text-gray-600" id="payments-pagination-info">Hiển thị 0 của 0 giao
+                                dịch</span>
+                            <div class="flex space-x-1" id="payments-pagination-controls">
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+                                    disabled>
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+                                    disabled>
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="customers-panel" class="tab-content hidden" role="tabpanel" aria-labelledby="customers-tab">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800">Danh sách khách hàng</h3>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                            <div class="relative flex-grow">
+                                <input type="search" placeholder="Tìm kiếm khách hàng (tên, SĐT)..."
+                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            <button
+                                class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex-shrink-0">
+                                <i class="fas fa-user-plus mr-2"></i> Thêm KH
+                            </button>
+                        </div>
+                    </div>
+                    <div id="customer-stats-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[100px]">
+                            <div class="loading-overlay">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[100px]">
+                            <div class="loading-overlay">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-md flex items-center justify-center min-h-[100px]">
+                            <div class="loading-overlay">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Khách hàng</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            SĐT</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tổng điểm</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Lần cuối GD</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Hạng</th>
+                                        <th scope="col"
+                                            class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="customers-table-container">
+                                    <tr>
+                                        <td colspan="6" class="py-4 px-4 text-center">
+                                            <div class="placeholder-message loading-overlay">
+                                                <div class="spinner"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <span class="text-sm text-gray-600" id="customers-pagination-info">Hiển thị 0 của 0 khách
+                                hàng</span>
+                            <div class="flex space-x-1" id="customers-pagination-controls">
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+                                    disabled>
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+                                    disabled>
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rewards-panel" class="tab-content hidden" role="tabpanel" aria-labelledby="rewards-tab">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-bold text-gray-800">Danh sách phần thưởng</h3>
+                        <button
+                            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Thêm phần thưởng
+                        </button>
+                    </div>
+                    <div id="rewards-list-container"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div class="placeholder-message col-span-full loading-overlay">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-200 mt-12 py-6">
+        <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+            &copy; <span id="current-year"></span> LoyaltyBrand. All rights reserved.
         </div>
-
-        <!-- Rewards Tab Content (Hidden by default) -->
-        <div id="rewards" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Danh sách phần thưởng</h3>
-                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">
-                    <i class="fas fa-plus mr-2"></i> Thêm phần thưởng
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Reward Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            Đang hoạt động
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="font-bold text-lg mb-2">Voucher giảm 20%</h4>
-                        <p class="text-gray-600 mb-4">Giảm 20% cho đơn hàng tiếp theo</p>
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">100 điểm</span>
-                            <span class="text-sm text-gray-500">Còn lại: 45/100</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 45%"></div>
-                        </div>
-                        <div class="flex justify-between">
-                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
-                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
-                                    class="fas fa-edit"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reward Card 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            Đang hoạt động
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="font-bold text-lg mb-2">Tặng ly sứ cao cấp</h4>
-                        <p class="text-gray-600 mb-4">Ly sứ in logo thương hiệu</p>
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">250 điểm</span>
-                            <span class="text-sm text-gray-500">Còn lại: 12/50</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 24%"></div>
-                        </div>
-                        <div class="flex justify-between">
-                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
-                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
-                                    class="fas fa-edit"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reward Card 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <div class="relative">
-                        <img src="https://via.placeholder.com/400x200" alt="Reward" class="w-full h-40 object-cover">
-                        <div class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                            Tạm ngừng
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="font-bold text-lg mb-2">Voucher giảm 50%</h4>
-                        <p class="text-gray-600 mb-4">Giảm 50% cho đơn hàng từ 500K</p>
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">500 điểm</span>
-                            <span class="text-sm text-gray-500">Còn lại: 0/30</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <div class="flex justify-between">
-                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Chi tiết</button>
-                            <button class="text-gray-500 hover:text-gray-700 text-sm"><i
-                                    class="fas fa-edit"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </footer>
 
     <script>
+        // Configuration
+        const BRAND_ID = 1; // Replace with actual brand ID from backend/authentication
+        const API_BASE_URL = ''; // Optional: Set a base URL if your API endpoints share a common prefix e.g., '/api/v1'
+        const MOCK_API = false; // Set to true to use mock data for testing without a backend
+
+        // --- DOM Element References ---
+        const quickStatsContainer = document.getElementById('quick-stats-container');
+        const campaignChartContainer = document.getElementById('campaignChartContainer');
+        const campaignChartCanvas = document.getElementById('campaignChart');
+        const rewardChartContainer = document.getElementById('rewardChartContainer');
+        const rewardChartCanvas = document.getElementById('rewardChart');
+        const currentCampaignsContainer = document.getElementById('current-campaigns-container');
+        const pastCampaignsContainer = document.getElementById('past-campaigns-container');
+        const paymentsTableContainer = document.getElementById('payments-table-container');
+        const paymentsPaginationInfo = document.getElementById('payments-pagination-info');
+        const paymentsPaginationControls = document.getElementById('payments-pagination-controls');
+        const customerStatsContainer = document.getElementById('customer-stats-container');
+        const customersTableContainer = document.getElementById('customers-table-container');
+        const customersPaginationInfo = document.getElementById('customers-pagination-info');
+        const customersPaginationControls = document.getElementById('customers-pagination-controls');
+        const rewardsListContainer = document.getElementById('rewards-list-container');
+        const currentYearSpan = document.getElementById('current-year');
+
+        // --- Utility Functions ---
+
+        /**
+         * Formats a number as Vietnamese Dong (VND).
+         * @param {number} amount - The amount to format.
+         * @returns {string} Formatted currency string.
+         */
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number' || isNaN(amount)) return 'N/A';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        /**
+         * Formats a number with thousand separators.
+         * @param {number} number - The number to format.
+         * @returns {string} Formatted number string.
+         */
+        function formatNumber(number) {
+            if (typeof number !== 'number' || isNaN(number)) return '0';
+            return number.toLocaleString('vi-VN');
+        }
+
+        /**
+         * Safely fetches data from an API endpoint or returns mock data.
+         * @param {string} endpoint - The API endpoint (relative to API_BASE_URL).
+         * @param {object} [options={}] - Fetch options (method, headers, body, etc.).
+         * @param {object|null} [mockData=null] - Mock data to return if MOCK_API is true.
+         * @returns {Promise<object>} The JSON response data or mock data.
+         * @throws {Error} If the fetch request fails or the response is not ok.
+         */
+        async function fetchData(endpoint, options = {}, mockData = null) {
+            if (MOCK_API && mockData !== null) {
+                console.log(`[MOCK] Returning mock data for ${endpoint}`);
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+                // Simulate potential mock error
+                if (mockData.error) {
+                    throw new Error(`Mock API Error: ${mockData.error}`);
+                }
+                return mockData.data;
+            }
+            if (MOCK_API && mockData === null) {
+                console.warn(`[MOCK] No mock data provided for ${endpoint}, returning empty object.`);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                return {};
+            }
+
+
+            const url = `${API_BASE_URL}${endpoint}`;
+            let response; // Declare response outside try block
+            try {
+                console.log(`Fetching data from: ${url}`); // Log the URL being fetched
+                response = await fetch(url, options);
+
+                // Log basic response info
+                console.log(`Response status for ${url}: ${response.status} ${response.statusText}`);
+
+                if (!response.ok) {
+                    let errorData = null;
+                    let errorText = `HTTP error ${response.status}: ${response.statusText}`;
+                    try {
+                        // Try to read response body as text first for non-JSON errors
+                        const text = await response.text();
+                        console.error(`Error response body for ${url}:`, text);
+                        // Try to parse as JSON if possible
+                        errorData = JSON.parse(text);
+                        if (errorData && errorData.detail) {
+                            errorText = `API Error (${response.status}): ${errorData.detail}`;
+                        }
+                    } catch (e) {
+                        // Ignore if response body is not readable or not JSON
+                        console.warn(`Could not parse error response body for ${url} as JSON.`);
+                    }
+                    // Throw a detailed error
+                    const error = new Error(errorText);
+                    error.status = response.status; // Attach status code to error object
+                    error.data = errorData; // Attach parsed error data if available
+                    throw error;
+                }
+
+                // Handle 204 No Content
+                if (response.status === 204) {
+                    console.log(`Received 204 No Content for ${url}`);
+                    return null;
+                }
+
+                // Attempt to parse JSON
+                const jsonData = await response.json();
+                console.log(`Successfully fetched and parsed JSON for ${url}`);
+                return jsonData;
+
+            } catch (error) {
+                // Log different types of errors
+                if (error instanceof SyntaxError) {
+                    console.error(`JSON Parsing Error for ${url}:`, error.message);
+                    throw new Error(`Invalid JSON received from server for ${endpoint}.`);
+                } else if (error instanceof TypeError) {
+                    console.error(`Network Error or CORS issue for ${url}:`, error.message);
+                    throw new Error(`Network error or CORS issue when fetching ${endpoint}. Check browser console Network tab.`);
+                } else {
+                    // Log the error object passed from the !response.ok block or other fetch errors
+                    console.error(`Fetch Error for ${url}:`, error);
+                    // Re-throw the original error or a more user-friendly one
+                    throw error; // Re-throw the error caught or created
+                }
+            }
+        }
+
+        /**
+         * Displays a message (loading, error, or placeholder) within a container.
+         * @param {HTMLElement} container - The container element.
+         * @param {string} type - 'loading', 'error', or 'placeholder'.
+         * @param {string} message - The message to display.
+         */
+        function showMessage(container, type, message) {
+            if (!container) return;
+            let content = '';
+            let cssClass = '';
+
+            switch (type) {
+                case 'loading':
+                    content = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+                    break;
+                case 'error':
+                    content = `<div class="error-message">${message}</div>`;
+                    cssClass = 'error-message'; // Keep class for potential styling
+                    break;
+                case 'placeholder':
+                default:
+                    content = `<div class="placeholder-message">${message}</div>`;
+                    cssClass = 'placeholder-message'; // Keep class
+                    break;
+            }
+
+            container.innerHTML = content;
+            // Optionally add classes to the container itself if needed
+            // container.className = container.className.replace(/loading-overlay|error-message|placeholder-message/g, '').trim();
+            // if (cssClass) container.classList.add(cssClass);
+        }
+
+
+        /**
+        * Displays a loading spinner or placeholder within a chart container.
+        * @param {HTMLElement} chartContainer - The container element holding the canvas and messages.
+        * @param {boolean} isLoading - Whether to show loading state.
+        * @param {string|null} errorMessage - Error message to display, or null if no error.
+        */
+        function setChartState(chartContainer, isLoading, errorMessage = null) {
+            if (!chartContainer) return;
+            const canvas = chartContainer.querySelector('canvas');
+            const loadingMessage = chartContainer.querySelector('.loading-overlay'); // Updated selector
+            const errorMessageElement = chartContainer.querySelector('.error-message');
+
+            if (canvas) canvas.style.display = (isLoading || errorMessage) ? 'none' : 'block';
+            if (loadingMessage) loadingMessage.classList.toggle('hidden', !isLoading || !!errorMessage); // Use !!errorMessage to convert to boolean
+            if (errorMessageElement) {
+                errorMessageElement.classList.toggle('hidden', !errorMessage);
+                if (errorMessage) errorMessageElement.textContent = errorMessage;
+            }
+        }
+
+        // --- Data Loading and Rendering ---
+
+        // Fetch and render Quick Stats
+        async function loadQuickStats() {
+            const statsConfig = [
+                // --- MOCK DATA Definitions ---
+                { id: 'total-points', endpoint: `/point/get_total_points/${BRAND_ID}`, title: 'Tổng điểm đã tích', icon: 'fa-coins', color: 'blue', parseFn: (data) => formatNumber(data?.total_points), trendText: '+12% vs tháng trước', mock: { data: { total_points: 123456 } } },
+                { id: 'active-campaigns', endpoint: `/campaign/get_active_campaigns/${BRAND_ID}`, title: 'Chiến dịch đang chạy', icon: 'fa-rocket', color: 'green', parseFn: (data) => formatNumber(data?.active_campaigns), trendText: data => data?.active_campaigns > 0 ? '2 sắp hết hạn' : '', mock: { data: { active_campaigns: 5 } } },
+                { id: 'total-customers', endpoint: `/user/get_total_customers/${BRAND_ID}`, title: 'Khách hàng tham gia', icon: 'fa-users', color: 'purple', parseFn: (data) => formatNumber(data?.total_customers), trendText: '+8% vs tháng trước', mock: { data: { total_customers: 1580 } } },
+                { id: 'rewards-redeemed', endpoint: `/voucher/get_rewards_redeemed/${BRAND_ID}`, title: 'Đổi quà thành công', icon: 'fa-gift', color: 'yellow', parseFn: (data) => formatNumber(data?.rewards_redeemed), trendText: data => data?.rewards_redeemed > 0 ? '5 đơn chờ xử lý' : '', mock: { data: { rewards_redeemed: 42 } } }
+                // Example of a mock error:
+                //{ id: 'rewards-redeemed-error', endpoint: `/voucher/get_rewards_redeemed_error/${BRAND_ID}`, title: 'Lỗi Đổi quà', icon: 'fa-exclamation-triangle', color: 'red', parseFn: (data) => formatNumber(data?.rewards_redeemed), trendText: 'N/A', mock: { error: 'Simulated API failure' } }
+            ];
+
+            quickStatsContainer.innerHTML = ''; // Clear previous placeholders
+
+            // Create card elements first with loading state
+            statsConfig.forEach(config => {
+                const card = document.createElement('div');
+                card.id = `stat-card-${config.id}`; // Add ID for easy targeting
+                card.className = 'bg-white rounded-xl p-6 shadow-md transition-all card-hover flex flex-col justify-between min-h-[120px]';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500">${config.title}</p>
+                            <h3 class="text-2xl font-bold mt-2 text-gray-800" id="stat-${config.id}-value">
+                                <div class="loading-overlay h-8 w-16"><div class="spinner !w-6 !h-6"></div></div> </h3>
+                        </div>
+                        <div class="bg-${config.color}-100 text-${config.color}-600 p-3 rounded-lg">
+                            <i class="fas ${config.icon} text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-3" id="stat-${config.id}-trend">&nbsp;</p> `;
+                quickStatsContainer.appendChild(card);
+            });
+
+            // Fetch data for each card individually
+            for (const config of statsConfig) {
+                const valueElement = document.getElementById(`stat-${config.id}-value`);
+                const trendElement = document.getElementById(`stat-${config.id}-trend`);
+                const cardElement = document.getElementById(`stat-card-${config.id}`); // Get the card element
+
+                try {
+                    console.log(`Fetching data for stat: ${config.title}`);
+                    const data = await fetchData(config.endpoint, {}, config.mock); // Pass mock data definition
+
+                    if (!data && config.id === 'total-points') { // Example: Check specifically for the first item if needed
+                        console.warn(`Received null or undefined data for ${config.title}`);
+                        // Handle null/undefined data appropriately, maybe show '0' or 'N/A'
+                        if (valueElement) valueElement.textContent = config.parseFn(null) ?? 'N/A'; // Use nullish coalescing
+                        if (trendElement) trendElement.textContent = 'Không có dữ liệu';
+                        continue; // Move to the next stat
+                    }
+
+
+                    // Update card content on success
+                    if (valueElement) valueElement.textContent = config.parseFn(data) ?? 'N/A'; // Use nullish coalescing for safety
+
+                    if (trendElement) {
+                        const trend = typeof config.trendText === 'function' ? config.trendText(data) : config.trendText;
+                        const trendIcon = trend?.startsWith('+') ? 'fa-arrow-up text-green-500' : trend ? 'fa-info-circle text-gray-500' : '';
+                        trendElement.innerHTML = trend ? `<i class="fas ${trendIcon} mr-1"></i> ${trend}` : '&nbsp;';
+                    }
+                } catch (error) {
+                    console.error(`Error loading stat '${config.title}' from ${config.endpoint}:`, error);
+                    // Update card content on error
+                    if (valueElement) valueElement.innerHTML = `<span class="text-red-500 text-sm">Lỗi tải</span>`;
+                    if (trendElement) trendElement.textContent = error.message.substring(0, 30) + '...'; // Show short error message
+                    // Optionally add a red border or background to the card
+                    if (cardElement) cardElement.classList.add('border', 'border-red-300');
+                }
+            }
+        }
+
+
+        // Fetch and render Campaigns
+        async function loadCampaigns() {
+            const mockCampaignData = {
+                data: {
+                    current: [
+                        { id: 1, name: "Tích điểm hè sôi động", type: "Tích điểm", description: "Tích điểm gấp đôi cho mọi hóa đơn trên 500k.", start_date: "01/06/25", end_date: "31/08/25", participants: 1250, target_participants: 2000, progress: 62, status: "Đang hoạt động", image_url: "https://placehold.co/300x160/ecfccb/4d7c0f?text=Hè+Sôi+Động" },
+                        { id: 2, name: "Đổi quà sinh nhật", type: "Đổi quà", description: "Ưu đãi đặc biệt cho khách hàng có sinh nhật trong tháng.", start_date: "01/07/25", end_date: "31/07/25", participants: 300, target_participants: 500, progress: 60, status: "Đang hoạt động", image_url: "https://placehold.co/300x160/fce7f3/831843?text=Sinh+Nhật" },
+                        { id: 3, name: "Giới thiệu bạn bè", type: "Tích điểm", description: "Nhận ngay 50 điểm khi giới thiệu bạn bè thành công.", start_date: "15/07/25", end_date: "15/09/25", participants: 80, target_participants: 300, progress: 27, status: "Sắp bắt đầu", image_url: "https://placehold.co/300x160/ffedd5/c2410c?text=Giới+Thiệu" }
+                    ],
+                    past: [
+                        { id: 4, name: "Chào hè rực rỡ", type: "Tích điểm", start_date: "01/04/25", end_date: "31/05/25", participants: 980, status: "Đã kết thúc" },
+                        { id: 5, name: "Voucher giảm giá 20%", type: "Đổi quà", start_date: "15/03/25", end_date: "15/04/25", participants: 550, status: "Đã kết thúc" }
+                    ]
+                }
+            };
+            try {
+                showMessage(currentCampaignsContainer, 'loading');
+                showMessage(pastCampaignsContainer, 'loading'); // Show loading in table body
+
+                const data = await fetchData(`/campaign/get_campaigns/${BRAND_ID}`, {}, mockCampaignData);
+
+                // Render Current Campaigns
+                if (data && data.current && data.current.length > 0) {
+                    currentCampaignsContainer.innerHTML = data.current.map(c => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover flex flex-col">
+                            <div class="relative">
+                                <img src="${c.image_url || 'https://placehold.co/300x160/e0e7ff/3730a3?text=Campaign'}" alt="Hình ảnh chiến dịch ${c.name}" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/300x160/e0e7ff/3730a3?text=Image+Error';">
+                                <span class="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded-full ${c.status === 'Đang hoạt động' ? 'bg-green-500' : c.status === 'Sắp bắt đầu' ? 'bg-yellow-500' : 'bg-gray-500'}">
+                                    ${c.status}
+                                </span>
+                            </div>
+                            <div class="p-4 flex flex-col flex-grow">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-md text-gray-800 flex-1 mr-2">${c.name}</h4>
+                                    <span class="text-xs px-2 py-1 rounded whitespace-nowrap ${c.type === 'Tích điểm' ? 'bg-blue-100 text-blue-800' : c.type === 'Đổi quà' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800'}">${c.type}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3 flex-grow">${c.description || 'Không có mô tả.'}</p>
+                                <div class="text-xs text-gray-500 mb-3 space-y-1">
+                                    <div class="flex justify-between"><span><i class="far fa-calendar-alt mr-1"></i> ${c.start_date || 'N/A'} - ${c.end_date || 'N/A'}</span></div>
+                                    <div class="flex justify-between"><span><i class="fas fa-users mr-1"></i> ${formatNumber(c.participants)} KH</span> <span>Mục tiêu: ${formatNumber(c.target_participants)} KH</span></div>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+                                    <div class="h-2 rounded-full ${c.status === 'Sắp bắt đầu' ? 'bg-gray-400' : 'bg-green-500'}" style="width: ${c.progress || 0}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 text-right">${c.status === 'Sắp bắt đầu' ? 'Chưa bắt đầu' : `Đã đạt ${c.progress || 0}%`}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    showMessage(currentCampaignsContainer, 'placeholder', 'Không có chiến dịch hiện tại.');
+                }
+
+                // Render Past Campaigns
+                if (data && data.past && data.past.length > 0) {
+                    pastCampaignsContainer.innerHTML = data.past.map(c => `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm font-medium text-gray-900">${c.name}</td>
+                            <td class="py-3 px-4 text-sm text-gray-500"><span class="text-xs px-2 py-1 rounded ${c.type === 'Tích điểm' ? 'bg-blue-100 text-blue-800' : c.type === 'Đổi quà' ? 'bg-purple-100 text-purple-800' : 'bg-pink-100 text-pink-800'}">${c.type}</span></td>
+                            <td class="py-3 px-4 text-sm text-gray-500">${c.start_date || 'N/A'} - ${c.end_date || 'N/A'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-500">${formatNumber(c.participants)}</td>
+                            <td class="py-3 px-4 text-sm"><span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">${c.status}</span></td>
+                            <td class="py-3 px-4 text-right">
+                                <button class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    pastCampaignsContainer.innerHTML = `<tr><td colspan="6" class="py-4 px-4 text-center"><div class="placeholder-message">Không có chiến dịch đã kết thúc.</div></td></tr>`;
+                }
+
+            } catch (error) {
+                console.error('Error loading campaigns:', error);
+                showMessage(currentCampaignsContainer, 'error', `Lỗi tải chiến dịch: ${error.message}`);
+                pastCampaignsContainer.innerHTML = `<tr><td colspan="6" class="py-4 px-4 text-center"><div class="error-message">Lỗi tải chiến dịch.</div></td></tr>`;
+            }
+        }
+
+        // Fetch and render Payments
+        async function loadPayments(page = 1, itemsPerPage = 10) { // Add pagination support
+            const mockPaymentData = {
+                data: {
+                    payments: Array.from({ length: itemsPerPage }, (_, i) => ({
+                        transaction_id: `GD${1000 + (page - 1) * itemsPerPage + i}`,
+                        customer_name: `Khách Hàng ${String.fromCharCode(65 + i)}${(page - 1) * itemsPerPage}`,
+                        customer_avatar: `https://placehold.co/32x32/e2e8f0/334155?text=${String.fromCharCode(65 + i)}`,
+                        payment_date: `2025-07-${String(10 + i).padStart(2, '0')} 10:30`,
+                        amount: (Math.random() * 1000000) + 50000,
+                        points_earned: Math.floor(Math.random() * 100) + 10,
+                        status: Math.random() > 0.1 ? 'Hoàn thành' : 'Đang xử lý'
+                    })),
+                    total_payments: 55 // Total items for pagination
+                }
+            };
+            try {
+                showMessage(paymentsTableContainer, 'loading');
+                paymentsPaginationInfo.textContent = 'Đang tải...';
+                updatePaginationControls(paymentsPaginationControls, 0, 0, 0); // Disable pagination while loading
+
+                const data = await fetchData(`/point/get_payments/${BRAND_ID}?page=${page}&limit=${itemsPerPage}`, {}, mockPaymentData);
+
+                if (data && data.payments && data.payments.length > 0) {
+                    paymentsTableContainer.innerHTML = data.payments.map(p => `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm font-medium text-gray-500">${p.transaction_id}</td>
+                            <td class="py-3 px-4 text-sm text-gray-900 flex items-center">
+                                <img src="${p.customer_avatar || 'https://placehold.co/32x32/e2e8f0/334155?text=KH'}" alt="Avatar ${p.customer_name}" class="w-8 h-8 rounded-full mr-2 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/32x32/e0e7ff/3730a3?text=KH';">
+                                ${p.customer_name}
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-500">${p.payment_date}</td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-900">${p.amount}</td>
+                            <td class="py-3 px-4 text-sm text-green-600 font-medium">+${formatNumber(p.points_earned)}</td>
+                            <td class="py-3 px-4 text-sm">
+                                <span class="text-xs px-2 py-1 rounded ${p.status === 'Hoàn thành' ? 'bg-green-100 text-green-800' : p.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                                    ${p.status}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <button class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    // Update pagination info
+                    const totalPayments = data.total_payments || 0;
+                    const startIndex = (page - 1) * itemsPerPage + 1;
+                    const endIndex = startIndex + data.payments.length - 1;
+                    paymentsPaginationInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${formatNumber(totalPayments)} giao dịch`;
+                    updatePaginationControls(paymentsPaginationControls, page, Math.ceil(totalPayments / itemsPerPage), (newPage) => loadPayments(newPage, itemsPerPage));
+                } else {
+                    showMessage(paymentsTableContainer, 'placeholder', 'Không có giao dịch nào.');
+                    paymentsPaginationInfo.textContent = 'Hiển thị 0 của 0 giao dịch';
+                    updatePaginationControls(paymentsPaginationControls, 0, 0, 0);
+                }
+            } catch (error) {
+                console.error('Error loading payments:', error);
+                showMessage(paymentsTableContainer, 'error', `Lỗi tải thanh toán: ${error.message}`);
+                paymentsPaginationInfo.textContent = 'Lỗi tải dữ liệu';
+                updatePaginationControls(paymentsPaginationControls, 0, 0, 0);
+            }
+        }
+
+        // Fetch and render Customers
+        async function loadCustomers(page = 1, itemsPerPage = 10) { // Add pagination support
+            const mockCustomerData = {
+                data: {
+                    stats: { total_customers: 1245, new_customers_30d: 87, vip_customers: 150 },
+                    customers: Array.from({ length: itemsPerPage }, (_, i) => {
+                        const tiers = ['Kim cương', 'Vàng', 'Bạc', 'Đồng', 'Thành viên'];
+                        const randomTier = tiers[Math.floor(Math.random() * tiers.length)];
+                        return {
+                            customer_code: `KH${10000 + (page - 1) * itemsPerPage + i}`,
+                            name: `Nguyễn Văn ${String.fromCharCode(65 + i)}${(page - 1) * itemsPerPage}`,
+                            avatar_url: `https://placehold.co/40x40/e2e8f0/334155?text=${String.fromCharCode(65 + i)}`,
+                            phone: `090xxxx${String(Math.random()).substring(2, 5)}`,
+                            total_points: Math.floor(Math.random() * 5000),
+                            last_transaction_date: `2025-07-${String(10 + i).padStart(2, '0')}`,
+                            tier: randomTier
+                        };
+                    }),
+                    total_customers: 1245 // Total items for pagination
+                }
+            };
+            try {
+                showMessage(customerStatsContainer, 'loading');
+                showMessage(customersTableContainer, 'loading');
+                customersPaginationInfo.textContent = 'Đang tải...';
+                updatePaginationControls(customersPaginationControls, 0, 0, 0);
+
+                // Add ?page=${page}&limit=${itemsPerPage} if needed
+                const data = await fetchData(`/user/get_customers/${BRAND_ID}?page=${page}&limit=${itemsPerPage}`, {}, mockCustomerData);
+
+                // Render Customer Stats (Only needs to load once, ideally)
+                // Consider loading stats separately if they don't change with pagination
+                if (page === 1 && data && data.stats) {
+                    customerStatsContainer.innerHTML = `
+                        <div class="bg-white rounded-xl p-6 shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">Tổng khách hàng</p>
+                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.total_customers || 0)}</h3>
+                                </div>
+                                <div class="bg-blue-100 text-blue-600 p-3 rounded-lg"> <i class="fas fa-users text-xl"></i> </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">KH mới (30 ngày)</p>
+                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.new_customers_30d || 0)}</h3>
+                                </div>
+                                <div class="bg-green-100 text-green-600 p-3 rounded-lg"> <i class="fas fa-user-plus text-xl"></i> </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">Khách VIP</p>
+                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.vip_customers || 0)}</h3>
+                                </div>
+                                <div class="bg-purple-100 text-purple-600 p-3 rounded-lg"> <i class="fas fa-crown text-xl"></i> </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (page === 1) {
+                    // Show placeholder/error for stats if load failed on first page
+                    showMessage(customerStatsContainer, 'placeholder', 'Không có dữ liệu thống kê.');
+                }
+
+
+                // Render Customer Table
+                if (data && data.customers && data.customers.length > 0) {
+                    customersTableContainer.innerHTML = data.customers.map(c => {
+                        // Tier color mapping
+                        const tierColors = { 'Kim cương': 'purple', 'Vàng': 'yellow', 'Bạc': 'gray', 'Đồng': 'orange', 'Thành viên': 'blue' };
+                        const tierColor = tierColors[c.tier] || 'blue'; // Default color
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm flex items-center">
+                                    <img src="${c.avatar_url || 'https://placehold.co/40x40/e2e8f0/334155?text=KH'}" alt="Avatar ${c.name}" class="w-10 h-10 rounded-full mr-3 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/e0e7ff/3730a3?text=KH';">
+                                    <div>
+                                        <p class="font-medium text-gray-900">${c.name}</p>
+                                        <p class="text-xs text-gray-500">ID: ${c.customer_code || 'N/A'}</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-500">${c.phone || 'N/A'}</td>
+                                <td class="py-3 px-4 text-sm font-medium text-blue-600">${formatNumber(c.total_points)}</td>
+                                <td class="py-3 px-4 text-sm text-gray-500">${c.last_transaction_date || 'Chưa có GD'}</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-${tierColor}-100 text-${tierColor}-800">${c.tier || 'Thành viên'}</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-blue-600 hover:text-blue-800 focus:outline-none mr-2" title="Xem chi tiết"> <i class="fas fa-eye"></i> </button>
+                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none" title="Chỉnh sửa"> <i class="fas fa-edit"></i> </button>
+                                </td>
+                            </tr>
+                         `;
+                    }).join('');
+                    // Update pagination info
+                    const totalCustomers = data.total_customers || 0;
+                    const startIndex = (page - 1) * itemsPerPage + 1;
+                    const endIndex = startIndex + data.customers.length - 1;
+                    customersPaginationInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${formatNumber(totalCustomers)} khách hàng`;
+                    updatePaginationControls(customersPaginationControls, page, Math.ceil(totalCustomers / itemsPerPage), (newPage) => loadCustomers(newPage, itemsPerPage));
+                } else {
+                    showMessage(customersTableContainer, 'placeholder', 'Không có khách hàng nào.');
+                    customersPaginationInfo.textContent = 'Hiển thị 0 của 0 khách hàng';
+                    updatePaginationControls(customersPaginationControls, 0, 0, 0);
+                }
+
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                if (page === 1) showMessage(customerStatsContainer, 'error', `Lỗi tải thống kê: ${error.message}`);
+                showMessage(customersTableContainer, 'error', `Lỗi tải khách hàng: ${error.message}`);
+                customersPaginationInfo.textContent = 'Lỗi tải dữ liệu';
+                updatePaginationControls(customersPaginationControls, 0, 0, 0);
+            }
+        }
+
+        // Fetch and render Rewards
+        async function loadRewards() {
+            const mockRewardData = {
+                data: {
+                    rewards: [
+                        { id: 1, name: "Voucher 50k", description: "Giảm 50.000đ cho đơn hàng từ 200k.", points_required: 500, stock: 85, initial_stock: 100, status: "Đang hoạt động", image_url: "https://placehold.co/300x160/cffafe/155f75?text=Voucher+50k" },
+                        { id: 2, name: "Miễn phí vận chuyển", description: "Áp dụng cho đơn hàng nội thành.", points_required: 200, stock: 150, initial_stock: 200, status: "Đang hoạt động", image_url: "https://placehold.co/300x160/ede9fe/5b21b6?text=Free+Ship" },
+                        { id: 3, name: "Ly giữ nhiệt", description: "Ly giữ nhiệt cao cấp phiên bản giới hạn.", points_required: 1000, stock: 0, initial_stock: 50, status: "Hết hàng", image_url: "https://placehold.co/300x160/fee2e2/991b1b?text=Ly+Giữ+Nhiệt" },
+                        { id: 4, name: "Giảm giá 10%", description: "Giảm 10% tổng hóa đơn.", points_required: 300, stock: 40, initial_stock: 100, status: "Tạm ngừng", image_url: "https://placehold.co/300x160/fef9c3/854d0e?text=Giảm+10%" }
+                    ]
+                }
+            };
+            try {
+                showMessage(rewardsListContainer, 'loading');
+                const data = await fetchData(`/voucher/get_rewards/${BRAND_ID}`, {}, mockRewardData);
+
+                if (data && data.rewards && data.rewards.length > 0) {
+                    rewardsListContainer.innerHTML = data.rewards.map(r => {
+                        const stockPercentage = (r.initial_stock > 0) ? Math.max(0, Math.min(100, (r.stock / r.initial_stock * 100))) : 0;
+                        const statusColors = { 'Đang hoạt động': 'green', 'Tạm ngừng': 'yellow', 'Hết hạn': 'red', 'Hết hàng': 'gray' };
+                        const statusColor = statusColors[r.status] || 'gray';
+
+                        return `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover flex flex-col">
+                            <div class="relative">
+                                <img src="${r.image_url || 'https://placehold.co/300x160/dbeafe/1e40af?text=Reward'}" alt="Phần thưởng ${r.name}" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/300x160/e0e7ff/3730a3?text=Image+Error';">
+                                <span class="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded-full bg-${statusColor}-500">
+                                    ${r.status}
+                                </span>
+                                <span class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
+                                    ${formatNumber(r.points_required)} điểm
+                                </span>
+                            </div>
+                            <div class="p-4 flex flex-col flex-grow">
+                                <h4 class="font-bold text-md text-gray-800 mb-2 flex-1">${r.name}</h4>
+                                <p class="text-sm text-gray-600 mb-3 flex-grow">${r.description || 'Không có mô tả.'}</p>
+                                <div class="text-xs text-gray-500 mb-2">Còn lại: ${formatNumber(r.stock)} / ${formatNumber(r.initial_stock)}</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: ${stockPercentage}%"></div>
+                                </div>
+                                <div class="flex justify-between items-center mt-auto pt-2 border-t border-gray-100">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none">Chi tiết</button>
+                                    <div>
+                                        <button class="text-gray-500 hover:text-gray-700 text-sm focus:outline-none mr-2" title="Chỉnh sửa"> <i class="fas fa-edit"></i> </button>
+                                        <button class="text-red-500 hover:text-red-700 text-sm focus:outline-none" title="Xóa"> <i class="fas fa-trash"></i> </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    showMessage(rewardsListContainer, 'placeholder', 'Không có phần thưởng nào.');
+                }
+            } catch (error) {
+                console.error('Error loading rewards:', error);
+                showMessage(rewardsListContainer, 'error', `Lỗi tải phần thưởng: ${error.message}`);
+            }
+        }
+
+
+        // --- Chart Initialization ---
+        let campaignChartInstance = null;
+        let rewardChartInstance = null;
+
+        async function initCampaignChart() {
+            const mockChartData = {
+                data: {
+                    campaign_chart: {
+                        labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6"],
+                        data: [650, 590, 800, 810, 960, 1050]
+                    }
+                }
+            };
+            if (campaignChartInstance) {
+                campaignChartInstance.destroy(); // Destroy previous instance if exists
+            }
+            setChartState(campaignChartContainer, true); // Show loading
+
+            try {
+                const data = await fetchData(`/campaign/get_campaign_chart/${BRAND_ID}`, {}, mockChartData);
+
+                if (!data || !data.campaign_chart || !data.campaign_chart.labels || !data.campaign_chart.data) {
+                    throw new Error("Dữ liệu biểu đồ chiến dịch không hợp lệ hoặc bị thiếu.");
+                }
+
+                setChartState(campaignChartContainer, false); // Hide loading
+
+                const campaignCtx = campaignChartCanvas.getContext('2d');
+                campaignChartInstance = new Chart(campaignCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.campaign_chart.labels,
+                        datasets: [{
+                            label: 'Số KH tham gia',
+                            data: data.campaign_chart.data,
+                            backgroundColor: 'rgba(30, 64, 175, 0.7)', // blue-800 with opacity
+                            borderColor: 'rgba(30, 64, 175, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            hoverBackgroundColor: 'rgba(30, 64, 175, 0.9)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // Allow chart to fill container height
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return ` ${context.dataset.label}: ${formatNumber(context.parsed.y)} KH`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { drawBorder: false, color: '#e5e7eb' }, // gray-200
+                                ticks: { color: '#6b7280', callback: value => formatNumber(value) } // gray-500
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#6b7280' } // gray-500
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing campaign chart:', error);
+                setChartState(campaignChartContainer, false, `Lỗi tải biểu đồ: ${error.message}`);
+            }
+        }
+
+        async function initRewardChart() {
+            const mockRewardChartData = {
+                data: {
+                    reward_chart: {
+                        labels: ["Voucher 50k", "Free Ship", "Giảm 10%", "Ly giữ nhiệt", "Voucher 20k"],
+                        data: [120, 95, 80, 45, 30]
+                    }
+                }
+            };
+            if (rewardChartInstance) {
+                rewardChartInstance.destroy();
+            }
+            setChartState(rewardChartContainer, true);
+
+            try {
+                const data = await fetchData(`/voucher/get_reward_chart/${BRAND_ID}`, {}, mockRewardChartData);
+
+                if (!data || !data.reward_chart || !data.reward_chart.labels || !data.reward_chart.data) {
+                    throw new Error("Dữ liệu biểu đồ phần thưởng không hợp lệ hoặc bị thiếu.");
+                }
+
+                setChartState(rewardChartContainer, false);
+
+                const rewardCtx = rewardChartCanvas.getContext('2d');
+                rewardChartInstance = new Chart(rewardCtx, {
+                    type: 'bar', // Changed to horizontal bar for better label readability
+                    data: {
+                        labels: data.reward_chart.labels,
+                        datasets: [{
+                            label: 'Số lần đổi',
+                            data: data.reward_chart.data,
+                            backgroundColor: [ // Use a color palette
+                                'rgba(59, 130, 246, 0.7)', // blue-500
+                                'rgba(99, 102, 241, 0.7)', // indigo-500
+                                'rgba(167, 139, 250, 0.7)', // violet-400
+                                'rgba(244, 114, 182, 0.7)', // pink-400
+                                'rgba(251, 146, 60, 0.7)'  // orange-400
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(99, 102, 241, 1)',
+                                'rgba(167, 139, 250, 1)',
+                                'rgba(244, 114, 182, 1)',
+                                'rgba(251, 146, 60, 1)'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', // Make it a horizontal bar chart
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return ` ${context.dataset.label}: ${formatNumber(context.parsed.x)} lần`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: { drawBorder: false, color: '#e5e7eb' },
+                                ticks: { color: '#6b7280', callback: value => formatNumber(value) }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#6b7280' }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing reward chart:', error);
+                setChartState(rewardChartContainer, false, `Lỗi tải biểu đồ: ${error.message}`);
+            }
+        }
+
+        // --- Pagination ---
+        /**
+         * Updates pagination controls.
+         * @param {HTMLElement} controlsContainer - The container for pagination buttons.
+         * @param {number} currentPage - The current active page (1-based).
+         * @param {number} totalPages - The total number of pages.
+         * @param {function} onPageClick - Callback function when a page button is clicked, receives the new page number.
+         */
+        function updatePaginationControls(controlsContainer, currentPage, totalPages, onPageClick) {
+            if (!controlsContainer) return;
+            controlsContainer.innerHTML = ''; // Clear existing controls
+
+            if (totalPages <= 1) {
+                // No need for pagination if only one page or no pages
+                controlsContainer.innerHTML = `
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-400 cursor-not-allowed" disabled> <i class="fas fa-chevron-left text-xs"></i> </button>
+                    ${totalPages === 1 ? '<button class="w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white text-sm font-medium">1</button>' : ''}
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 text-gray-400 cursor-not-allowed" disabled> <i class="fas fa-chevron-right text-xs"></i> </button>
+                 `;
+                return;
+            }
+
+            // Previous Button
+            const prevButton = document.createElement('button');
+            prevButton.className = `w-8 h-8 flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-200 ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white'}`;
+            prevButton.innerHTML = `<i class="fas fa-chevron-left text-xs"></i>`;
+            prevButton.disabled = currentPage === 1;
+            if (currentPage > 1) {
+                prevButton.onclick = () => onPageClick(currentPage - 1);
+            }
+            controlsContainer.appendChild(prevButton);
+
+            // Page Number Buttons (simplified example: show first, last, current, and neighbors)
+            const maxPagesToShow = 5; // Adjust as needed
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+            // Adjust startPage if endPage is at the limit
+            if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+            }
+
+            if (startPage > 1) {
+                const firstButton = createPageButton(1, currentPage, onPageClick);
+                controlsContainer.appendChild(firstButton);
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'px-2 py-1 text-gray-500';
+                    ellipsis.textContent = '...';
+                    controlsContainer.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = createPageButton(i, currentPage, onPageClick);
+                controlsContainer.appendChild(pageButton);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'px-2 py-1 text-gray-500';
+                    ellipsis.textContent = '...';
+                    controlsContainer.appendChild(ellipsis);
+                }
+                const lastButton = createPageButton(totalPages, currentPage, onPageClick);
+                controlsContainer.appendChild(lastButton);
+            }
+
+
+            // Next Button
+            const nextButton = document.createElement('button');
+            nextButton.className = `w-8 h-8 flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-200 ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white'}`;
+            nextButton.innerHTML = `<i class="fas fa-chevron-right text-xs"></i>`;
+            nextButton.disabled = currentPage === totalPages;
+            if (currentPage < totalPages) {
+                nextButton.onclick = () => onPageClick(currentPage + 1);
+            }
+            controlsContainer.appendChild(nextButton);
+        }
+
+        /** Helper to create a single page button */
+        function createPageButton(pageNumber, currentPage, onClick) {
+            const button = document.createElement('button');
+            button.className = `w-8 h-8 flex items-center justify-center rounded-md text-sm ${pageNumber === currentPage ? 'bg-blue-600 text-white font-medium' : 'bg-white text-gray-600 hover:bg-gray-100'}`;
+            button.textContent = pageNumber;
+            if (pageNumber !== currentPage) {
+                button.onclick = () => onClick(pageNumber);
+            }
+            return button;
+        }
+
+
+        // --- Event Listeners ---
+
         // Tab switching functionality
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all buttons
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('tab-active', 'text-blue-600');
-                    btn.classList.add('text-gray-500');
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+
+                    // Update button states
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active', 'text-blue-600', 'border-blue-600');
+                        btn.classList.add('text-gray-500', 'border-transparent');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    button.classList.add('tab-active', 'text-blue-600', 'border-blue-600');
+                    button.classList.remove('text-gray-500', 'border-transparent');
+                    button.setAttribute('aria-selected', 'true');
+
+
+                    // Update panel visibility
+                    tabContents.forEach(content => {
+                        if (content.id === `${tabId}-panel`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+
+                    // Optional: Reload data for the activated tab if needed
+                    /*
+                    switch (tabId) {
+                        case 'payments': loadPayments(); break;
+                        case 'customers': loadCustomers(); break;
+                        // Add other cases if needed
+                    }
+                    */
                 });
-
-                // Add active class to clicked button
-                button.classList.add('tab-active', 'text-blue-600');
-                button.classList.remove('text-gray-500');
-
-                // Hide all tab contents
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.add('hidden');
-                });
-
-                // Show the selected tab content
-                const tabId = button.getAttribute('data-tab');
-                document.getElementById(tabId).classList.remove('hidden');
-            });
-        });
-
-        // Initialize Charts
-        function initCharts() {
-            // Biểu đồ đường - Điểm tích lũy theo tháng
-            const pointsCtx = document.getElementById('pointsChart').getContext('2d');
-            const pointsChart = new Chart(pointsCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'],
-                    datasets: [{
-                        label: 'Điểm tích lũy',
-                        data: [850, 920, 1020, 1150, 1250, 1340, 1480, 1560, 1420, 1350, 1620, 1840],
-                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
-                        borderColor: '#1e40af',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Biểu đồ tròn - Phân bố khách hàng theo hạng
-            const tierCtx = document.getElementById('tierChart').getContext('2d');
-            const tierChart = new Chart(tierCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Kim cương', 'Vàng', 'Bạc', 'Đồng'],
-                    datasets: [{
-                        data: [32, 145, 568, 500],
-                        backgroundColor: [
-                            'rgba(30, 64, 175, 0.8)',
-                            'rgba(234, 179, 8, 0.8)',
-                            'rgba(156, 163, 175, 0.8)',
-                            'rgba(180, 83, 9, 0.8)'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
-            });
-
-            // Biểu đồ cột - Hiệu quả chiến dịch
-            const campaignCtx = document.getElementById('campaignChart').getContext('2d');
-            const campaignChart = new Chart(campaignCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Mua 1 tặng 1', 'Tích điểm đổi quà', 'Sinh nhật thương hiệu', 'Black Friday', 'Tết Nguyên Đán'],
-                    datasets: [{
-                        label: 'Số KH tham gia',
-                        data: [245, 532, 0, 1245, 2134],
-                        backgroundColor: 'rgba(30, 64, 175, 0.7)',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Biểu đồ ngang - Phần thưởng được đổi nhiều nhất
-            const rewardCtx = document.getElementById('rewardChart').getContext('2d');
-            const rewardChart = new Chart(rewardCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Voucher 20%', 'Ly sứ cao cấp', 'Voucher 50%', 'Bộ quà tặng', 'Phiếu mua hàng'],
-                    datasets: [{
-                        label: 'Số lần đổi',
-                        data: [55, 38, 30, 22, 18],
-                        backgroundColor: [
-                            'rgba(30, 64, 175, 0.7)',
-                            'rgba(59, 130, 246, 0.7)',
-                            'rgba(99, 102, 241, 0.7)',
-                            'rgba(129, 140, 248, 0.7)',
-                            'rgba(165, 180, 252, 0.7)'
-                        ],
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        y: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
             });
         }
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initCharts);
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded and parsed");
+            // Set current year in footer
+            if (currentYearSpan) {
+                currentYearSpan.textContent = new Date().getFullYear();
+            }
 
-        
+            setupTabs();
+
+            // Load initial data
+            console.log("Starting initial data load...");
+            // Use Promise.allSettled to load data even if some requests fail
+            Promise.allSettled([
+                loadQuickStats(),      // Item 0
+                initCampaignChart(),   // Item 1
+                initRewardChart(),     // Item 2
+                loadCampaigns(),       // Item 3
+                loadPayments(),        // Item 4 (Loads page 1 by default)
+                loadCustomers(),       // Item 5 (Loads page 1 by default)
+                loadRewards()          // Item 6
+            ]).then(results => {
+                console.log("Initial data load finished. Results:", results);
+                results.forEach((result, index) => {
+                    if (result.status === 'rejected') {
+                        // Log detailed error from Promise.allSettled
+                        console.error(`Initial load failed for item ${index}:`, result.reason);
+                        // You could potentially update the UI here to show a general error message
+                        // For example: find the corresponding container and show an error message
+                        // This requires mapping the index back to the function/UI element
+                        const failedItemMap = [
+                            'Quick Stats', 'Campaign Chart', 'Reward Chart', 'Campaigns',
+                            'Payments', 'Customers', 'Rewards'
+                        ];
+                        console.error(`--> Failed task: ${failedItemMap[index] || 'Unknown Task'}`);
+                        // Example: Show error in quick stats if item 0 failed
+                        // if (index === 0) {
+                        //    showMessage(quickStatsContainer, 'error', 'Không thể tải một số thống kê.');
+                        // }
+                    } else {
+                        console.log(`Initial load succeeded for item ${index}`);
+                    }
+                });
+            }).catch(error => {
+                // This catch is unlikely to be hit with Promise.allSettled,
+                // but good practice to have it.
+                console.error("Unexpected error during initial data load setup:", error);
+            });
+        });
+
     </script>
 </body>
 

@@ -39,6 +39,40 @@
             transform: scale(1.03);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1e40af;
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 
@@ -83,21 +117,21 @@
                 </div>
                 <div class="relative group">
                     <button id="profileBtn" class="flex items-center space-x-2">
-                        <img src="https://via.placeholder.com/40" alt="Avatar" class="w-10 h-10 rounded-full">
-                        <span class="font-medium">Nguyễn Văn A</span>
+                        <span class="font-medium" id="customer-name-header">{{user.user_name }}</span>
                     </button>
                     <div id="profileDropdown"
                         class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                         <div class="p-4 border-b">
-                            <h3 class="font-bold text-gray-800">Nguyễn Văn A</h3>
-                            <p class="text-xs text-gray-500">Thành viên Bạc</p>
+                            <h3 class="font-bold text-gray-800" id="customer-name-dropdown"></h3>
+                            <p class="text-xs text-gray-500" id="customer-tier-dropdown">{{user.membership}}</p>
                         </div>
                         <div class="py-1">
                             <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
                             <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
                         </div>
                         <div class="py-1 border-t">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+                            <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
+                                xuất</a>
                         </div>
                     </div>
                 </div>
@@ -111,16 +145,16 @@
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div class="mb-4 md:mb-0">
-                    <h2 class="text-2xl font-bold mb-2">Xin chào, Nguyễn Văn A!</h2>
-                    <p class="text-gray-600">Thành viên Bạc - Ưu đãi 5% trên mọi hóa đơn</p>
+                    <h2 class="text-2xl font-bold mb-2" id="customer-name">Xin chào, {{user.user_name}}!</h2>
+                    <p class="text-gray-600" id="customer-tier">Thành viên Bạc - Ưu đãi 5% trên mọi hóa đơn</p>
                 </div>
-                <div class="bg-blue-50 rounded-lg p-4 flex items-center">
+                <div class="bg-blue-50 rounded-lg p-4 flex items-center" id="points-container">
                     <div class="bg-blue-100 text-blue-600 p-3 rounded-lg mr-4">
                         <i class="fas fa-coins text-2xl"></i>
                     </div>
                     <div>
                         <p class="text-gray-500">Điểm tích lũy</p>
-                        <h3 class="text-2xl font-bold">12,450 <span class="text-lg">điểm</span></h3>
+                        <h3 class="text-2xl font-bold" id="total-points">Đang tải...</h3>
                     </div>
                 </div>
             </div>
@@ -128,8 +162,8 @@
 
         <!-- Navigation Tabs -->
         <div class="flex border-b mb-8">
-            <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="promotions">Ưu
-                đãi</button>
+            <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all tab-active"
+                data-target="promotions">Ưu đãi</button>
             <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="points">Quản lý
                 điểm</button>
             <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="history">Lịch sử
@@ -139,91 +173,15 @@
         <!-- Promotions Content -->
         <div data-content id="promotions" class="active">
             <h3 class="text-xl font-bold mb-6">Ưu đãi hiện có</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Promotion Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <img src="https://via.placeholder.com/600x300" alt="Promotion" class="w-full h-40 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-lg font-bold">Giảm 30% thứ 6 đen</h4>
-                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Mới</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">Giảm 30% cho tất cả sản phẩm tại Nike Store từ 24/11 -
-                            26/11</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Nike Store</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Xem chi tiết
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Promotion Card 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <img src="https://via.placeholder.com/600x300" alt="Promotion" class="w-full h-40 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-lg font-bold">Mua 1 tặng 1</h4>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Sắp hết
-                                hạn</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">Mua 1 ly bất kỳ tặng 1 ly tại Starbucks đến hết ngày 30/11
-                        </p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Starbucks</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Xem chi tiết
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Promotion Card 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
-                    <img src="https://via.placeholder.com/600x300" alt="Promotion" class="w-full h-40 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-lg font-bold">Ưu đãi thành viên</h4>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Dài hạn</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">Giảm 5% cho tất cả hóa đơn từ 500k khi là thành viên Bạc
-                        </p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Toàn hệ
-                                thống</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Xem chi tiết
-                            </button>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="current-promotions">
+                <div class="loading-overlay">
+                    <div class="spinner"></div>
                 </div>
             </div>
-
             <h3 class="text-xl font-bold mb-6">Ưu đãi sắp tới</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Upcoming Promotion Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover opacity-75">
-                    <img src="https://via.placeholder.com/600x300" alt="Promotion" class="w-full h-40 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-lg font-bold">Giáng sinh ấm áp</h4>
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp diễn ra</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">Giảm 20% toàn bộ cửa hàng thời trang từ 15/12 - 25/12</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Cửa hàng thời
-                                trang</span>
-                            <button class="bg-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg cursor-not-allowed">
-                                Sắp diễn ra
-                            </button>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="upcoming-promotions">
+                <div class="loading-overlay">
+                    <div class="spinner"></div>
                 </div>
             </div>
         </div>
@@ -239,13 +197,15 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Điểm hiện có</p>
-                            <h3 class="text-2xl font-bold">12,450 <span class="text-lg">điểm</span></h3>
+                            <h3 class="text-2xl font-bold" id="points-summary">Đang tải...</h3>
                         </div>
                     </div>
                     <div class="border-t pt-4">
-                        <p class="text-sm text-gray-600"><span class="font-medium">Tỷ lệ quy đổi:</span> 1,000đ = 1 điểm
+                        <p class="text-sm text-gray-600"><span class="font-medium">Tỷ lệ quy đổi:</span> 100,000đ = 1
+                            điểm
                         </p>
-                        <p class="text-sm text-gray-600"><span class="font-medium">Cấp độ:</span> Thành viên Bạc</p>
+                        <p class="text-sm text-gray-600"><span class="font-medium">Cấp độ:</span> <span
+                                id="tier-summary">Đang tải...</span></p>
                     </div>
                 </div>
 
@@ -254,7 +214,7 @@
                     <h4 class="text-lg font-bold mb-4">Tích điểm</h4>
                     <p class="text-gray-600 text-sm mb-4">Quét mã QR tại cửa hàng để tích điểm sau mỗi lần mua sắm</p>
                     <div class="flex flex-col items-center">
-                        <img src="https://via.placeholder.com/150x150" alt="QR Code" class="w-32 h-32 mb-4">
+                        <img src="" alt="QR Code" class="w-32 h-32 mb-4">
                         <p class="text-xs text-gray-500 mb-2">Mã khách hàng: CUS123456</p>
                         <button
                             class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
@@ -275,57 +235,11 @@
 
             <!-- Reward Catalog -->
             <h3 class="text-xl font-bold mb-6">Quà tặng đổi điểm</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Reward Card 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all reward-card">
-                    <img src="https://via.placeholder.com/600x400" alt="Reward" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Voucher 100k</h4>
-                        <p class="text-gray-600 text-sm mb-4">Giảm 100k cho hóa đơn từ 500k tại bất kỳ cửa hàng nào</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-medium">1,000 điểm</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Đổi ngay
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reward Card 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all reward-card">
-                    <img src="https://via.placeholder.com/600x400" alt="Reward" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Ly Starbucks</h4>
-                        <p class="text-gray-600 text-sm mb-4">Ly cao cấp từ Starbucks với thiết kế độc quyền</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-medium">2,500 điểm</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Đổi ngay
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reward Card 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all reward-card">
-                    <img src="https://via.placeholder.com/600x400" alt="Reward" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h4 class="text-lg font-bold mb-2">Túi vải thời trang</h4>
-                        <p class="text-gray-600 text-sm mb-4">Túi vải cao cấp in logo mall, thân thiện môi trường</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-medium">3,000 điểm</span>
-                            <button
-                                class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
-                                Đổi ngay
-                            </button>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="rewards-catalog">
+                <div class="loading-overlay">
+                    <div class="spinner"></div>
                 </div>
             </div>
-
             <button
                 class="w-full md:w-auto bg-white text-blue-600 border border-blue-600 font-medium py-2 px-6 rounded-lg hover:bg-blue-50 transition-all">
                 <i class="fas fa-redo mr-2"></i> Xem thêm quà tặng
@@ -348,7 +262,6 @@
                         class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-
             <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -374,102 +287,20 @@
                                     Trạng thái</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white divide-y divide-gray-200" id="transaction-history">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    15/11/2023 14:30
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #TXN123456
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Nike Store
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Tích điểm từ hóa đơn
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                                    +250
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoàn
-                                        thành</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    10/11/2023 09:15
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #TXN123455
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Quà tặng
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Đổi điểm lấy voucher 100k
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
-                                    -1,000
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoàn
-                                        thành</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    05/11/2023 18:45
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #TXN123454
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Starbucks
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Tích điểm từ hóa đơn
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                                    +120
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoàn
-                                        thành</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    01/11/2023 11:20
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #TXN123453
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Apple Store
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Tích điểm từ hóa đơn
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                                    +500
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hoàn
-                                        thành</span>
+                                <td colspan="6" class="py-4 px-4 text-center">
+                                    <div class="loading-overlay">
+                                        <div class="spinner"></div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-
             <div class="flex justify-between items-center">
-                <p class="text-sm text-gray-600">Hiển thị 4 trên tổng số 32 giao dịch</p>
+                <p class="text-sm text-gray-600">Hiển thị 0 trên tổng số 0 giao dịch</p>
                 <div class="flex space-x-2">
                     <button
                         class="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg hover:bg-gray-50 transition-all">
@@ -505,7 +336,7 @@
                         <li><a href="#" class="text-gray-600 text-sm hover:text-blue-600 transition-all"><i
                                     class="fas fa-phone-alt mr-2"></i> 1900 1234</a></li>
                         <li><a href="#" class="text-gray-600 text-sm hover:text-blue-600 transition-all"><i
-                                    class="fas fa-envelope mr-2"></i> support@mall.com</a></li>
+                                    class="fas fa-envelope mr-2"></i> support@mallmanagement.com</a></li>
                     </ul>
                 </div>
                 <div>
@@ -534,53 +365,330 @@
                 </div>
             </div>
             <div class="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500 text-sm">
-                <p>© 2023 Mall Management. Tất cả quyền được bảo lưu.</p>
+                <p>© 2025 Mall Management. Tất cả quyền được bảo lưu.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Tab switching functionality
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active class from all tabs and contents
-                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('tab-active'));
-                document.querySelectorAll('[data-content]').forEach(c => c.classList.remove('active'));
+        // Configuration
+        const USER_ID = 1;
+        const BRAND_ID = 1;
 
-                // Add active class to clicked tab and corresponding content
-                btn.classList.add('tab-active');
-                const target = btn.getAttribute('data-target');
-                document.getElementById(target).classList.add('active');
+        // Utility function to format number
+        function formatNumber(number) {
+            if (typeof number !== 'number' || isNaN(number)) return '0';
+            return number.toLocaleString('vi-VN');
+        }
+
+        // Utility function to show messages
+        function showMessage(container, message, type = 'error') {
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+        }
+
+        // Fetch and render customer info (mock for now)
+        async function loadCustomerInfo() {
+            // Giả định thông tin khách hàng từ API hoặc session
+            const customerName = document.getElementById('customer-name-header').textContent; // Thay bằng API call nếu có
+            const customerTier = document.getElementById('customer-tier-dropdown').textContent;
+            document.getElementById('customer-name').textContent = `Xin chào, ${customerName}!`;
+            document.getElementById('customer-tier').textContent = `${customerTier} - Ưu đãi 5% trên mọi hóa đơn`;
+            document.getElementById('customer-name-header').textContent = customerName;
+            document.getElementById('customer-name-dropdown').textContent = customerName;
+            document.getElementById('customer-tier-dropdown').textContent = customerTier;
+            document.getElementById('tier-summary').textContent = customerTier;
+        }
+
+        // Fetch and render total points
+        async function loadTotalPoints() {
+            const pointsContainer = document.getElementById('total-points');
+            const pointsSummary = document.getElementById('points-summary');
+            try {
+                const response = await fetch(`/point/get_points/${USER_ID}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải điểm');
+                pointsContainer.innerHTML = `${formatNumber(data[0]?.total_points)} <span class="text-lg">điểm</span>`;
+                pointsSummary.innerHTML = `${formatNumber(data[0]?.total_points)} <span class="text-lg">điểm</span>`;
+            } catch (error) {
+                console.error('Error loading total points:', error);
+                pointsContainer.innerHTML = '<span class="text-red-500">Lỗi tải</span>';
+                pointsSummary.innerHTML = '<span class="text-red-500">Lỗi tải</span>';
+            }
+        }
+
+        // Fetch and render promotions (campaigns)
+        async function loadPromotions() {
+            const currentContainer = document.getElementById('current-promotions');
+            const upcomingContainer = document.getElementById('upcoming-promotions');
+            try {
+                const response = await fetch(`/campaign/campaigns?brand_id=${BRAND_ID}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải ưu đãi');
+
+                // Current promotions (Đang hoạt động)
+                const current = data.filter(c => c.status === 'Đang hoạt động');
+                if (current.length > 0) {
+                    currentContainer.innerHTML = current.map(c => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover">
+                            <img src="https://placehold.co/600x300/e0e7ff/3730a3?text=${encodeURIComponent(c.title)}" alt="${c.title}" class="w-full h-40 object-cover">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-lg font-bold">${c.title}</h4>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Đang hoạt động</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">${c.description}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Brand ${BRAND_ID}</span>
+                                    <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all" onclick="redeemCampaign(${c.campaign_id}, ${c.points_required})">
+                                        Đổi ngay (${formatNumber(c.points_required)} điểm)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    currentContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Không có ưu đãi hiện tại.</div>';
+                }
+
+                // Upcoming promotions (Sắp bắt đầu)
+                const upcoming = data.filter(c => c.status === 'Sắp bắt đầu');
+                if (upcoming.length > 0) {
+                    upcomingContainer.innerHTML = upcoming.map(c => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover opacity-75">
+                            <img src="https://placehold.co/600x300/e0e7ff/3730a3?text=${encodeURIComponent(c.title)}" alt="${c.title}" class="w-full h-40 object-cover">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-lg font-bold">${c.title}</h4>
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp diễn ra</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">${c.description}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Brand ${BRAND_ID}</span>
+                                    <button class="bg-gray-300 text-gray-600 text-sm px-4 py-2 rounded-lg cursor-not-allowed">
+                                        Sắp diễn ra
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    upcomingContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Không có ưu đãi sắp tới.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading promotions:', error);
+                showMessage(currentContainer, `Lỗi tải ưu đãi: ${error.message}`);
+                showMessage(upcomingContainer, `Lỗi tải ưu đãi: ${error.message}`);
+            }
+        }
+
+        // Fetch and render rewards (vouchers)
+        async function loadRewards() {
+            const rewardsContainer = document.getElementById('rewards-catalog');
+            try {
+                const response = await fetch(`/voucher/vouchers?brand_id=${BRAND_ID}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải quà tặng');
+
+                if (data.length > 0) {
+                    rewardsContainer.innerHTML = data.map(v => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all reward-card">
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=${encodeURIComponent(v.title)}" alt="${v.title}" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h4 class="text-lg font-bold mb-2">${v.title}</h4>
+                                <p class="text-gray-600 text-sm mb-4">${v.description}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-blue-600 font-medium">${formatNumber(v.points_required)} điểm</span>
+                                    <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all" onclick="redeemVoucher(${v.voucher_id}, ${v.points_required}, '${v.title}')">
+                                        Đổi ngay
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    rewardsContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Không có quà tặng nào.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading rewards:', error);
+                showMessage(rewardsContainer, `Lỗi tải quà tặng: ${error.message}`);
+            }
+        }
+
+        // Redeem campaign
+        async function redeemCampaign(campaignId, pointsRequired) {
+            try {
+                // Kiểm tra điểm đủ để đổi
+                const pointsResponse = await fetch(`/point/get_total_points/${BRAND_ID}`);
+                const pointsData = await pointsResponse.json();
+                if (!pointsResponse.ok) throw new Error(pointsData.error || 'Lỗi kiểm tra điểm');
+                if (pointsData.total_points < pointsRequired) {
+                    alert('Bạn không đủ điểm để đổi ưu đãi này.');
+                    return;
+                }
+
+                const response = await fetch(`/campaign/campaigns/${campaignId}/redeem`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: USER_ID })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi khi đổi ưu đãi');
+                alert(`Đổi ưu đãi thành công! Mã đổi: ${data.redemption_code}`);
+                loadTotalPoints(); // Refresh points
+                loadTransactionHistory(); // Refresh history
+            } catch (error) {
+                console.error('Error redeeming campaign:', error);
+                alert(`Lỗi: ${error.message}`);
+            }
+        }
+
+        // Redeem voucher
+        async function redeemVoucher(voucherId, pointsRequired, voucherTitle) {
+            try {
+                // Kiểm tra điểm đủ để đổi
+                const pointsResponse = await fetch(`/point/get_total_points/${BRAND_ID}`);
+                const pointsData = await pointsResponse.json();
+                if (!pointsResponse.ok) throw new Error(pointsData.error || 'Lỗi kiểm tra điểm');
+                if (pointsData.total_points < pointsRequired) {
+                    alert('Bạn không đủ điểm để đổi quà này.');
+                    return;
+                }
+
+                const redemptionCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Generate random code
+                const response = await fetch(`/voucher/vouchers/${voucherId}/redeem`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        points_spent: pointsRequired,
+                        redemption_code: redemptionCode
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi khi đổi quà');
+                alert(`Đổi quà "${voucherTitle}" thành công! Mã đổi: ${redemptionCode}`);
+                loadTotalPoints(); // Refresh points
+                loadTransactionHistory(); // Refresh history
+            } catch (error) {
+                console.error('Error redeeming voucher:', error);
+                alert(`Lỗi: ${error.message}`);
+            }
+        }
+
+        // Fetch and render transaction history
+        async function loadTransactionHistory() {
+            const historyContainer = document.getElementById('transaction-history');
+            try {
+                // Load campaign redemptions
+                const campaignResponse = await fetch(`/campaign/${USER_ID}/redeemed_campaigns`);
+                const campaignData = await campaignResponse.json();
+                if (!campaignResponse.ok) throw new Error(campaignData.error || 'Lỗi tải lịch sử campaign');
+
+                // Load voucher redemptions (assuming an endpoint exists; mock for now)
+                let voucherData = [];
+                try {
+                    const voucherResponse = await fetch(`/voucher/${USER_ID}/redeemed_vouchers`);
+                    voucherData = await voucherResponse.json();
+                    if (!voucherResponse.ok) throw new Error(voucherData.error || 'Lỗi tải lịch sử voucher');
+                } catch (e) {
+                    console.warn('Voucher redemption history endpoint not implemented, skipping.');
+                }
+
+                const transactions = [
+                    ...campaignData.map(c => ({
+                        date: new Date(c.redeemed_at).toLocaleString('vi-VN'),
+                        transaction_id: `CAM${c.campaign_id}`,
+                        store: `Brand ${c.brand_id}`,
+                        description: `Đổi ưu đãi: ${c.title}`,
+                        points: -c.points_spent,
+                        status: 'Hoàn thành'
+                    })),
+                    ...voucherData.map(v => ({
+                        date: new Date(v.redeemed_at).toLocaleString('vi-VN'),
+                        transaction_id: `VOU${v.voucher_id}`,
+                        store: `Brand ${v.brand_id}`,
+                        description: `Đổi quà: ${v.title}`,
+                        points: -v.points_spent,
+                        status: 'Hoàn thành'
+                    }))
+                ];
+
+                if (transactions.length > 0) {
+                    historyContainer.innerHTML = transactions.map(t => `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${t.transaction_id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.store}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.description}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm ${t.points < 0 ? 'text-red-600' : 'text-green-600'} font-medium">
+                                ${t.points < 0 ? '' : '+'}${formatNumber(t.points)}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">${t.status}</span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    historyContainer.innerHTML = '<tr><td colspan="6" class="py-4 px-4 text-center text-gray-600">Không có giao dịch nào.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading transaction history:', error);
+                showMessage(historyContainer, `Lỗi tải lịch sử: ${error.message}`);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching functionality
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('tab-active'));
+                    document.querySelectorAll('[data-content]').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('tab-active');
+                    const target = btn.getAttribute('data-target');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+
+            // Notification and profile dropdowns
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const profileBtn = document.getElementById('profileBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+
+            notificationBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+            });
+
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                notificationDropdown.classList.add('hidden');
+                profileDropdown.classList.add('hidden');
+            });
+
+            notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
+            profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+            // Load initial data
+            Promise.allSettled([
+                loadCustomerInfo(),
+                loadTotalPoints(),
+                loadPromotions(),
+                loadRewards(),
+                loadTransactionHistory()
+            ]).then(results => {
+                results.forEach((result, index) => {
+                    if (result.status === 'rejected') {
+                        console.error(`Load failed for task ${index}:`, result.reason);
+                    }
+                });
             });
         });
-
-        // Notification dropdown
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-
-        notificationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('hidden');
-        });
-
-        // Profile dropdown
-        const profileBtn = document.getElementById('profileBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
-
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('hidden');
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', () => {
-            notificationDropdown.classList.add('hidden');
-            profileDropdown.classList.add('hidden');
-        });
-
-        // Prevent dropdown from closing when clicking inside
-        notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
-        profileDropdown.addEventListener('click', (e) => e.stopPropagation());
     </script>
 </body>
 

@@ -18,7 +18,9 @@ def get_db_connection():
 
 def generate_code(length=6):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-
+@campaign_bp.route('/brand', methods=['GET'])
+def brand_page():
+    return render_template("brand.html")
 @campaign_bp.route('/create_campaign', methods=['GET'])
 def create_campaign_page():
     if 'brand_id' not in session:
@@ -155,21 +157,21 @@ def get_campaign_page():
     user_name = session.get('user_name', '')
     return render_template("campaign_service/get_campaign.html", user_name=user_name, brand_id=session['brand_id'])
 
-@campaign_bp.route('/get_campaign/<int:brand_id>', methods=['GET'])
-def get_campaign(brand_id):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM Campaign WHERE brand_id=%s", (brand_id,))
-        campaign = cursor.fetchall()
-        if not campaign:
-            return jsonify({"error": "Campaign not found"}), 404
-        return jsonify(campaign)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
+# @campaign_bp.route('/get_campaign/<int:brand_id>', methods=['GET'])
+# def get_campaign(brand_id):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT * FROM Campaign WHERE brand_id=%s", (brand_id,))
+#         campaign = cursor.fetchall()
+#         if not campaign:
+#             return jsonify({"error": "Campaign not found"}), 404
+#         return jsonify(campaign)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+#     finally:
+#         cursor.close()
+#         conn.close()
 
 @campaign_bp.route('/campaigns', methods=['GET'])
 def list_campaigns():
@@ -267,7 +269,7 @@ def get_campaign_redemptions(campaign_id):
         cursor.close()
         conn.close()
 
-@campaign_bp.route('/users/<int:user_id>/redeemed-campaigns', methods=['GET'])
+@campaign_bp.route('/<int:user_id>/redeemed_campaigns', methods=['GET'])
 def get_user_redeemed_campaigns(user_id):
     try:
         conn = get_db_connection()
@@ -425,65 +427,6 @@ def campaign_dashboard():
         top_redeem_count=top_redeem_count
     )
 
-@campaign_bp.route('/brand_transaction_history_data', methods=['GET']) # Hoặc đặt trong transaction_bp
-def get_brand_transaction_history_data():
-    """API endpoint to get transaction history related to the logged-in brand's campaigns."""
-    if 'brand_id' not in session:
-        return jsonify({"error": "Unauthorized: Brand not logged in or session invalid."}), 401
-
-    logged_in_brand_id = session['brand_id']
-    if not logged_in_brand_id:
-         return jsonify({"error": "Invalid Brand ID in session."}), 401
-
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection() # Make sure this connects to the correct DB if transactions are separate
-        cursor = conn.cursor(dictionary=True)
-
-        # Query to get redemption history for campaigns belonging to this brand
-        # You might need to JOIN with user tables to get customer names if desired
-        query = """
-            SELECT
-                cr.campaign_redemption_id,
-                cr.user_id,  -- ID của khách hàng đổi quà
-                cr.points_spent,
-                cr.redeemed_at,
-                c.title AS campaign_title,
-                c.campaign_id
-                -- Optional: Join with user_service.Users or user_service.User_Profile if needed
-                -- u.username AS customer_username
-            FROM Campaign_Redemption cr
-            JOIN Campaign c ON cr.campaign_id = c.campaign_id
-            -- Optional JOIN:
-            -- LEFT JOIN user_service.Users u ON cr.user_id = u.user_id
-            WHERE c.brand_id = %s
-            ORDER BY cr.redeemed_at DESC
-        """
-        cursor.execute(query, (logged_in_brand_id,))
-        transactions = cursor.fetchall()
-
-        # Convert datetime objects to ISO format strings
-        for tx in transactions:
-            if tx.get('redeemed_at'):
-                tx['redeemed_at'] = tx['redeemed_at'].isoformat()
-            # Add default values for potentially missing joined fields
-            # tx['customer_username'] = tx.get('customer_username', 'N/A')
-
-        return jsonify(transactions)
-
-    except mysql.connector.Error as err:
-        print(f"Database error fetching brand transaction history: {err}")
-        return jsonify({"error": f"Database error: {err}"}), 500
-    except Exception as e:
-        print(f"Error fetching brand transaction history: {e}")
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if cursor: cursor.close()
-        if conn and conn.is_connected(): conn.close()
-
-# Route để render trang HTML lịch sử thanh toán
-# Đặt trong campaign_bp hoặc service phù hợp
 @campaign_bp.route('/payment_history', methods=['GET'])
 def payment_history_page():
     """Renders the HTML page for the brand's payment/transaction history."""
@@ -491,3 +434,177 @@ def payment_history_page():
         return redirect('/user/login')
     user_name = session.get('user_name', '')
     return render_template("campaign_service/brand_payment_history.html", user_name=user_name)
+
+@campaign_bp.route('/brand_point_history_data', methods=['GET'])
+def get_brand_point_history_data():
+    """
+    API endpoint to get point transaction history (earn/redeem)
+    related to the logged-in brand's campaigns or activities.
+    """
+    # --- Authentication Check ---
+    if 'brand_id' not in session:
+        return jsonify({"error": "Unauthorized: Brand not logged in or session invalid."}), 401
+    logged_in_brand_id = session['brand_id']
+    if not logged_in_brand_id:
+         return jsonify({"error": "Invalid Brand ID in session."}), 401
+    # ---------------------------
+
+    conn_campaign = None
+    conn_point = None # Separate connection if Point_Log is in another DB
+    cursor_campaign = None
+    cursor_point = None
+    point_history = []
+
+    try:
+        # --- 1. Fetch Redemption History (Spending points) ---
+        conn_campaign = get_db_connection() # Connect to campaign DB
+        cursor_campaign = conn_campaign.cursor(dictionary=True)
+
+        redeem_query = """
+            SELECT
+                cr.campaign_redemption_id AS id,
+                cr.redeemed_at AS timestamp,
+                'REDEEM_REWARD' AS transaction_type,
+                CONCAT('Đổi quà: ', c.title) AS description,
+                cr.user_id AS customer_id,
+                cr.points_spent * -1 AS points_change, -- Make points spent negative
+                c.campaign_id AS related_campaign_id
+            FROM Campaign_Redemption cr
+            JOIN Campaign c ON cr.campaign_id = c.campaign_id
+            WHERE c.brand_id = %s
+        """
+        cursor_campaign.execute(redeem_query, (logged_in_brand_id,))
+        redemptions = cursor_campaign.fetchall()
+        point_history.extend(redemptions)
+        cursor_campaign.close()
+        conn_campaign.close() # Close campaign DB connection
+
+        # --- 2. Fetch Earning History (Optional - if applicable) ---
+    
+        try:
+            # --- Define a function to connect to point_service DB ---
+            # def get_point_db_connection():
+            #     return mysql.connector.connect(..., database="point_service")
+
+            # conn_point = get_point_db_connection()
+            # cursor_point = conn_point.cursor(dictionary=True)
+            # earn_query = """
+            #     SELECT
+            #         pl.log_id AS id,
+            #         pl.created_at AS timestamp,
+            #         'EARN_POINTS' AS transaction_type,
+            #         pl.description, -- Use description from log
+            #         pl.user_id AS customer_id,
+            #         pl.points AS points_change, -- Points earned are positive
+            #         NULL AS related_campaign_id -- Or link if applicable
+            #     FROM Point_Log pl
+            #     WHERE pl.type = 'EARN' AND pl.brand_ref_id = %s -- Filter by type and brand reference
+            # """
+            # cursor_point.execute(earn_query, (logged_in_brand_id,))
+            # earnings = cursor_point.fetchall()
+            # point_history.extend(earnings)
+            pass # Remove 'pass' when implementing point earning query
+        except mysql.connector.Error as err:
+             print(f"Database error fetching point earning history: {err}")
+             # Decide if this error should stop the whole request or just be logged
+        finally:
+             if cursor_point: cursor_point.close()
+             if conn_point and conn_point.is_connected(): conn_point.close()
+
+
+        # --- 3. Sort combined history by timestamp ---
+        point_history.sort(key=lambda x: x['timestamp'], reverse=True) # Sort descending
+
+        # --- 4. Format dates for JSON ---
+        for item in point_history:
+            if item.get('timestamp'):
+                item['timestamp'] = item['timestamp'].isoformat()
+
+        return jsonify(point_history)
+
+    except mysql.connector.Error as err:
+        print(f"Database error fetching brand point history: {err}")
+        return jsonify({"error": f"Database error: {err}"}), 500
+    except Exception as e:
+        print(f"Error fetching brand point history: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        # Ensure connections opened in the main try block are closed
+        if cursor_campaign: cursor_campaign.close()
+        if conn_campaign and conn_campaign.is_connected(): conn_campaign.close()
+
+
+# New APIs for Dashboard
+@campaign_bp.route('/get_campaigns/<int:brand_id>', methods=['GET'])
+def get_campaigns(brand_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT campaign_id, title AS name, 
+                   CASE 
+                       WHEN reward LIKE '%Discount%' THEN 'Khuyến mãi'
+                       WHEN reward LIKE '%Voucher%' THEN 'Đổi quà'
+                       ELSE 'Tích điểm'
+                   END AS type,
+                   description, 
+                   DATE_FORMAT(start_at, '%d/%m') AS start_date, 
+                   DATE_FORMAT(end_at, '%d/%m') AS end_date, 
+                   status, 
+                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) AS participants,
+                   1000 AS target_participants, -- Placeholder, adjust as needed
+                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) / 1000 * 100 AS progress
+            FROM campaign 
+            WHERE brand_id = %s
+        """, (brand_id,))
+        campaigns = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        if not campaigns:
+            return jsonify({"error": "No campaigns found"}), 404
+        current = [c for c in campaigns if c['status'] in ['Đang hoạt động', 'Sắp bắt đầu']]
+        past = [c for c in campaigns if c['status'] == 'Kết thúc']
+        return jsonify({"current": current, "past": past}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+@campaign_bp.route('/get_campaign_chart/<int:brand_id>', methods=['GET'])
+def get_campaign_chart(brand_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT title AS name, 
+                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) AS participants
+            FROM campaign
+            WHERE brand_id = %s
+            ORDER BY participants DESC, campaign_id DESC LIMIT 5
+        """, (brand_id,))
+        campaign_data = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        campaign_labels = [c['name'] for c in campaign_data]
+        campaign_participants = [c['participants'] for c in campaign_data]
+
+        return jsonify({
+            "campaign_chart": {
+                "labels": campaign_labels,
+                "data": campaign_participants
+            }
+        }), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    
+@campaign_bp.route('/get_active_campaigns/<int:brand_id>', methods=['GET'])
+def get_active_campaigns(brand_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) AS active_campaigns FROM campaign WHERE brand_id = %s AND status = 'Đang hoạt động'", (brand_id,))
+        active_campaigns = cursor.fetchone()['active_campaigns']
+        cursor.close()
+        conn.close()
+        return jsonify({"active_campaigns": active_campaigns}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

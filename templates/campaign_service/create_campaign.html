@@ -4,322 +4,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Chiến Dịch Mới</title>
+    <title>Tạo Chiến Dịch Mới - LoyaltyBrand</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        /* Gradient background for header */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
 
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            filter: invert(0.6);
+        /* Hover effect for cards */
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .input-error {
-            border-color: #e53e3e;
-            /* red-600 */
-            box-shadow: 0 0 0 1px #e53e3e;
+        /* Smooth transitions */
+        .transition-all {
+            transition: all 0.3s ease;
         }
 
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1e40af;
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        /* Error and success messages */
         .error-message {
-            color: #c53030;
-            /* red-700 */
-            font-size: 0.875rem;
-            /* text-sm */
-            margin-top: 0.25rem;
-            /* mt-1 */
+            color: #ef4444;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
         }
     </style>
 </head>
 
-<body class="bg-gray-100">
-
-    <nav class="bg-gray-800 text-white shadow-md">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-end items-center h-10 text-sm">
-                <span>Xin chào, <span id="usernamePlaceholder" class="font-medium">{{user_name}}</span>!</span>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-crown text-2xl"></i>
+                <h1 class="text-2xl font-bold">LoyaltyBrand</h1>
             </div>
-            <div class="flex justify-between items-center h-12 border-t border-gray-700">
-                <div class="text-xl font-semibold">Brand Dashboard</div>
-                <div class="flex space-x-6">
-                    <a href="#" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Xem Thông tin</a>
-                    <a href="#" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                        aria-current="page">Tạo chiến dịch</a>
-                    <a href="#" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Lịch sử thanh
-                        toán</a>
-                    <a href="/user/logout" class="hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Đăng
-                        Xuất</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mx-auto mt-8 p-4 sm:p-6">
-        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
-            <h1 class="text-2xl font-bold mb-6 text-gray-800">Tạo Chiến Dịch Mới</h1>
-
-            <form id="createCampaignForm" novalidate>
-                <div class="mb-4">
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề chiến dịch <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" id="title" name="title" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                        placeholder="Ví dụ: Giảm giá mùa hè">
-                    <p id="title-error" class="error-message hidden"></p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Mô tả <span
-                            class="text-red-500">*</span></label>
-                    <textarea id="description" name="description" rows="3" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                        placeholder="Mô tả chi tiết về chiến dịch"></textarea>
-                    <p id="description-error" class="error-message hidden"></p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="points_required" class="block text-sm font-medium text-gray-700 mb-1">Điểm yêu cầu <span
-                            class="text-red-500">*</span></label>
-                    <input type="number" id="points_required" name="points_required" required min="0"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                        placeholder="Ví dụ: 100">
-                    <p id="points_required-error" class="error-message hidden"></p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="reward" class="block text-sm font-medium text-gray-700 mb-1">Phần thưởng <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" id="reward" name="reward" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                        placeholder="Ví dụ: Voucher giảm 10%, Cafe miễn phí">
-                    <p id="reward-error" class="error-message hidden"></p>
-                </div>
-
-                <div class="mb-4">
-                    <label for="start_at" class="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu <span
-                            class="text-red-500">*</span></label>
-                    <input type="datetime-local" id="start_at" name="start_at" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <p id="start_at-error" class="error-message hidden"></p>
-                </div>
-
-                <div class="mb-6">
-                    <label for="end_at" class="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc <span
-                            class="text-red-500">*</span></label>
-                    <input type="datetime-local" id="end_at" name="end_at" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <p id="end_at-error" class="error-message hidden"></p>
-                </div>
-
-                <div id="messageArea" class="mb-4 text-sm font-medium"></div>
-
-                <div class="flex justify-end">
-                    <button type="submit" id="submitButton"
-                        class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
-                        Tạo Chiến Dịch & Gửi Duyệt
+            <div class="flex items-center space-x-6">
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 focus:outline-none">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                     </button>
                 </div>
-            </form>
+                <div class="flex items-center space-x-2">
+                    <img src="https://placehold.co/40x40/e2e8f0/334155?text=A" alt="Avatar quản trị viên"
+                        class="w-10 h-10 rounded-full border-2 border-white">
+                    <span class="font-medium hidden sm:inline" id="user-name">Admin Brand</span>
+                    <button class="text-gray-300 hover:text-white focus:outline-none ml-2" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section aria-labelledby="create-campaign-heading">
+            <h2 id="create-campaign-heading" class="text-2xl font-bold text-gray-800 mb-6">Tạo Chiến Dịch Mới</h2>
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <form id="create-campaign-form" class="space-y-6">
+                    <!-- Campaign Title -->
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">Tên chiến dịch <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="title" name="title" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Ví dụ: Chiến dịch Mùa Hè">
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Mô tả <span
+                                class="text-red-500">*</span></label>
+                        <textarea id="description" name="description" rows="4" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Mô tả chi tiết về chiến dịch"></textarea>
+                    </div>
+
+                    <!-- Points Required -->
+                    <div>
+                        <label for="points_required" class="block text-sm font-medium text-gray-700">Số điểm cần thiết
+                            <span class="text-red-500">*</span></label>
+                        <input type="number" id="points_required" name="points_required" required min="1"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Ví dụ: 500">
+                    </div>
+
+                    <!-- Reward -->
+                    <div>
+                        <label for="reward" class="block text-sm font-medium text-gray-700">Phần thưởng <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="reward" name="reward" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Ví dụ: Voucher 100K">
+                    </div>
+
+                    <!-- Start Date -->
+                    <div>
+                        <label for="start_at" class="block text-sm font-medium text-gray-700">Ngày bắt đầu <span
+                                class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="start_at" name="start_at" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    </div>
+
+                    <!-- End Date -->
+                    <div>
+                        <label for="end_at" class="block text-sm font-medium text-gray-700">Ngày kết thúc <span
+                                class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="end_at" name="end_at" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    </div>
+
+                    <!-- Message Area -->
+                    <div id="message-area" class="hidden"></div>
+
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="window.location.href='/brand.html'"
+                            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            Hủy
+                        </button>
+                        <button type="submit"
+                            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Tạo và gửi chiến dịch
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-12 py-6">
+        <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+            © <span id="current-year"></span> LoyaltyBrand. All rights reserved.
+        </div>
+    </footer>
 
     <script>
-        const form = document.getElementById('createCampaignForm');
-        const messageArea = document.getElementById('messageArea');
-        const submitButton = document.getElementById('submitButton');
-        const inputs = form.querySelectorAll('input[required], textarea[required]');
-        // Placeholder for username - replace 'Brand User' dynamically
-        const usernamePlaceholder = document.getElementById('usernamePlaceholder');
-        // Example: Set username dynamically if available (e.g., from session storage or server)
-        // const loggedInUsername = sessionStorage.getItem('username'); // Example
-        // if (loggedInUsername) {
-        //    usernamePlaceholder.textContent = loggedInUsername;
-        // }
+        // Configuration
+        const BRAND_ID = 1; // Should be dynamically set from session
 
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        function showError(fieldId, message) {
-            const field = document.getElementById(fieldId);
-            const errorElement = document.getElementById(`${fieldId}-error`);
-            if (field && errorElement) {
-                field.classList.add('input-error');
-                errorElement.textContent = message;
-                errorElement.classList.remove('hidden');
-            }
+        // Utility function to show messages
+        function showMessage(message, type = 'error') {
+            const messageArea = document.getElementById('message-area');
+            messageArea.className = `mt-4 ${type === 'error' ? 'error-message' : 'success-message'}`;
+            messageArea.textContent = message;
+            messageArea.classList.remove('hidden');
+            setTimeout(() => messageArea.classList.add('hidden'), 5000);
         }
 
-        function clearError(fieldId) {
-            const field = document.getElementById(fieldId);
-            const errorElement = document.getElementById(`${fieldId}-error`);
-            if (field && errorElement) {
-                field.classList.remove('input-error');
-                errorElement.textContent = '';
-                errorElement.classList.add('hidden');
-            }
+        // Utility function to format datetime-local input
+        function formatDateTimeForInput(date) {
+            const d = new Date(date);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
 
-        function validateForm() {
-            let isValid = true;
-            messageArea.textContent = '';
-            messageArea.className = 'mb-4 text-sm font-medium';
-
-            inputs.forEach(input => {
-                clearError(input.id);
-                if (!input.value.trim()) {
-                    showError(input.id, 'Trường này là bắt buộc.');
-                    isValid = false;
-                } else if (input.type === 'number' && input.min !== '' && parseFloat(input.value) < parseFloat(input.min)) {
-                    showError(input.id, `Giá trị phải lớn hơn hoặc bằng ${input.min}.`);
-                    isValid = false;
-                }
-            });
-
-            const startDateInput = document.getElementById('start_at');
-            const endDateInput = document.getElementById('end_at');
-            clearError('end_at'); // Clear specific date error first
-
-            if (startDateInput.value && endDateInput.value) {
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
-                if (endDate <= startDate) {
-                    showError('end_at', 'Ngày kết thúc phải sau ngày bắt đầu.');
-                    isValid = false;
-                }
-            } else {
-                // Check individual date fields only if the combined check failed or wasn't performed
-                if (!startDateInput.value) { showError('start_at', 'Trường này là bắt buộc.'); isValid = false; }
-                if (!endDateInput.value) { showError('end_at', 'Trường này là bắt buộc.'); isValid = false; }
-            }
-            return isValid;
-        }
-
-        // Add event listeners for validation
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                // Clear error only for the field being typed in
-                if (input.value.trim()) { clearError(input.id); }
-                // Re-validate date range if either date changes
-                if (input.id === 'start_at' || input.id === 'end_at') {
-                    const start = document.getElementById('start_at').value;
-                    const end = document.getElementById('end_at').value;
-                    if (start && end && new Date(end) > new Date(start)) {
-                        clearError('end_at'); // Clear error if dates become valid
-                    }
-                }
-            });
-            input.addEventListener('blur', () => { validateForm(); }); // Validate on losing focus
-        });
-
-        // Handle form submission
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!validateForm()) {
-                messageArea.textContent = 'Vui lòng sửa các lỗi trong form.';
-                messageArea.classList.add('text-red-600');
-                return;
-            }
-
+        // Form submission handler
+        document.getElementById('create-campaign-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = e.target.querySelector('button[type="submit"]');
             submitButton.disabled = true;
-            submitButton.textContent = 'Đang xử lý...';
-            messageArea.textContent = ''; // Clear previous messages
-            messageArea.className = 'mb-4 text-sm font-medium'; // Reset message style
+            submitButton.innerHTML = `<div class="spinner !w-5 !h-5 mr-2"></div> Đang xử lý...`;
 
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => { data[key] = value; });
+            const formData = new FormData(e.target);
+            const data = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                points_required: parseInt(formData.get('points_required')),
+                reward: formData.get('reward'),
+                start_at: formData.get('start_at'),
+                end_at: formData.get('end_at')
+            };
 
-            console.log('Sending data for creation:', JSON.stringify(data));
-
-            let campaignId = null; // Variable to store the created campaign ID
-
-            // Step 1: Create the campaign
             try {
-                const createResponse = await fetch('/campaign/campaigns', { // Ensure this endpoint is correct for your setup
+                // Step 1: Create campaign
+                const createResponse = await fetch(`/campaign/campaigns`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        // Add authentication headers if required, e.g., Authorization: Bearer <token>
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(data)
                 });
 
-                let createResult;
-                try {
-                    createResult = await createResponse.json();
-                } catch (jsonError) {
-                    console.error('Failed to parse JSON from create response:', jsonError);
-                    throw new Error(`Lỗi máy chủ hoặc phản hồi không hợp lệ khi tạo (Status: ${createResponse.status}).`); // Throw error to be caught below
-                }
+                const createResult = await createResponse.json();
 
                 if (!createResponse.ok) {
-                    // Throw an error with the message from the backend if available
-                    throw new Error(`Lỗi tạo (${createResponse.status}): ${createResult.error || 'Không thể tạo chiến dịch.'}`);
+                    throw new Error(createResult.error || 'Lỗi khi tạo chiến dịch');
                 }
 
-                // Creation successful, store campaign ID and show initial success message
-                campaignId = createResult.campaign_id; // Make sure backend returns campaign_id
-                if (!campaignId) {
-                    throw new Error('Backend did not return a campaign_id after creation.');
-                }
-                messageArea.textContent = `Đã tạo chiến dịch (ID: ${campaignId})! Mã giảm giá: ${createResult.redemption_code || 'N/A'}. Đang gửi duyệt...`;
-                messageArea.className = 'mb-4 text-sm font-medium text-blue-600'; // Indicate processing next step
+                const campaignId = createResult.campaign_id;
+                const redemptionCode = createResult.redemption_code;
 
-            } catch (error) {
-                // Handle errors during creation (network, server, JSON parsing, logical)
-                console.error('Campaign creation error:', error);
-                messageArea.textContent = error.message || 'Lỗi khi tạo chiến dịch. Vui lòng thử lại.';
-                messageArea.className = 'mb-4 text-sm font-medium text-red-600';
-                submitButton.disabled = false; // Re-enable button on failure
-                submitButton.textContent = 'Tạo Chiến Dịch & Gửi Duyệt';
-                return; // Stop the process if creation failed
-            }
-
-            // Step 2: Submit the campaign for approval (only if creation was successful)
-            try {
-                console.log(`Submitting campaign ID: ${campaignId} for approval`);
-                const submitResponse = await fetch(`/campaign/campaigns/${campaignId}/submit`, { // Use correct endpoint
+                // Step 2: Submit campaign to mall
+                const submitResponse = await fetch(`/campaign/campaigns/${campaignId}/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({}) // Empty body as per backend requirement
+                        // Add authentication headers if required
+                    }
                 });
 
-                let submitResult;
-                try {
-                    submitResult = await submitResponse.json();
-                } catch (jsonError) {
-                    console.error('Failed to parse JSON from submit response:', jsonError);
-                    throw new Error(`Lỗi máy chủ hoặc phản hồi không hợp lệ khi gửi duyệt (Status: ${submitResponse.status}).`);
-                }
+                const submitResult = await submitResponse.json();
 
                 if (!submitResponse.ok) {
-                    throw new Error(`Lỗi gửi duyệt (${submitResponse.status}): ${submitResult.error || 'Không thể gửi chiến dịch đi duyệt.'}`);
+                    throw new Error(submitResult.error || 'Lỗi khi gửi chiến dịch đến mall');
                 }
 
-                // Both steps successful
-                messageArea.textContent = `Chiến dịch (ID: ${campaignId}) đã được tạo và gửi đi duyệt thành công!`;
-                messageArea.className = 'mb-4 text-sm font-medium text-green-600';
-                form.reset();
-                inputs.forEach(input => clearError(input.id));
-                clearError('end_at');
+                showMessage(`Tạo và gửi chiến dịch thành công! Mã đổi: ${redemptionCode}`, 'success');
+                // Reset form
+                e.target.reset();
+                // Redirect to dashboard after a delay
+                setTimeout(() => {
+                    window.location.assign('/campaign/brand');
+                }, 2000);
+
 
             } catch (error) {
-                // Handle errors during submission step
-                console.error('Campaign submission error:', error);
-                // Update message area to show creation was okay, but submission failed
-                messageArea.textContent = `Đã tạo chiến dịch (ID: ${campaignId}), nhưng ${error.message || 'lỗi khi gửi duyệt.'}`;
-                messageArea.className = 'mb-4 text-sm font-medium text-yellow-600'; // Use yellow for partial success/warning
+                console.error('Error processing campaign:', error);
+                showMessage(`Lỗi: ${error.message}`, 'error');
             } finally {
-                // Re-enable button regardless of submission success/failure, as creation part finished
                 submitButton.disabled = false;
-                submitButton.textContent = 'Tạo Chiến Dịch & Gửi Duyệt';
+                submitButton.innerHTML = `<i class="fas fa-plus mr-2"></i> Tạo và gửi chiến dịch`;
             }
         });
-    </script>
 
+        // Logout function (placeholder, implement based on your auth system)
+        function logout() {
+            // Clear session and redirect to login
+            fetch(`/logout`, { method: 'POST' })
+                .then(() => window.location.href = '/login.html')
+                .catch(err => console.error('Logout error:', err));
+        }
+
+        // Initialize user name (fetch from session or API if needed)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Example: Fetch user info from API
+            /*
+            fetch(`${API_BASE_URL}/user/profile`, { headers: { 'Authorization': 'Bearer <token>' } })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('user-name').textContent = data.user_name || 'Admin Brand';
+                })
+                .catch(err => console.error('Error fetching user info:', err));
+            */
+            document.getElementById('user-name').textContent = 'Admin Brand'; // Static for now
+        });
+    </script>
 </body>
 
 </html>
