@@ -190,6 +190,48 @@ def get_user(user_id):
         return jsonify({"success": True, "user": user}), 200
     else:
         return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
+    
+# Đếm số lượng user
+@user_bp.route('/count_user', methods=['GET'])
+def count_user():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) as count FROM users join customer on users.user_id = customer.user_id")
+    count = cursor.fetchone()
+    conn.close()
+
+    if count:
+        return jsonify({"success": True, "count": count['count']}), 200
+    else:
+        return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
+
+# Đếm số lượng admin
+@user_bp.route('/count_admin', methods=['GET'])
+def count_admin():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) as count FROM users join mall on users.user_id = mall.user_id")
+    count = cursor.fetchone()
+    conn.close()
+
+    if count:
+        return jsonify({"success": True, "count": count['count']}), 200
+    else:
+        return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
+
+# Đếm tổng số lượng tài khoản
+@user_bp.route('/count_total', methods=['GET'])
+def count_total():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) as count FROM users")
+    count = cursor.fetchone()
+    conn.close()
+
+    if count:
+        return jsonify({"success": True, "count": count['count']}), 200
+    else:
+        return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
 
 # Quản lý brand
 @user_bp.route('/manage_brand', methods=['GET'])

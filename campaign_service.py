@@ -491,3 +491,18 @@ def payment_history_page():
         return redirect('/user/login')
     user_name = session.get('user_name', '')
     return render_template("campaign_service/brand_payment_history.html", user_name=user_name)
+
+# Đếm số lượng chiến dịch hoạt động
+@campaign_bp.route('/count_campaigns', methods=['GET'])
+def count_campaign():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) AS total_campaigns FROM Campaign WHERE status = 1")
+        result = cursor.fetchone()
+        return jsonify({"total_campaigns": result['total_campaigns']}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()

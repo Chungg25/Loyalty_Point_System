@@ -19,7 +19,7 @@ def get_brand():
     try: 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand")
+        cursor.execute("SELECT * FROM brand join contract on brand.brand_id = contract.brand_id")
         brands = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -147,5 +147,22 @@ def update_coefficient():
         cursor.close()
         conn.close()
         return jsonify({"message": "Coefficient updated successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+# Đếm số số lượng brand
+@brand_bp.route('/count_brand', methods=['GET'])
+def count_brand():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) as total FROM Brand")
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not result:
+            return jsonify({"error": "No brands found"}), 404
+        return jsonify({"total": result['total']}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
