@@ -20,7 +20,10 @@ def get_brand():
     try: 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand join contract on brand.brand_id = contract.brand_id")
+        cursor.execute("""SELECT distinct b.*, c.name, ct.* FROM brand b
+                        join contract ct on b.brand_id = ct.brand_id
+                        LEFT JOIN Brand_Category c ON b.category_id = c.category_id
+                       """)
         brands = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -139,3 +142,36 @@ def count_brand():
         return jsonify({"total": result['total']}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@brand_bp.route('/get_brand', methods=['GET'])
+def get_all_brands():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM brand where status = 1")
+        brands = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if not brands:
+            return jsonify({"error": "No brands found"}), 404
+        return jsonify({"brands": brands}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    
+@brand_bp.route('/brand_by_type_chart', methods=['GET'])
+def brand_by_type_chart():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT c.name, COUNT(b.brand_id) as total FROM brand b JOIN Brand_Category c ON b.category_id = c.category_id GROUP BY c.name")
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        if not result:
+            return jsonify({"error": "No brands found"}), 404
+        return jsonify({"brand_by_type": result}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    

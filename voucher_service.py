@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint, render_template
+from flask import request, jsonify, Blueprint, render_template, session
 import mysql.connector
 from flask_cors import CORS
 from datetime import datetime
@@ -240,6 +240,36 @@ def get_user_redeemed_vouchers(user_id):
         cursor.execute(query, (user_id,))
         result = cursor.fetchall()
         return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@voucher_bp.route('/voucher', methods=['GET'])
+def create_voucher_page():
+    user_id = session.get('user_id', '')
+    user_name = session.get('user_name', '')
+    user = {"user_id": user_id, "user_name": user_name}
+    return render_template('/voucher_service/create_voucher.html', user=user)
+
+@voucher_bp.route('/create_voucher', methods=['POST'])
+def create_voucher_form():
+    data = request.form
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+        INSERT INTO Voucher (brand_id, title, description, points_required, discount_amount, created_at, start_at, end_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (
+            data.get('brand_id'), data['title'], data['description'],
+            data['points_required'], data['discount_amount'], datetime.now(),
+            data['start_at'], data['end_at']
+        ))
+        conn.commit()
+        return jsonify({"message": "Voucher created"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

@@ -140,3 +140,63 @@ def monthly_revenue():
         return jsonify({"months": months, "totals": totals}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@point_bp.route('/top_brand_chart', methods=['GET'])
+def top_brand_chart():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT 
+                t.brand_id,
+                b.brandname,
+                SUM(t.amount) AS total
+            FROM Transactions t
+            JOIN Brand_Service.Brand b ON t.brand_id = b.brand_id
+            GROUP BY t.brand_id, b.brandname
+            ORDER BY total DESC
+            LIMIT 3
+        """)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        # Trả về mảng brand và doanh thu
+        brands = [row['brandname'] for row in results]
+        totals = [float(row['total']) for row in results]
+        return jsonify({"brands": brands, "totals": totals}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    
+@point_bp.route('/total_accumulated_points', methods=['GET'])
+def total_accumulated_points():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT COALESCE(SUM(amount), 0) AS total_points
+            FROM Transactions
+            WHERE amount > 0
+        """)
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return jsonify({"total_points": result['total_points']}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+    
+@point_bp.route('/total_current_points', methods=['GET'])
+def total_current_points():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT COALESCE(SUM(total_points), 0) AS total_points
+            FROM Pointwallet
+        """)
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return jsonify({"total_points": result['total_points']}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

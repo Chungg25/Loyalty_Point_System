@@ -142,6 +142,14 @@
             padding: 1.5rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
+
+        #brandTypeChart {
+            max-width: 250px;
+            max-height: 250px;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -346,7 +354,7 @@
                         <div>
                             <h2 class="text-2xl font-bold mb-2">Xin chào, {{ user.user_name | default('Admin') }}!</h2>
                             <p class="mb-4">Hệ thống quản lý toàn diện cho trung tâm thương mại của bạn.</p>
-                            <button onclick="window.location.href='/campaign/create_campaign';"
+                            <button onclick="window.location.href='/voucher/voucher';"
                                 class="bg-white text-blue-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-100 transition-all">
                                 <i class="fas fa-plus mr-2"></i> Tạo ưu đãi mới
                             </button>
@@ -442,7 +450,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <!-- Biểu đồ chiến dịch hiệu quả -->
                     <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
-                        <h3 class="text-lg font-bold mb-4">Top 5 Brand doanh thu cao</h3>
+                        <h3 class="text-lg font-bold mb-4">Top 3 Brand doanh thu cao</h3>
                         <div class="chart-container">
                             <canvas id="topBrandsChart"></canvas>
                         </div>
@@ -473,7 +481,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Tổng số tài khoản</p>
-                                <h3 id="total-account" class="text-2xl font-bold mt-2">124</h3>
+                                <h3 id="total-account" class="text-2xl font-bold mt-2"></h3>
                             </div>
                             <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
                                 <i class="fas fa-users text-xl"></i>
@@ -659,7 +667,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium">Thời trang</h4>
-                                <p class="text-sm text-gray-500">32 Brand</p>
+                                <p class="text-sm text-gray-500">01 Brand</p>
                             </div>
                         </div>
                         <div class="flex items-center p-3 bg-green-50 rounded-lg">
@@ -668,7 +676,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium">F&B</h4>
-                                <p class="text-sm text-gray-500">28 Brand</p>
+                                <p class="text-sm text-gray-500">02 Brand</p>
                             </div>
                         </div>
                         <div class="flex items-center p-3 bg-purple-50 rounded-lg">
@@ -677,7 +685,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium">Điện tử</h4>
-                                <p class="text-sm text-gray-500">15 Brand</p>
+                                <p class="text-sm text-gray-500">01 Brand</p>
                             </div>
                         </div>
                         <div class="flex items-center p-3 bg-pink-50 rounded-lg">
@@ -686,7 +694,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium">Mỹ phẩm</h4>
-                                <p class="text-sm text-gray-500">12 Brand</p>
+                                <p class="text-sm text-gray-500">01 Brand</p>
                             </div>
                         </div>
                     </div>
@@ -1626,23 +1634,22 @@
                 }
                 const statusColor = getStatusColor(brand.status);
 
-                const startDate = formatDate(brand.start_at);
-                const endDate = formatDate(brand.end_at);
+                const startDate = brand.start_at ? formatDate(brand.start_at) : '';
+                const endDate = brand.end_at ? formatDate(brand.end_at) : '';
 
                 const row = `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
+                    <div class=" items-left">
                         <div class="flex-shrink-0 h-10 w-10">
                         </div>
                         <div class="ml-4">
                         <div class="text-sm font-medium text-gray-900">${brand.brandname}</div>
-                        <div class="text-sm text-gray-500">${brand.brand_id}</div>
                         </div>
                     </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">Thời trang</div>
+                    <div class="text-sm text-gray-900">${brand.name}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -1716,6 +1723,108 @@
             console.error('Lỗi khi vẽ biểu đồ doanh thu:', error);
         }
     }
+
+    async function drawBrandbyTypeChart() {
+        try {
+            const response = await fetch('/brand/brand_by_type_chart');
+            const data = await response.json();
+            // Chuyển đổi dữ liệu trả về thành labels và values
+            const labels = data.brand_by_type.map(item => item.name);
+            const values = data.brand_by_type.map(item => item.total);
+
+            const ctx = document.getElementById('brandTypeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng Brand theo loại',
+                        data: values,
+                        backgroundColor: ['#4F46E5', '#3B82F6', '#10B981', '#FBBF24']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi vẽ biểu đồ Brand theo loại:', error);
+        }
+    }
+
+    async function drawTopBrandChart() {
+        try {
+            const response = await fetch('/point/top_brand_chart');
+            const data = await response.json();
+            const ctx = document.getElementById('topBrandsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.brands,
+                    datasets: [{
+                        label: 'Doanh thu (VND)',
+                        data: data.totals,
+                        backgroundColor: 'rgba(30, 64, 175, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => value.toLocaleString('vi-VN')
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi vẽ biểu đồ Top Brand:', error);
+        }
+    }
+
+    async function drawTopUserChart() {
+        try {
+            const response = await fetch('/user/top_user_chart');
+            const data = await response.json();
+            const ctx = document.getElementById('pointsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Điểm (VND)',
+                        data: data.values,
+                        backgroundColor: 'rgba(30, 64, 175, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => value.toLocaleString('vi-VN')
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Lỗi khi vẽ biểu đồ Top User:', error);
+        }
+    }
+
     async function loadPendingCampaigns() {
         const container = document.getElementById('pending-campaigns-container');
         container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
@@ -1728,6 +1837,8 @@
                 container.innerHTML = `<div class="text-center text-gray-500 py-8">Không có chiến dịch chờ duyệt.</div>`;
                 return;
             }
+
+            window.pendingCampaigns = data.campaigns;
 
             container.innerHTML = '';
             data.campaigns.forEach(campaign => {
@@ -1756,8 +1867,17 @@
     }
 
     function openReviewModal(campaignId) {
-        document.getElementById('review-form').setAttribute('data-campaign-id', campaignId);
+        const campaign = window.pendingCampaigns.find(c => c.campaign_id === campaignId);
+        if (!campaign) return;
+
+        document.getElementById('modal-campaign-title').textContent = campaign.title;
+        document.getElementById('modal-campaign-description').textContent = campaign.description || '';
+        document.getElementById('modal-campaign-points').textContent = campaign.points_required;
+        document.getElementById('modal-campaign-reward').textContent = campaign.reward;
+        document.getElementById('modal-campaign-time').textContent = `${campaign.start_at} - ${campaign.end_at}`;
+        document.getElementById('modal-message').classList.add('hidden');
         document.getElementById('review-modal').style.display = 'flex';
+        document.getElementById('review-form').setAttribute('data-campaign-id', campaignId);
     }
 
     function closeModal() {
@@ -1810,6 +1930,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         fetchRunningCampaigns();
         drawMonthlyRevenueChart();
+        drawBrandbyTypeChart();
+        drawTopBrandChart();
+        drawTopUserChart();
         monthlyRevenue();
         fetchBrandCount();
         fetchCountUsers();

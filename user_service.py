@@ -349,3 +349,25 @@ def get_total_customers(brand_id):
         return jsonify({"total_customers": total_customers}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@user_bp.route('/top_user_chart', methods=['GET'])
+def top_user_chart():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT username, pw.total_points
+            FROM users u
+            JOIN point_service.pointwallet pw ON u.user_id = pw.user_id
+            WHERE u.status = 1
+            ORDER BY pw.total_points DESC
+            LIMIT 3
+        """)
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        labels = [row['username'] for row in results]
+        values = [row['total_points'] for row in results]
+        return jsonify({"labels": labels, "values": values}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

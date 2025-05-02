@@ -141,7 +141,18 @@ def get_pending_campaigns():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT campaign_id, title, description, points_required, reward, start_at, end_at FROM Campaign WHERE status = 'Đang chờ duyệt'")
+        cursor.execute("""
+            SELECT 
+                campaign_id, 
+                title, 
+                description, 
+                points_required, 
+                reward, 
+                DATE_FORMAT(start_at, '%H:%i %d/%m/%Y ') AS start_at, 
+                DATE_FORMAT(end_at, '%H:%i %d/%m/%Y ') AS end_at
+            FROM Campaign 
+            WHERE status = 'Đang chờ duyệt'
+        """)
         campaigns = cursor.fetchall()
         cursor.close()
         conn.close()
