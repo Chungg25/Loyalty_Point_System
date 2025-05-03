@@ -86,6 +86,8 @@
   </div>
 
   <script>
+    const returnUrl = "{{ return_url | safe }}" || "/user/customer";
+
     document.getElementById('loginForm').addEventListener('submit', async function (event) {
       event.preventDefault();
 
@@ -98,21 +100,20 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username, password, return_url: returnUrl })
         });
 
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success && data.redirect) {
           window.location.href = data.redirect;
         } else {
-          alert(data.message);
+          alert(data.message || "Đăng nhập thất bại!");
         }
       } catch (error) {
         alert('Đã xảy ra lỗi khi đăng nhập.');
       }
     });
-
   </script>
 </body>
 

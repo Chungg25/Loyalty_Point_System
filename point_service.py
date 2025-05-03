@@ -200,3 +200,112 @@ def total_current_points():
         return jsonify({"total_points": result['total_points']}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+
+@point_bp.route('/add_transaction', methods=['POST'])
+def add_transaction():
+    try:
+        # Lấy dữ liệu từ request
+        data = request.get_json()
+        required_fields = ['user_id', 'brand_id', 'invoice_code', 'amount', 'created_at', 'user_snapshot_id']
+        
+        # Kiểm tra các trường bắt buộc
+        for field in required_fields:
+            if field not in data or data[field] is None:
+                return jsonify({"error": f"Thiếu trường bắt buộc: {field}"}), 400
+
+        user_id = int(data['user_id'])
+        brand_id = int(data['brand_id'])
+        invoice_code = data['invoice_code']
+        amount = float(data['amount'])
+        created_at_str = data['created_at']
+        user_snapshot_id = int(data['user_snapshot_id'])
+
+        # Kiểm tra user_id khớp với session
+        if 'user_id' not in session or str(session['user_id']) != str(user_id):
+            return jsonify({"error": "Bạn không có quyền thực hiện giao dịch này!"}), 403
+
+        # Parse created_at
+        try:
+            created_at = datetime.strptime(created_at_str, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return jsonify({"error": "Định dạng created_at không hợp lệ, phải là YYYY-MM-DD HH:MM:SS"}), 400
+
+        # Kết nối database
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Thêm giao dịch vào bảng Transactions
+        cursor.execute("""
+            INSERT INTO Transactions (user_id, brand_id, invoice_code, amount, created_at, user_snapshot_id)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (user_id, brand_id, invoice_code, amount, created_at, user_snapshot_id))
+        
+        # Lấy transaction_id vừa thêm
+        transaction_id = cursor.lastrowid
+
+        # Cập nhật số điểm trong bảng PointWallet
+        cursor.execute("""
+            SELECT FLOOR(
+                %s / cr.rate * mtc.member_coefficient * b.coefficient
+            ) AS earned_points
+            FROM Brand_Service.Brand b
+            JOIN User_Service.Customer c ON c.user_id = %s
+            JOIN User_Service.MemberTypeCoefficient mtc ON c.membertype = mtc.membertype
+            JOIN ConversionRule cr 
+                ON %s BETWEEN cr.effective_from AND IFNULL(cr.effective_to, NOW())
+            WHERE b.brand_id = %s
+            LIMIT 1
+        """, (amount, user_id, created_at, brand_id))
+        result = cursor.fetchone()
+        
+        # Kiểm tra kết quả truy vấn
+        if not result:
+            conn.rollback()
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Không thể tính điểm do thiếu dữ liệu (Brand, Customer, MemberTypeCoefficient, hoặc ConversionRule)!"}), 500
+        
+        earned_points = result['earned_points'] or 0
+
+        # Kiểm tra PointWallet tồn tại
+        cursor.execute("SELECT point_wallet_id FROM PointWallet WHERE user_id = %s", (user_id,))
+        wallet = cursor.fetchone()
+        if not wallet:
+            cursor.execute("INSERT INTO PointWallet (user_id, total_points, last_update) VALUES (%s, %s, CURRENT_TIMESTAMP)", (user_id, 0))
+            point_wallet_id = cursor.lastrowid
+        else:
+            point_wallet_id = wallet['point_wallet_id']
+
+        # Cập nhật điểm trong PointWallet
+        cursor.execute("""
+            UPDATE PointWallet
+            SET total_points = total_points + %s,
+                last_update = CURRENT_TIMESTAMP
+            WHERE user_id = %s
+        """, (earned_points, user_id))
+
+        # Ghi log tích điểm vào Point_Log
+        cursor.execute("""
+            INSERT INTO Point_Log (
+                point_wallet_id, brand_id, type, source_type, source_id, points, metadata, description, created_at
+            ) VALUES (%s, %s, 'EARN', 'TRANSACTION', %s, %s, NULL, %s, CURRENT_TIMESTAMP)
+        """, (point_wallet_id, brand_id, transaction_id, earned_points, f'Tích điểm từ hóa đơn {invoice_code}'))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Transaction added successfully", "earned_points": earned_points}), 201
+
+    except mysql.connector.Error as err:
+        if 'conn' in locals():
+            conn.rollback()
+            cursor.close()
+            conn.close()
+        return jsonify({"error": str(err)}), 500
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+            cursor.close()
+            conn.close()
+        return jsonify({"error": str(e)}), 500

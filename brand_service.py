@@ -174,4 +174,19 @@ def brand_by_type_chart():
         return jsonify({"brand_by_type": result}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
+# @brand_bp.route("/brand_coefficient", methods=["GET"])
+# def brand_coefficient():
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT brand_id, coefficient FROM brand")
+#         result = cursor.fetchall()
+#         cursor.close()
+#         conn.close()
+
+#         if not result:
+#             return jsonify({"error": "No brands found"}), 404
+#         return jsonify({"brand_coefficient": result}), 200
+#     except mysql.connector.Error as err:
+#         return jsonify({"error": str(err)}), 500

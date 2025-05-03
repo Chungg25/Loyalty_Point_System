@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận Giao Dịch - Mall Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Gradient background for header */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+
+        /* Hover effect for cards */
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Smooth transitions */
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #1e40af;
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        /* Error and success messages */
+        .error-message {
+            color: #ef4444;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-store text-2xl"></i>
+                <h1 class="text-2xl font-bold">Mall Management</h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/40x40/e2e8f0/334155?text=A" alt="Avatar khách hàng"
+                    class="w-10 h-10 rounded-full border-2 border-white">
+                <span id="user-name" class="font-medium hidden sm:inline">{{ user_name }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section aria-labelledby="transaction-heading">
+            <h2 id="transaction-heading" class="text-2xl font-bold text-gray-800 mb-6">Xác Nhận Giao Dịch</h2>
+            <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
+                <div id="transaction-details" class="space-y-4">
+                    <p><strong>Mã khách hàng:</strong> <span id="user-id">{{ transaction_data.user_id }}</span></p>
+                    <p><strong>Brand:</strong> <span id="brand-id">{{ transaction_data.brand_id }}</span></p>
+                    <p><strong>Mã hóa đơn:</strong> <span id="invoice-code">{{ transaction_data.invoice_code }}</span>
+                    </p>
+                    <p><strong>Số tiền:</strong> <span id="amount">{{ transaction_data.amount}}</span> VNĐ</p>
+                    <p><strong>Thời gian giao dịch:</strong> <span id="created-at">{{
+                            transaction_data.created_at}}</span></p>
+                    <div id="message-area" class="mt-4 hidden"></div>
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button id="cancel-btn" onclick="window.location.href='/customer.html'"
+                            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            Hủy
+                        </button>
+                        <button id="confirm-btn"
+                            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+                            <i class="fas fa-check mr-2"></i> Xác nhận
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 mt-12 py-6">
+        <div class="container mx-auto px-4 text-center text-gray-600 text-sm">
+            © <span id="current-year"></span> Mall Management. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Utility function to format number
+        function formatNumber(number) {
+            if (typeof number !== 'number' || isNaN(number)) return '0';
+            return number.toLocaleString('vi-VN');
+        }
+
+        // Utility function to format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // Utility function to show messages
+        function showMessage(message, type = 'error') {
+            const messageArea = document.getElementById('message-area');
+            messageArea.className = `mt-4 ${type === 'error' ? 'error-message' : 'success-message'}`;
+            messageArea.textContent = message;
+            messageArea.classList.remove('hidden');
+            setTimeout(() => messageArea.classList.add('hidden'), 5000);
+        }
+
+        // Confirm transaction and earn points
+        async function confirmTransaction() {
+            const confirmButton = document.getElementById('confirm-btn');
+            confirmButton.disabled = true;
+            confirmButton.innerHTML = `<div class="spinner !w-5 !h-5 mr-2"></div> Đang xử lý...`;
+
+            const data = {
+                user_id: "{{ transaction_data.user_id }}",
+                brand_id: "{{ transaction_data.brand_id }}",
+                invoice_code: "{{ transaction_data.invoice_code }}",
+                amount: parseFloat("{{ transaction_data.amount }}"),
+                created_at: "{{ transaction_data.created_at }}",
+                user_snapshot_id: "{{ user_snapshot_id }}",
+            };
+
+            // Validate data
+            if (!data.user_id || !data.brand_id || !data.invoice_code || !data.amount || !data.created_at) {
+                showMessage('Dữ liệu giao dịch không hợp lệ.');
+                confirmButton.disabled = false;
+                confirmButton.innerHTML = `<i class="fas fa-check mr-2"></i> Xác nhận`;
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://192.168.1.13:5000/point/add_transaction`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Add authentication headers if required
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Lỗi khi ghi nhận giao dịch');
+
+                showMessage('Giao dịch được ghi nhận thành công! Điểm đã được tích lũy.', 'success');
+                setTimeout(() => {
+                    window.location.href = '/user/customer';
+                }, 2000);
+            } catch (error) {
+                console.error('Error confirming transaction:', error);
+                showMessage(`Lỗi: ${error.message}`);
+            } finally {
+                confirmButton.disabled = false;
+                confirmButton.innerHTML = `<i class="fas fa-check mr-2"></i> Xác nhận`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bind confirm button
+            const isValid = "{{ transaction_data.user_id }}" && "{{ transaction_data.brand_id }}" && "{{ transaction_data.invoice_code }}" && "{{ transaction_data.amount }}" && "{{ transaction_data.created_at }}";
+            if (!isValid) {
+                showMessage('Dữ liệu giao dịch không hợp lệ.');
+                document.getElementById('confirm-btn').disabled = true;
+            } else {
+                document.getElementById('confirm-btn').addEventListener('click', confirmTransaction);
+            }
+        });
+    </script>
+</body>
+
+</html>

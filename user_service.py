@@ -15,7 +15,25 @@ def get_db_connection():
 
 @user_bp.route('/login', methods=['GET'])
 def login_page():
-    return render_template("login.html")
+    return_url = request.args.get('return_url', '/user/customer')
+    return render_template("login.html", return_url=return_url)
+
+@user_bp.route('/transaction_qr', methods=['GET'])
+def transaction_qr_page():
+    # Kiểm tra đăng nhập và vai trò
+    if 'user_id' not in session or session.get('role') != 'customer':
+        return redirect(url_for('user.login_page', return_url=request.url))
+
+    # Lấy dữ liệu từ query string và truyền vào template
+    transaction_data = {
+        "user_id": request.args.get('user_id'),
+        "brand_id": request.args.get('brand_id'),
+        "invoice_code": request.args.get('invoice_code'),
+        "amount": request.args.get('amount'),
+        "created_at": request.args.get('created_at'),
+    }
+    user_snapshot_id = request.args.get('user_snapshot_id') 
+    return render_template("transaction_qr.html", transaction_data=transaction_data, user_snapshot_id=user_snapshot_id, user_name=session.get('user_name', 'Khách hàng'))
 
 # Xử lý đăng nhập (POST)
 @user_bp.route('/login', methods=['POST'])
@@ -23,6 +41,7 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    return_url = data.get('return_url', None)  # Lấy return_url từ dữ liệu gửi lên
 
     if not username or not password:
         return jsonify({"success": False, "message": "Thiếu tên đăng nhập hoặc mật khẩu!"}), 400
@@ -46,7 +65,12 @@ def login():
         session['user_id'] = user_id
         session['role'] = 'customer'
         session['user_name'] = username
-        return jsonify({"success": True, "role": "customer", "redirect": f"/user/customer?user_id={user_id}&username={username}"})
+        # Nếu return_url là transaction_qr.html, ưu tiên trả về return_url
+        if return_url and 'transaction_qr.html' in return_url:
+            return jsonify({"success": True, "role": "customer", "redirect": return_url})
+        # Mặc định chuyển về trang customer
+        redirect_url = f"/user/customer?user_id={user_id}&username={username}"
+        return jsonify({"success": True, "role": "customer", "redirect": redirect_url})
 
     cursor.execute("SELECT brand_id FROM brand WHERE user_id = %s", (user_id,))
     brand = cursor.fetchone()
@@ -57,7 +81,10 @@ def login():
         session['role'] = 'brand'
         session['brand_id'] = brand['brand_id']
         session['user_name'] = username
-        return jsonify({"success": True, "role": "brand", "redirect": f"/user/brand?user_id={user_id}&username={username}&brand_id={brand['brand_id']}"})
+        if return_url and 'transaction_qr.html' in return_url:
+            return jsonify({"success": True, "role": "brand", "redirect": return_url})
+        redirect_url = f"/user/brand?user_id={user_id}&username={username}&brand_id={brand['brand_id']}"
+        return jsonify({"success": True, "role": "brand", "redirect": redirect_url})
 
     cursor.execute("SELECT * FROM mall WHERE user_id = %s", (user_id,))
     if cursor.fetchone():
@@ -66,7 +93,10 @@ def login():
         session['user_id'] = user_id
         session['role'] = 'mall'
         session['user_name'] = username
-        return jsonify({"success": True, "role": "mall", "redirect": f"/user/mall?user_id={user_id}&username={username}"})
+        if return_url and 'transaction_qr.html' in return_url:
+            return jsonify({"success": True, "role": "mall", "redirect": return_url})
+        redirect_url = f"/user/mall?user_id={user_id}&username={username}"
+        return jsonify({"success": True, "role": "mall", "redirect": redirect_url})
 
     conn.close()
     return jsonify({"success": False, "message": "Người dùng không thuộc bất kỳ vai trò nào!"}), 403
@@ -144,11 +174,6 @@ def infor():
 def logout():
     session.clear()
     return redirect(url_for("user.login_page"))
-
-# Debug session (tùy chọn, xóa khi production)
-@user_bp.route('/debug_session')
-def debug_session():
-    return jsonify(dict(session))
 
 @user_bp.route('/manage_account', methods=['GET'])
 def manage_account():
