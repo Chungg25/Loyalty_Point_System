@@ -24,6 +24,10 @@ CREATE TABLE Contract
   FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
 );
 
+CREATE TABLE Category (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
 
 INSERT INTO Brand (brand_id, brandname, email, status, coefficient)
 VALUES
@@ -44,3 +48,9 @@ VALUES
 (7, 2, 7, '2023-12-20', '2024-12-20', 0, '2023-12-01 23:00:00'),
 (8, 3, 6, '2020-04-21', '2021-04-21', 0, '2020-04-20 11:00:00'),
 (9, 4, 6, '2021-04-21', '2022-04-21', 0, '2021-03-31 12:00:00');
+
+INSERT INTO Category (name) VALUES
+('Thời trang'),
+('F&B'),
+('Điện tử'),
+('Mỹ Phẩm');
