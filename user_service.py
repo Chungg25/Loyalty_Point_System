@@ -5,12 +5,20 @@ from flask_cors import CORS
 user_bp = Blueprint("user", __name__)
 CORS(user_bp)
 
+# def get_db_connection():
+#     return mysql.connector.connect(
+#         host="localhost",
+#         user="root",
+#         password="",
+#         database="user_service"
+#     )
+
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="user_service"
+        host="han312.mysql.pythonanywhere-services.com",
+        user="han312",
+        password="SOA2025@",
+        database= "han312$user_service"
     )
 
 @user_bp.route('/login', methods=['GET'])
@@ -20,19 +28,20 @@ def login_page():
 
 @user_bp.route('/transaction_qr', methods=['GET'])
 def transaction_qr_page():
+    user_id = request.args.get('user_id')
     # Kiểm tra đăng nhập và vai trò
-    if 'user_id' not in session or session.get('role') != 'customer':
+    if not user_id:
         return redirect(url_for('user.login_page', return_url=request.url))
 
     # Lấy dữ liệu từ query string và truyền vào template
     transaction_data = {
-        "user_id": request.args.get('user_id'),
+        "user_id": user_id,
         "brand_id": request.args.get('brand_id'),
         "invoice_code": request.args.get('invoice_code'),
         "amount": request.args.get('amount'),
         "created_at": request.args.get('created_at'),
     }
-    user_snapshot_id = request.args.get('user_snapshot_id') 
+    user_snapshot_id = request.args.get('user_snapshot_id')
     return render_template("transaction_qr.html", transaction_data=transaction_data, user_snapshot_id=user_snapshot_id, user_name=session.get('user_name', 'Khách hàng'))
 
 # Xử lý đăng nhập (POST)
@@ -48,7 +57,7 @@ def login():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s AND status = 1", (username, password))
+    cursor.execute("SELECT * FROM Users WHERE username = %s AND password = %s AND status = 1", (username, password))
     user = cursor.fetchone()
 
     if not user:
@@ -56,61 +65,59 @@ def login():
         return jsonify({"success": False, "message": "Tên đăng nhập hoặc mật khẩu không đúng!"}), 401
 
     user_id = user['user_id']
+    role = None
+    redirect_url = None
 
-    # Kiểm tra vai trò
-    cursor.execute("SELECT * FROM customer WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT * FROM Customer WHERE user_id = %s", (user_id,))
     if cursor.fetchone():
-        conn.close()
-        session.clear()
-        session['user_id'] = user_id
-        session['role'] = 'customer'
-        session['user_name'] = username
-        # Nếu return_url là transaction_qr.html, ưu tiên trả về return_url
-        if return_url and 'transaction_qr.html' in return_url:
-            return jsonify({"success": True, "role": "customer", "redirect": return_url})
-        # Mặc định chuyển về trang customer
-        redirect_url = f"/user/customer?user_id={user_id}&username={username}"
-        return jsonify({"success": True, "role": "customer", "redirect": redirect_url})
+        role = "customer"
 
-    cursor.execute("SELECT brand_id FROM brand WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT brand_id FROM Brand WHERE user_id = %s", (user_id,))
     brand = cursor.fetchone()
     if brand:
-        conn.close()
-        session.clear()
-        session['user_id'] = user_id
-        session['role'] = 'brand'
-        session['brand_id'] = brand['brand_id']
-        session['user_name'] = username
-        if return_url and 'transaction_qr.html' in return_url:
-            return jsonify({"success": True, "role": "brand", "redirect": return_url})
-        redirect_url = f"/user/brand?user_id={user_id}&username={username}&brand_id={brand['brand_id']}"
-        return jsonify({"success": True, "role": "brand", "redirect": redirect_url})
+        role = "brand"
 
-    cursor.execute("SELECT * FROM mall WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT * FROM Mall WHERE user_id = %s", (user_id,))
     if cursor.fetchone():
-        conn.close()
-        session.clear()
-        session['user_id'] = user_id
-        session['role'] = 'mall'
-        session['user_name'] = username
-        if return_url and 'transaction_qr.html' in return_url:
-            return jsonify({"success": True, "role": "mall", "redirect": return_url})
-        redirect_url = f"/user/mall?user_id={user_id}&username={username}"
-        return jsonify({"success": True, "role": "mall", "redirect": redirect_url})
+        role = "mall"
 
     conn.close()
-    return jsonify({"success": False, "message": "Người dùng không thuộc bất kỳ vai trò nào!"}), 403
+
+    if not role:
+        return jsonify({"success": False, "message": "Người dùng không thuộc bất kỳ vai trò nào!"}), 403
+
+    if return_url:
+        from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
+        parsed = urlparse(return_url)
+        query = parse_qs(parsed.query)
+        query['user_id'] = [str(user_id)]
+        query['username'] = [username]
+        new_query = urlencode(query, doseq=True)
+        redirect_url = urlunparse(parsed._replace(query=new_query))
+    else:
+        if role == "customer":
+            redirect_url = f"/user/customer?user_id={user_id}&username={username}"
+        elif role == "brand":
+            redirect_url = f"/user/brand?user_id={user_id}&username={username}&brand_id={brand['brand_id']}"
+        elif role == "mall":
+            redirect_url = f"/user/mall?user_id={user_id}&username={username}"
+
+    return jsonify({
+        "success": True,
+        "role": role,
+        "redirect": redirect_url
+    })
 
 # Trang tương ứng mỗi vai trò
 @user_bp.route('/customer')
-
 def customer_page():
     user_id = request.args.get('user_id')
-    user_name = session.get('user_name', '')
-    
+    user_name = request.args.get('username', '')
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT membertype FROM customer WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT membertype FROM Customer WHERE user_id = %s", (user_id,))
     customer = cursor.fetchone()
     conn.close()
     # Map membertype to membership name
@@ -136,7 +143,7 @@ def brand_page():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT brand_id FROM brand WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT brand_id FROM Brand WHERE user_id = %s", (user_id,))
     brand = cursor.fetchone()
     conn.close()
 
@@ -161,7 +168,7 @@ def infor():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM user_profile WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT * FROM User_Profile WHERE user_id = %s", (user_id,))
     user = cursor.fetchone()
     conn.close()
 
@@ -172,7 +179,6 @@ def infor():
 
 @user_bp.route('/logout')
 def logout():
-    session.clear()
     return redirect(url_for("user.login_page"))
 
 @user_bp.route('/manage_account', methods=['GET'])
@@ -185,7 +191,7 @@ def manage_account():
 def account_customer():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join customer on users.user_id = customer.user_id")
+    cursor.execute("SELECT * FROM Users join User_Profile on Users.user_id = User_Profile.user_id join customer on Users.user_id = customer.user_id")
     user = cursor.fetchall()
     conn.close()
     return jsonify({"user": user}), 200
@@ -194,7 +200,7 @@ def account_customer():
 def account_brand():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join brand on users.user_id = brand.user_id")
+    cursor.execute("SELECT * FROM Users join User_Profile on Users.user_id = User_Profile.user_id join Brand on Users.user_id = Brand.user_id")
     user = cursor.fetchall()
     conn.close()
     return jsonify({"user": user}), 200
@@ -203,7 +209,7 @@ def account_brand():
 def account_mall():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users join user_profile on users.user_id = user_profile.user_id join mall on users.user_id = mall.user_id")
+    cursor.execute("SELECT * FROM Users join User_Profile on Users.user_id = User_Profile.user_id join Mall on Users.user_id = Mall.user_id")
     user = cursor.fetchall()
     conn.close()
     return jsonify({"user": user}), 200
@@ -212,18 +218,24 @@ def account_mall():
 def update_status(user_id, status):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET status = %s WHERE user_id = %s", (status, user_id))
+    cursor.execute("UPDATE Users SET status = %s WHERE user_id = %s", (status, user_id))
     conn.commit()
     conn.close()
 
     return jsonify({"success": True, "message": "Cập nhật trạng thái thành công!"}), 200
 
-# Lấy thông tin user theo ID
+# Lấy thông tin user theo IDbạn không
 @user_bp.route('/get_user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    cursor.execute("""
+        SELECT *
+        FROM Users
+        JOIN Customer ON Users.user_id = Customer.user_id
+        JOIN MemberTypeCoefficient ON Customer.membertype = MemberTypeCoefficient.membertype
+        WHERE Users.user_id = %s
+    """, (user_id,))
     user = cursor.fetchone()
     conn.close()
 
@@ -231,13 +243,13 @@ def get_user(user_id):
         return jsonify({"success": True, "user": user}), 200
     else:
         return jsonify({"success": False, "message": "Không tìm thấy người dùng!"}), 404
-    
+
 # Đếm số lượng user
 @user_bp.route('/count_user', methods=['GET'])
 def count_user():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(*) as count FROM users join customer on users.user_id = customer.user_id")
+    cursor.execute("SELECT COUNT(*) as count FROM Users join Customer on Users.user_id = Customer.user_id")
     count = cursor.fetchone()
     conn.close()
 
@@ -251,7 +263,7 @@ def count_user():
 def count_admin():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(*) as count FROM users join mall on users.user_id = mall.user_id")
+    cursor.execute("SELECT COUNT(*) as count FROM Users join Mall on Users.user_id = Mall.user_id")
     count = cursor.fetchone()
     conn.close()
 
@@ -265,7 +277,7 @@ def count_admin():
 def count_total():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(*) as count FROM users")
+    cursor.execute("SELECT COUNT(*) as count FROM Users")
     count = cursor.fetchone()
     conn.close()
 
@@ -320,18 +332,18 @@ def get_customers(brand_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT up.user_id, up.fullname AS name, 
-                   CONCAT('KH-', LPAD(up.user_id, 3, '0')) AS customer_code, 
-                   up.phone, 
-                   COALESCE(pw.total_points, 0) AS total_points, 
+            SELECT up.user_id, up.fullname AS name,
+                   CONCAT('KH-', LPAD(up.user_id, 3, '0')) AS customer_code,
+                   up.phone,
+                   COALESCE(pw.total_points, 0) AS total_points,
                    DATE_FORMAT(t.max_date, '%d/%m/%Y') AS last_transaction_date,
-                   CASE 
+                   CASE
                        WHEN c.membertype = 3 THEN 'Kim cương'
                        WHEN c.membertype = 2 THEN 'Vàng'
                        WHEN c.membertype = 1 THEN 'Bạc'
                        ELSE 'Đồng'
                    END AS tier
-            FROM user_profile up
+            FROM User_Profile up
             JOIN customer c ON up.user_id = c.user_id
             LEFT JOIN point_service.pointwallet pw ON up.user_id = pw.user_id
             LEFT JOIN (
@@ -341,8 +353,8 @@ def get_customers(brand_id):
                 GROUP BY user_id
             ) t ON up.user_id = t.user_id
             WHERE up.user_id IN (
-                SELECT DISTINCT user_id 
-                FROM point_service.transactions 
+                SELECT DISTINCT user_id
+                FROM point_service.transactions
                 WHERE brand_id = %s
             )
             LIMIT 4 -- Match dashboard pagination
@@ -372,7 +384,7 @@ def get_total_customers(brand_id):
         return jsonify({"total_customers": total_customers}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
 @user_bp.route('/top_user_chart', methods=['GET'])
 def top_user_chart():
     try:
@@ -380,7 +392,7 @@ def top_user_chart():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT username, pw.total_points
-            FROM users u
+            FROM Users u
             JOIN point_service.pointwallet pw ON u.user_id = pw.user_id
             WHERE u.status = 1
             ORDER BY pw.total_points DESC

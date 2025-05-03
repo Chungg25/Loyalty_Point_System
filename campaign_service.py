@@ -10,10 +10,10 @@ CORS(campaign_bp)
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="campaign_service"
+        host="han312.mysql.pythonanywhere-services.com",
+        user="han312",
+        password="SOA2025@",
+        database="han312$campaign_service"
     )
 
 def generate_code(length=6):
@@ -383,10 +383,10 @@ def get_campaigns(brand_id):
                    DATE_FORMAT(start_at, '%d/%m') AS start_date, 
                    DATE_FORMAT(end_at, '%d/%m') AS end_date, 
                    status, 
-                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) AS participants,
+                   (SELECT COUNT(*) FROM Campaign_Redemption cr WHERE cr.campaign_id = Campaign.campaign_id) AS participants,
                    1000 AS target_participants, -- Placeholder, adjust as needed
-                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) / 1000 * 100 AS progress
-            FROM campaign 
+                   (SELECT COUNT(*) FROM Campaign_Redemption cr WHERE cr.campaign_id = Campaign.campaign_id) / 1000 * 100 AS progress
+            FROM Campaign 
             WHERE brand_id = %s
         """, (brand_id,))
         campaigns = cursor.fetchall()
@@ -407,8 +407,8 @@ def get_campaign_chart(brand_id):
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT title AS name, 
-                   (SELECT COUNT(*) FROM campaign_redemption cr WHERE cr.campaign_id = campaign.campaign_id) AS participants
-            FROM campaign
+                   (SELECT COUNT(*) FROM Campaign_Redemption cr WHERE cr.campaign_id = Campaign.campaign_id) AS participants
+            FROM Campaign
             WHERE brand_id = %s
             ORDER BY participants DESC, campaign_id DESC LIMIT 5
         """, (brand_id,))
@@ -433,7 +433,7 @@ def get_active_campaigns(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT COUNT(*) AS active_campaigns FROM campaign WHERE brand_id = %s AND status = 'Đang hoạt động'", (brand_id,))
+        cursor.execute("SELECT COUNT(*) AS active_campaigns FROM Campaign WHERE brand_id = %s AND status = 'Đang hoạt động'", (brand_id,))
         active_campaigns = cursor.fetchone()['active_campaigns']
         cursor.close()
         conn.close()
