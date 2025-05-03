@@ -7,6 +7,7 @@
     <title>Brand Dashboard - Hệ Thống Tích Điểm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-pHF8jYxRMqZxIz1IYdMQNUYmZ7lW+owcDjeMJkDA4XeZVfSwKfe1coCGsYfD1KbZf6C1EezgwKAhZd6MwRQyIA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Gradient background for header and banner */
@@ -93,35 +94,71 @@
             min-height: 80px;
         }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-50 font-sans">
-    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-crown text-2xl"></i>
-                <h1 class="text-2xl font-bold">LoyaltyBrand</h1>
-            </div>
-            <div class="flex items-center space-x-6">
-                <!-- <div class="relative group">
-                    <button class="flex items-center space-x-2 focus:outline-none">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span
-                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                    </button>
-                </div> -->
-                <div class="flex items-center space-x-2">
-                    <img src="https://placehold.co/40x40/e2e8f0/334155?text=A" alt="Avatar quản trị viên"
-                        class="w-10 h-10 rounded-full border-2 border-white">
-                    <span class="font-medium hidden sm:inline">{{user.user_name}}</span>
-                    <button class="text-gray-300 hover:text-white focus:outline-none ml-2">
-                        <a href="/user/logout" class="fas fa-sign-out-alt"></a>
-                    </button>
+    <header class="gradient-bg text-white shadow-lg w-full">
+        <div class="w-full px-4 py-4 flex justify-between items-center">
+          <!-- Logo và tiêu đề -->
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-store text-2xl"></i>
+            <h1 class="text-xl font-bold">Brand Management</h1>
+          </div>
+      
+          <!-- Khu vực bên phải: Thông báo + Tài khoản -->
+          <div class="flex items-center space-x-6">
+            <!-- Biểu tượng thông báo -->
+            <div class="relative group">
+              <button id="notificationBtn" class="relative">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  1
+                </span>
+              </button>
+              <!-- Dropdown thông báo -->
+              <div id="notificationDropdown"
+                class="hidden absolute right-0 mt-2 w-64 bg-white text-black rounded-md shadow-lg z-50">
+                <div class="p-4 border-b">
+                  <h3 class="font-bold text-gray-800">Thông báo</h3>
                 </div>
-
+                <div class="divide-y divide-gray-200">
+                  <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                    <p class="text-sm font-medium text-gray-900">2 người dùng vừa đăng ký tài khoản</p>
+                    <p class="text-xs text-gray-500">1 ngày trước</p>
+                  </a>
+                </div>
+                <div class="p-2 text-center bg-gray-50">
+                  <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
+                </div>
+              </div>
             </div>
+      
+            <!-- Tài khoản -->
+            <div class="relative group">
+              <button id="profileBtn" class="flex items-center space-x-2">
+                <span class="font-medium hidden md:block">{{ user.user_name }}</span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <!-- Dropdown tài khoản -->
+              <div id="profileDropdown"
+                class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                <div class="p-4 border-b">
+                  <h3 class="font-bold text-gray-800">{{ user.user_name }}</h3>
+                </div>
+                <div class="py-1">
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
+                  <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+                </div>
+                <div class="py-1 border-t">
+                  <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </header>
+      </header>
+      
 
     <main class="container mx-auto px-4 py-8">
         <section aria-labelledby="welcome-heading"
@@ -1387,6 +1424,25 @@
         });
 
     </script>
+    <script>
+        document.getElementById('notificationBtn').addEventListener('click', function () {
+          document.getElementById('notificationDropdown').classList.toggle('hidden');
+        });
+      
+        document.getElementById('profileBtn').addEventListener('click', function () {
+          document.getElementById('profileDropdown').classList.toggle('hidden');
+        });
+      
+        // Ẩn dropdown khi click bên ngoài
+        window.addEventListener('click', function(e) {
+          if (!document.getElementById('notificationBtn').contains(e.target)) {
+            document.getElementById('notificationDropdown').classList.add('hidden');
+          }
+          if (!document.getElementById('profileBtn').contains(e.target)) {
+            document.getElementById('profileDropdown').classList.add('hidden');
+          }
+        });
+      </script>      
 </body>
 
 </html>

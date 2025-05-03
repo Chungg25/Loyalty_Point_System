@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Quảng cáo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Quản lý Quảng cáo</h1>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="container mx-auto my-8 flex-grow">
+
+        <!-- Search and filter section -->
+        <div class="mb-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <label for="search" class="mr-2">Tìm kiếm:</label>
+                <input type="text" id="search" placeholder="Tìm chiến dịch" class="p-2 border rounded w-1/2" 
+                       onkeyup="searchCampaigns()">
+            </div>
+        </div>
+
+        <!-- Advertising Campaign Table -->
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg mb-8">
+            <table class="min-w-full divide-y divide-gray-200" id="campaignTable">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">STT</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên chiến dịch</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thời gian bắt đầu</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thời gian kết thúc</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-6 py-4">1</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">Khuyến mãi Tết Nguyên Đán</td>
+                        <td class="px-6 py-4">01/01/2025</td>
+                        <td class="px-6 py-4">15/02/2025</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Đang diễn ra</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button class="text-blue-600 hover:underline">Xem chi tiết</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4">2</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">Khuyến mãi mùa hè</td>
+                        <td class="px-6 py-4">01/06/2025</td>
+                        <td class="px-6 py-4">31/08/2025</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Sắp diễn ra</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button class="text-blue-600 hover:underline">Xem chi tiết</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4">3</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">Giảm giá Black Friday</td>
+                        <td class="px-6 py-4">15/11/2025</td>
+                        <td class="px-6 py-4">30/11/2025</td>
+                        <td class="px-6 py-4">
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Kết thúc</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button class="text-blue-600 hover:underline">Xem chi tiết</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center">
+            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Trang trước</button>
+            <span class="text-gray-700">Trang 1 của 5</span>
+            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Trang sau</button>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Quản lý Quảng cáo. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Function to filter campaigns based on search input
+        function searchCampaigns() {
+            const searchInput = document.getElementById('search').value.toLowerCase();
+            const rows = document.querySelectorAll('#campaignTable tbody tr');
+            
+            rows.forEach(row => {
+                const campaignName = row.cells[1].textContent.toLowerCase();
+                if (campaignName.includes(searchInput)) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -312,9 +312,7 @@ def manage_notification():
 # Báo cáo
 @user_bp.route('/report', methods=['GET'])
 def report():
-    user_id = request.args.get('user_id')
-    user_name = request.args.get('user_name')
-    return render_template("user_service/report.html", user={"user_id": user_id, "user_name": user_name})
+    return render_template("user_service/report.html")
 
 @user_bp.route('/get_customers/<int:brand_id>', methods=['GET'])
 def get_customers(brand_id):
