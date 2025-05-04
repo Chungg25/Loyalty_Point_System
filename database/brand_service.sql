@@ -1,6 +1,18 @@
 create database Brand_Service;
 use Brand_Service;
 
+-- Tạo bảng category
+CREATE TABLE Category (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+-- Chèn dữ liệu mà không chỉ định category_id (vì nó tự động tăng)
+INSERT INTO Category (name) VALUES
+('Thời trang'),
+('F&B'),
+('Điện tử'),
+('Mỹ Phẩm');
+
 CREATE TABLE Brand
 (
   brand_id INT NOT NULL,
@@ -8,6 +20,7 @@ CREATE TABLE Brand
   email VARCHAR(50) NOT NULL,
   status bit NOT NULL,
   coefficient FLOAT NOT NULL CHECK (coefficient >= 0),
+  category_id INT NOT NULL FOREIGN KEY REFERENCES Category(category_id),
   PRIMARY KEY (brand_id)
 );
 
@@ -25,13 +38,14 @@ CREATE TABLE Contract
 );
 
 
-INSERT INTO Brand (brand_id, brandname, email, status, coefficient)
+INSERT INTO Brand (brand_id, brandname, email, status, coefficient,category_id)
 VALUES
-(1, 'BrandA', 'contact@branda.com', '1', 1.5),
-(2, 'BrandB', 'contact@brandb.com', '1', 1.8),
-(3, 'BrandC', 'contact@brandc.com', '1', 1.2),
-(4, 'BrandD', 'contact@brandd.com', '1', 2.0),
-(5, 'BrandE', 'contact@brande.com', '1', 1.7);
+(1, 'LV', 'contact@branda.com', '1', 1.5, 1),
+(2, 'Lifebuoy', 'contact@brandb.com', '1', 1.8, 2),
+(3, 'Maybelline', 'contact@brandc.com', '1', 1.2, 4),
+(4, 'Phúc Long', 'contact@brandd.com', '1', 2.0, 2),
+(5, 'Samsung', 'contact@brande.com', '1', 1.7, 3),
+(6, 'Chanel', 'contact@brandf.com', '1', 1.7, 1)
 
 INSERT INTO Contract (contract_id, brand_id, user_id, start_at, end_at, status, created_at)
 VALUES
