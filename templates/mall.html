@@ -279,70 +279,73 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <!-- Header -->
-        <header class="gradient-bg text-white shadow-lg">
-            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-2 md:hidden">
-                    <i class="fas fa-store text-2xl"></i>
-                    <h1 class="text-xl font-bold">Mall Management</h1>
-                </div>
-                <button id="openSidebar" class="md:hidden text-white">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <div class="flex items-center space-x-6">
-                    <div class="relative group">
-                        <button id="notificationBtn" class="flex items-center space-x-2">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span
-                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                        </button>
-                        <div id="notificationDropdown"
-                            class="hidden absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50">
-                            <div class="p-4 border-b">
-                                <h3 class="font-bold text-gray-800">Thông báo</h3>
-                            </div>
-                            <div class="divide-y divide-gray-200">
-                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                                    <p class="text-sm font-medium text-gray-900">Hợp đồng với Nike sắp hết hạn</p>
-                                    <p class="text-xs text-gray-500">2 giờ trước</p>
-                                </a>
-                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                                    <p class="text-sm font-medium text-gray-900">Chiến dịch Black Friday đã được tạo</p>
-                                    <p class="text-xs text-gray-500">1 ngày trước</p>
-                                </a>
-                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                                    <p class="text-sm font-medium text-gray-900">5 tài khoản mới đăng ký</p>
-                                    <p class="text-xs text-gray-500">2 ngày trước</p>
-                                </a>
-                            </div>
-                            <div class="p-2 text-center bg-gray-50">
-                                <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
-                            </div>
-                        </div>
+        <header class="gradient-bg text-white shadow-lg w-full">
+            <div class="w-full px-4 py-4 flex justify-between items-center">
+              <!-- Logo và tiêu đề -->
+              <div class="flex items-center space-x-2">
+              </div>
+          
+              <!-- Khu vực bên phải: Thông báo + Tài khoản -->
+              <div class="flex items-center space-x-6">
+                <!-- Biểu tượng thông báo -->
+                <div class="relative group">
+                  <button id="notificationBtn" class="relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      3
+                    </span>
+                  </button>
+                  <!-- Dropdown thông báo -->
+                  <div id="notificationDropdown"
+                    class="hidden absolute right-0 mt-2 w-64 bg-white text-black rounded-md shadow-lg z-50">
+                    <div class="p-4 border-b">
+                      <h3 class="font-bold text-gray-800">Thông báo</h3>
                     </div>
-                    <div class="relative group">
-                        <button id="profileBtn" class="flex items-center space-x-2">
-                            <span class="font-medium hidden md:block">{{ user.user_name | default('Admin') }}</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div id="profileDropdown"
-                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
-                            <div class="p-4 border-b">
-                                <h3 class="font-bold text-gray-800">{{ user.user_name | default('Admin') }}</h3>
-                                <p class="text-xs text-gray-500">admin@mallmanagement.com</p>
-                            </div>
-                            <div class="py-1">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
-                            </div>
-                            <div class="py-1 border-t">
-                                <a href="/user/logout"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
-                            </div>
-                        </div>
+                    <div class="divide-y divide-gray-200">
+                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Hợp đồng với Nike sắp hết hạn</p>
+                        <p class="text-xs text-gray-500">2 giờ trước</p>
+                      </a>
+                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                        <p class="text-sm font-medium text-gray-900">Chiến dịch Black Friday đã được tạo</p>
+                        <p class="text-xs text-gray-500">1 ngày trước</p>
+                      </a>
+                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                        <p class="text-sm font-medium text-gray-900">5 tài khoản mới đăng ký</p>
+                        <p class="text-xs text-gray-500">2 ngày trước</p>
+                      </a>
                     </div>
+                    <div class="p-2 text-center bg-gray-50">
+                      <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
+                    </div>
+                  </div>
                 </div>
+          
+                <!-- Tài khoản -->
+                <div class="relative group">
+                  <button id="profileBtn" class="flex items-center space-x-2">
+                    <span class="font-medium hidden md:block">{{ user.user_name | default('Admin') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <!-- Dropdown tài khoản -->
+                  <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                    <div class="p-4 border-b">
+                      <h3 class="font-bold text-gray-800">{{ user.user_name | default('Admin') }}</h3>
+                      <p class="text-xs text-gray-500">admin@mallmanagement.com</p>
+                    </div>
+                    <div class="py-1">
+                      <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
+                      <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+                    </div>
+                    <div class="py-1 border-t">
+                      <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </header>
+          </header>          
 
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
@@ -1381,8 +1384,11 @@
                         </div>
                     </div>
                     <div class="mt-6 text-center">
-                        <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Xem báo cáo chi
-                            tiết</button>
+                        <a href="/user/report">
+                            <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                                Xem báo cáo chi tiết
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1941,5 +1947,47 @@
         fetchCountUser();
         loadBrands();
         loadPendingCampaigns();
+    });
+
+    const revenueMonthlyCtx = document.getElementById("revenueReportChart").getContext("2d");
+    const revenueMonthlyChart = new Chart(revenueMonthlyCtx, {
+    type: "bar",
+    data: {
+        labels: ["Tháng 1", "Tháng 2", "Tháng 3"],
+        datasets: [{
+        label: "Tổng doanh thu (triệu VND)",
+        data: [
+            400 + 300 + 250, // Tháng 1
+            350 + 350 + 300, // Tháng 2
+            450 + 350 + 250  // Tháng 3
+        ],
+        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"], // Màu khác nhau cho từng cột
+        borderRadius: 6,
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: {
+        legend: {
+            display: false, // Ẩn chú thích vì đã rõ
+        },
+        tooltip: {
+            callbacks: {
+            label: function (context) {
+                return context.parsed.y + " triệu VND";
+            },
+            },
+        },
+        },
+        scales: {
+        y: {
+            beginAtZero: true,
+            title: {
+            display: true,
+            text: "Triệu VND",
+            },
+        },
+        },
+    },
     });
 </script>

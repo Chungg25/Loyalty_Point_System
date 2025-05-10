@@ -21,6 +21,7 @@ CREATE TABLE Campaign_Redemption
 (
   campaign_redemption_id INT NOT NULL,
   campaign_id INT NOT NULL,
+  user_id INT NOT NULL,
   points_spent INT NOT NULL,
   redeemed_at datetime NOT NULL,
   PRIMARY KEY (campaign_redemption_id),
@@ -39,25 +40,6 @@ VALUES
 ('1', 'Cuối năm rộn ràng', 'Quà tặng cuối năm ấm áp', 600, 'Discount 10%', NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 40 DAY), 'Đang hoạt động', 'V4W5X6'),
 ('1', 'Black Friday', 'Siêu ưu đãi Black Friday', 500, 'Discount 50%', NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 2 DAY), 'Kết thúc', 'Y7Z8A9'),
 ('1', 'Tết Nguyên Đán', 'Ưu đãi mừng Tết', 900, 'Voucher 300K', NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 70 DAY), 'Sắp bắt đầu', 'B1C2D3');
- 
-INSERT INTO Campaign_Redemption (campaign_id, points_spent, redeemed_at) VALUES
-(1, 500, NOW()),
-(1, 500, NOW() - INTERVAL 1 DAY),
-(2, 700, NOW()),
-(2, 700, NOW() - INTERVAL 2 DAY),
-(3, 400, NOW()),
-(4, 800, NOW()),
-(5, 300, NOW() - INTERVAL 5 DAY),
-(6, 200, NOW() - INTERVAL 6 DAY),
-(7, 1000, NOW()),
-(8, 600, NOW()),
-(9, 500, NOW()),
-(10, 900, NOW()),
-(1, 500, NOW() - INTERVAL 10 DAY),
-(2, 700, NOW() - INTERVAL 11 DAY),
-(3, 400, NOW() - INTERVAL 12 DAY),
-(4, 800, NOW() - INTERVAL 13 DAY),
-(5, 300, NOW() - INTERVAL 14 DAY),
-(6, 200, NOW() - INTERVAL 15 DAY),
-(7, 1000, NOW() - INTERVAL 16 DAY),
-(8, 600, NOW() - INTERVAL 17 DAY);
+
+ALTER TABLE Campaign_Redemption
+ADD COLUMN status ENUM('Chưa sử dụng', 'Đã sử dụng', 'Hết hạn') DEFAULT 'Chưa sử dụng';

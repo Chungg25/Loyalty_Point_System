@@ -26,3 +26,6 @@ CREATE TABLE Voucher_Redemption (
   redemption_code VARCHAR(100),
   user_snapshot VARCHAR(200)
 );
+
+ALTER TABLE Voucher_Redemption
+ADD COLUMN status ENUM('Chưa sử dụng', 'Đã sử dụng', 'Hết hạn') DEFAULT 'Chưa sử dụng';

@@ -14,15 +14,24 @@ def get_db_connection():
         database= "brand_service"
     )
 
+# def get_db_connection():
+#     return mysql.connector.connect(
+#         host="han312.mysql.pythonanywhere-services.com",
+#         user="han312",
+#         password="SOA2025@",
+#         database= "han312$brand_service"
+#     )
+
+
 # Existing APIs
 @brand_bp.route('/get_brand', methods=['GET'])
 def get_brand():
-    try: 
+    try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("""SELECT distinct b.*, c.name, ct.* FROM brand b
-                        join contract ct on b.brand_id = ct.brand_id
-                        LEFT JOIN Brand_Category c ON b.category_id = c.category_id
+        cursor.execute("""SELECT distinct b.*, c.name, ct.* FROM Brand b
+                        join Contract ct on b.brand_id = ct.brand_id
+                        LEFT JOIN Category c ON b.category_id = c.category_id
                        """)
         brands = cursor.fetchall()
         cursor.close()
@@ -35,10 +44,10 @@ def get_brand():
 
 @brand_bp.route('/get_contract/<int:brand_id>', methods=['GET'])
 def get_contract(brand_id):
-    try: 
+    try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM contract JOIN brand ON contract.brand_id = brand.brand_id WHERE brand.brand_id = %s", (brand_id,))
+        cursor.execute("SELECT * FROM Contract JOIN Brand ON Contract.brand_id = Brand.brand_id WHERE Brand.brand_id = %s", (brand_id,))
         contract = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -53,7 +62,7 @@ def get_brand_by_id(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand WHERE brand_id = %s", (brand_id,))
+        cursor.execute("SELECT * FROM Brand WHERE brand_id = %s", (brand_id,))
         brand = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -67,21 +76,21 @@ def get_brand_by_id(brand_id):
 def update_brand():
     data = request.get_json()
     brand_id = data.get('brand_id')
-    brandname = data.get('brandname')  
-    email = data.get('email')  
+    brandname = data.get('brandname')
+    email = data.get('email')
     if not brand_id or not brandname or not email:
         return jsonify({"error": "Missing required fields (brand_id, brandname, email)"}), 400
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand WHERE brand_id = %s", (brand_id,))
+        cursor.execute("SELECT * FROM Brand WHERE brand_id = %s", (brand_id,))
         brand = cursor.fetchone()
         if not brand:
             cursor.close()
             conn.close()
             return jsonify({"error": "Brand not found"}), 404
         cursor.execute(
-            "UPDATE brand SET brandname = %s, email = %s WHERE brand_id = %s",
+            "UPDATE Brand SET brandname = %s, email = %s WHERE brand_id = %s",
             (brandname, email, brand_id)
         )
         conn.commit()
@@ -99,20 +108,20 @@ def update_brand():
 def update_coefficient():
     data = request.get_json()
     brand_id = data.get('brand_id')
-    coefficient = data.get('coefficient')  
+    coefficient = data.get('coefficient')
     if not brand_id or not coefficient:
         return jsonify({"error": "Missing required fields (brand_id, coefficient)"}), 400
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand WHERE brand_id = %s", (brand_id,))
+        cursor.execute("SELECT * FROM Brand WHERE brand_id = %s", (brand_id,))
         brand = cursor.fetchone()
         if not brand:
             cursor.close()
             conn.close()
             return jsonify({"error": "Brand not found"}), 404
         cursor.execute(
-            "UPDATE brand SET coefficient = %s WHERE brand_id = %s",
+            "UPDATE Brand SET coefficient = %s WHERE brand_id = %s",
             (coefficient, brand_id)
         )
         conn.commit()
@@ -142,13 +151,13 @@ def count_brand():
         return jsonify({"total": result['total']}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
 @brand_bp.route('/get_brand', methods=['GET'])
 def get_all_brands():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM brand where status = 1")
+        cursor.execute("SELECT * FROM Brand where status = 1")
         brands = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -158,13 +167,13 @@ def get_all_brands():
         return jsonify({"brands": brands}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
 @brand_bp.route('/brand_by_type_chart', methods=['GET'])
 def brand_by_type_chart():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT c.name, COUNT(b.brand_id) as total FROM brand b JOIN Brand_Category c ON b.category_id = c.category_id GROUP BY c.name")
+        cursor.execute("SELECT c.name, COUNT(b.brand_id) as total FROM Brand b JOIN Category c ON b.category_id = c.category_id GROUP BY c.name")
         result = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -174,19 +183,3 @@ def brand_by_type_chart():
         return jsonify({"brand_by_type": result}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-
-# @brand_bp.route("/brand_coefficient", methods=["GET"])
-# def brand_coefficient():
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True)
-#         cursor.execute("SELECT brand_id, coefficient FROM brand")
-#         result = cursor.fetchall()
-#         cursor.close()
-#         conn.close()
-
-#         if not result:
-#             return jsonify({"error": "No brands found"}), 404
-#         return jsonify({"brand_coefficient": result}), 200
-#     except mysql.connector.Error as err:
-#         return jsonify({"error": str(err)}), 500

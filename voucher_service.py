@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint, render_template, session
+from flask import request, jsonify, Blueprint, render_template
 import mysql.connector
 from flask_cors import CORS
 from datetime import datetime
@@ -14,6 +14,14 @@ def get_db_connection():
         database="voucher_service"
     )
 
+# def get_db_connection():
+#     return mysql.connector.connect(
+#         host="han312.mysql.pythonanywhere-services.com",
+#         user="han312",
+#         password="SOA2025@",
+#         database= "han312$voucher_service"
+#     )
+
 # 1. Tạo voucher
 @voucher_bp.route('/vouchers', methods=['POST'])
 def create_voucher():
@@ -26,7 +34,7 @@ def create_voucher():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(query, (
-            data.get('brand_id'), data['title'], data['description'],
+            1, data['title'], data['description'],
             data['points_required'], data['discount_amount'], datetime.now(),
             data['start_at'], data['end_at']
         ))
@@ -155,21 +163,21 @@ def get_rewards(brand_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT 
-                voucher_id AS reward_id, 
-                title AS name, 
-                description, 
-                points_required AS points, 
+            SELECT
+                voucher_id AS reward_id,
+                title AS name,
+                description,
+                points_required AS points,
                 discount_amount AS discount,
-                start_at AS start_time, 
+                start_at AS start_time,
                 end_at AS end_time,
-                CASE 
+                CASE
                     WHEN NOW() BETWEEN start_at AND end_at THEN 'Đang hoạt động'
                     ELSE 'Hết hạn'
                 END AS status,
                 stock ,
-                initial_stock   
-            FROM voucher
+                initial_stock
+            FROM Voucher
             WHERE brand_id = %s
         """, (brand_id,))
         rewards = cursor.fetchall()
@@ -182,17 +190,17 @@ def get_rewards(brand_id):
         return jsonify({"error": str(err)}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 @voucher_bp.route('/get_reward_chart/<int:brand_id>', methods=['GET'])
 def get_reward_chart(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT v.title AS name, 
+            SELECT v.title AS name,
                    COUNT(vr.redemption_id) AS redeemed
-            FROM voucher v
-            LEFT JOIN voucher_redemption vr ON v.voucher_id = vr.voucher_id
+            FROM Voucher v
+            LEFT JOIN Voucher_Redemption vr ON v.voucher_id = vr.voucher_id
             WHERE v.brand_id = %s
             GROUP BY v.voucher_id, v.title
             ORDER BY redeemed DESC LIMIT 5
@@ -212,20 +220,20 @@ def get_reward_chart(brand_id):
         }), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
 @voucher_bp.route('/get_rewards_redeemed/<int:brand_id>', methods=['GET'])
 def get_rewards_redeemed(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT COUNT(*) AS rewards_redeemed FROM voucher_redemption WHERE voucher_id IN (SELECT voucher_id FROM voucher WHERE brand_id = %s)", (brand_id,))
+        cursor.execute("SELECT COUNT(*) AS rewards_redeemed FROM Voucher_Redemption WHERE voucher_id IN (SELECT voucher_id FROM Voucher WHERE brand_id = %s)", (brand_id,))
         rewards_redeemed = cursor.fetchone()['rewards_redeemed']
         cursor.close()
         conn.close()
         return jsonify({"rewards_redeemed": rewards_redeemed}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-    
+
 @voucher_bp.route('/<int:user_id>/redeemed_vouchers', methods=['GET'])
 def get_user_redeemed_vouchers(user_id):
     try:
@@ -248,8 +256,8 @@ def get_user_redeemed_vouchers(user_id):
 
 @voucher_bp.route('/voucher', methods=['GET'])
 def create_voucher_page():
-    user_id = session.get('user_id', '')
-    user_name = session.get('user_name', '')
+    user_id = request.args.get('user_id', '')
+    user_name = request.args.get('user_name', '')
     user = {"user_id": user_id, "user_name": user_name}
     return render_template('/voucher_service/create_voucher.html', user=user)
 
@@ -264,7 +272,7 @@ def create_voucher_form():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(query, (
-            data.get('brand_id'), data['title'], data['description'],
+            1, data['title'], data['description'],
             data['points_required'], data['discount_amount'], datetime.now(),
             data['start_at'], data['end_at']
         ))
@@ -275,3 +283,23 @@ def create_voucher_form():
     finally:
         cursor.close()
         conn.close()
+
+@voucher_bp.route('/user_mall_vouchers/<int:user_id>', methods=['GET'])
+def get_user_mall_vouchers(user_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT vr.redemption_id AS voucher_id, v.title, v.description, vr.points_spent AS points_required,
+                   vr.redemption_code, vr.status, vr.redeemed_at
+            FROM Voucher_Redemption vr
+            JOIN Voucher v ON vr.voucher_id = v.voucher_id
+            WHERE vr.user_id = %s
+            ORDER BY vr.redeemed_at DESC
+        """, (user_id,))
+        vouchers = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(vouchers), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

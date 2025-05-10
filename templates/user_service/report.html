@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Báo cáo chi tiết</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Báo cáo chi tiết doanh thu các brand</h1>
+
+    <!-- Bảng chi tiết -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg mb-8">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">STT</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Brand</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tháng 1</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tháng 2</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tháng 3</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng cộng</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr>
+            <td class="px-6 py-4">1</td>
+            <td class="px-6 py-4 font-medium text-gray-900">Nike Store</td>
+            <td class="px-6 py-4">400</td>
+            <td class="px-6 py-4">350</td>
+            <td class="px-6 py-4">450</td>
+            <td class="px-6 py-4 font-bold text-blue-600">1.2 tỷ</td>
+          </tr>
+          <tr>
+            <td class="px-6 py-4">2</td>
+            <td class="px-6 py-4 font-medium text-gray-900">Apple Store</td>
+            <td class="px-6 py-4">300</td>
+            <td class="px-6 py-4">350</td>
+            <td class="px-6 py-4">350</td>
+            <td class="px-6 py-4 font-bold text-blue-600">1.0 tỷ</td>
+          </tr>
+          <tr>
+            <td class="px-6 py-4">3</td>
+            <td class="px-6 py-4 font-medium text-gray-900">Starbucks</td>
+            <td class="px-6 py-4">250</td>
+            <td class="px-6 py-4">300</td>
+            <td class="px-6 py-4">250</td>
+            <td class="px-6 py-4 font-bold text-blue-600">800 triệu</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Biểu đồ -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Biểu đồ doanh thu theo tháng</h2>
+      <canvas id="revenueChart" height="100"></canvas>
+    </div>
+
+    <!-- Nút quay lại -->
+    <div class="mt-6">
+        <button onclick="goBack()" class="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded">
+            Quay lại trang trước
+        </button>
+    </div>
+  </div>
+
+  <script>
+    const ctx = document.getElementById("revenueChart").getContext("2d");
+
+    const revenueChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Tháng 1", "Tháng 2", "Tháng 3"],
+        datasets: [
+          {
+            label: "Nike Store",
+            data: [400, 350, 450],
+            backgroundColor: "#3b82f6",
+          },
+          {
+            label: "Apple Store",
+            data: [300, 350, 350],
+            backgroundColor: "#10b981",
+          },
+          {
+            label: "Starbucks",
+            data: [250, 300, 250],
+            backgroundColor: "#f59e0b",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Doanh thu (triệu VND)",
+            },
+          },
+        },
+      },
+    });
+
+    function goBack() {
+        window.history.back();
+    }
+  </script>
+</body>
+
+</html>

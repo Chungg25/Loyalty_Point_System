@@ -25,11 +25,19 @@ CREATE TABLE User_Profile (
 );
 
 -- Bảng Customer
+-- CREATE TABLE Customer (
+--   membertype INT NOT NULL,
+--   user_id INT NOT NULL PRIMARY KEY,
+--   FOREIGN KEY (membertype) REFERENCES Users(membertype)
+-- );
+
+-- Bảng Customer (sửa FOREIGN KEY đúng tới MemberTypeCoefficient)
 CREATE TABLE Customer (
   membertype INT NOT NULL,
   user_id INT NOT NULL PRIMARY KEY,
-  FOREIGN KEY (membertype) REFERENCES Users(membertype)
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
+
 
 CREATE TABLE MemberTypeCoefficient (
   membertype INT PRIMARY KEY,
@@ -56,8 +64,6 @@ CREATE TABLE Brand (
   user_id INT NOT NULL PRIMARY KEY,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
-
-
 
 -- Insert dữ liệu mẫu cho bảng Users
 INSERT INTO Users (user_id, username, password, created_at, status) VALUES

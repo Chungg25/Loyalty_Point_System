@@ -7,6 +7,9 @@
     <title>Brand Dashboard - Hệ Thống Tích Điểm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-pHF8jYxRMqZxIz1IYdMQNUYmZ7lW+owcDjeMJkDA4XeZVfSwKfe1coCGsYfD1KbZf6C1EezgwKAhZd6MwRQyIA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Gradient background for header and banner */
@@ -93,35 +96,73 @@
             min-height: 80px;
         }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-50 font-sans">
-    <header class="gradient-bg text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="gradient-bg text-white shadow-lg w-full">
+        <div class="w-full px-4 py-4 flex justify-between items-center">
+            <!-- Logo và tiêu đề -->
             <div class="flex items-center space-x-2">
-                <i class="fas fa-crown text-2xl"></i>
-                <h1 class="text-2xl font-bold">LoyaltyBrand</h1>
+                <i class="fas fa-store text-2xl"></i>
+                <h1 class="text-xl font-bold">Brand Management</h1>
             </div>
+
+            <!-- Khu vực bên phải: Thông báo + Tài khoản -->
             <div class="flex items-center space-x-6">
-                <!-- <div class="relative group">
-                    <button class="flex items-center space-x-2 focus:outline-none">
+                <!-- Biểu tượng thông báo -->
+                <div class="relative group">
+                    <button id="notificationBtn" class="relative">
                         <i class="fas fa-bell text-xl"></i>
                         <span
-                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            1
+                        </span>
                     </button>
-                </div> -->
-                <div class="flex items-center space-x-2">
-                    <img src="https://placehold.co/40x40/e2e8f0/334155?text=A" alt="Avatar quản trị viên"
-                        class="w-10 h-10 rounded-full border-2 border-white">
-                    <span class="font-medium hidden sm:inline">{{user.user_name}}</span>
-                    <button class="text-gray-300 hover:text-white focus:outline-none ml-2">
-                        <a href="/user/logout" class="fas fa-sign-out-alt"></a>
-                    </button>
+                    <!-- Dropdown thông báo -->
+                    <div id="notificationDropdown"
+                        class="hidden absolute right-0 mt-2 w-64 bg-white text-black rounded-md shadow-lg z-50">
+                        <div class="p-4 border-b">
+                            <h3 class="font-bold text-gray-800">Thông báo</h3>
+                        </div>
+                        <div class="divide-y divide-gray-200">
+                            <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                                <p class="text-sm font-medium text-gray-900">2 người dùng vừa đăng ký tài khoản</p>
+                                <p class="text-xs text-gray-500">1 ngày trước</p>
+                            </a>
+                        </div>
+                        <div class="p-2 text-center bg-gray-50">
+                            <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Tài khoản -->
+                <div class="relative group">
+                    <button id="profileBtn" class="flex items-center space-x-2">
+                        <span class="font-medium hidden md:block">{{ user.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <!-- Dropdown tài khoản -->
+                    <div id="profileDropdown"
+                        class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                        <div class="p-4 border-b">
+                            <h3 class="font-bold text-gray-800">{{ user.user_name }}</h3>
+                        </div>
+                        <div class="py-1">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+                        </div>
+                        <div class="py-1 border-t">
+                            <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng
+                                xuất</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
+
 
     <main class="container mx-auto px-4 py-8">
         <section aria-labelledby="welcome-heading"
@@ -463,7 +504,7 @@
     <script>
         // Configuration
         const BRAND_ID = 1; // Replace with actual brand ID from backend/authentication
-        const API_BASE_URL = ''; // Optional: Set a base URL if your API endpoints share a common prefix e.g., '/api/v1'
+        const API_BASE_URL = 'http://127.0.0.1:5000'; // Optional: Set a base URL if your API endpoints share a common prefix e.g., '/api/v1'
         const MOCK_API = false; // Set to true to use mock data for testing without a backend
 
         // --- DOM Element References ---
@@ -800,188 +841,174 @@
         }
 
         // Fetch and render Payments
-        async function loadPayments(page = 1, itemsPerPage = 10) { // Add pagination support
-            const mockPaymentData = {
-                data: {
-                    payments: Array.from({ length: itemsPerPage }, (_, i) => ({
-                        transaction_id: `GD${1000 + (page - 1) * itemsPerPage + i}`,
-                        customer_name: `Khách Hàng ${String.fromCharCode(65 + i)}${(page - 1) * itemsPerPage}`,
-                        customer_avatar: `https://placehold.co/32x32/e2e8f0/334155?text=${String.fromCharCode(65 + i)}`,
-                        payment_date: `2025-07-${String(10 + i).padStart(2, '0')} 10:30`,
-                        amount: (Math.random() * 1000000) + 50000,
-                        points_earned: Math.floor(Math.random() * 100) + 10,
-                        status: Math.random() > 0.1 ? 'Hoàn thành' : 'Đang xử lý'
-                    })),
-                    total_payments: 55 // Total items for pagination
-                }
-            };
+        async function loadPayments(page = 1, itemsPerPage = 10, filters = {}) {
             try {
+                if (!BRAND_ID || isNaN(BRAND_ID)) {
+                    throw new Error('BRAND_ID không hợp lệ hoặc không được định nghĩa!');
+                }
+                if (!paymentsTableContainer || !paymentsPaginationInfo || !paymentsPaginationControls) {
+                    throw new Error('Không tìm thấy container hiển thị giao dịch trong DOM!');
+                }
+
                 showMessage(paymentsTableContainer, 'loading');
                 paymentsPaginationInfo.textContent = 'Đang tải...';
-                updatePaginationControls(paymentsPaginationControls, 0, 0, 0); // Disable pagination while loading
+                updatePaginationControls(paymentsPaginationControls, 0, 0, 0);
 
-                const data = await fetchData(`/point/get_payments/${BRAND_ID}?page=${page}&limit=${itemsPerPage}`, {}, mockPaymentData);
+                // Tạo query string
+                const params = new URLSearchParams({
+                    brand_id: BRAND_ID,
+                    page: page,
+                    items_per_page: itemsPerPage,
+                    ...(filters.start_date && { start_date: filters.start_date }),
+                    ...(filters.end_date && { end_date: filters.end_date }),
+                    ...(filters.status && { status: filters.status })
+                });
+
+                const data = await fetchData(`/point/get_payments?${params.toString()}`, {
+                    method: "GET",
+                    headers: {
+                        // Không cần Content-Type cho GET
+                        "Accept": "application/json"
+                    }
+                });
 
                 if (data && data.payments && data.payments.length > 0) {
-                    paymentsTableContainer.innerHTML = data.payments.map(p => `
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-3 px-4 text-sm font-medium text-gray-500">${p.transaction_id}</td>
-                            <td class="py-3 px-4 text-sm text-gray-900 flex items-center">
-                                <img src="${p.customer_avatar || 'https://placehold.co/32x32/e2e8f0/334155?text=KH'}" alt="Avatar ${p.customer_name}" class="w-8 h-8 rounded-full mr-2 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/32x32/e0e7ff/3730a3?text=KH';">
-                                ${p.customer_name}
-                            </td>
-                            <td class="py-3 px-4 text-sm text-gray-500">${p.payment_date}</td>
-                            <td class="py-3 px-4 text-sm font-medium text-gray-900">${p.amount}</td>
-                            <td class="py-3 px-4 text-sm text-green-600 font-medium">+${formatNumber(p.points_earned)}</td>
-                            <td class="py-3 px-4 text-sm">
-                                <span class="text-xs px-2 py-1 rounded ${p.status === 'Hoàn thành' ? 'bg-green-100 text-green-800' : p.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
-                                    ${p.status}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4 text-right">
-                                <button class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
+                    paymentsTableContainer.innerHTML = data.payments.map(p => {
+                        if (!p.transaction_id || !p.customer_name) {
+                            console.warn('Dữ liệu giao dịch không hợp lệ:', p);
+                            return '';
+                        }
+                        return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4 text-sm font-medium text-gray-500">${p.transaction_id}</td>
+                        <td class="py-3 px-4 text-sm text-gray-900 flex items-center">
+                            <img src="https://placehold.co/32x32/e2e8f0/334155?text=${p.customer_name[0] || 'KH'}" alt="Avatar ${p.customer_name}" class="w-8 h-8 rounded-full mr-2 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/32x32/e0e7ff/3730a3?text=KH';">
+                            ${p.customer_name}
+                        </td>
+                        <td class="py-3 px-4 text-sm text-gray-500">${p.payment_date || 'N/A'}</td>
+                        <td class="py-3 px-4 text-sm font-medium text-gray-900">${p.amount || '0'}</td>
+                        <td class="py-3 px-4 text-sm text-green-600 font-medium">+${formatNumber(p.points_earned) || '0'}</td>
+                        <td class="py-3 px-4 text-sm">
+                            <span class="text-xs px-2 py-1 rounded ${p.status === 'Hoàn thành' ? 'bg-green-100 text-green-800' : p.status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                                ${p.status || 'Không xác định'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                    }).join('');
 
-                    // Update pagination info
                     const totalPayments = data.total_payments || 0;
                     const startIndex = (page - 1) * itemsPerPage + 1;
-                    const endIndex = startIndex + data.payments.length - 1;
+                    const endIndex = Math.min(startIndex + data.payments.length - 1, totalPayments);
                     paymentsPaginationInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${formatNumber(totalPayments)} giao dịch`;
-                    updatePaginationControls(paymentsPaginationControls, page, Math.ceil(totalPayments / itemsPerPage), (newPage) => loadPayments(newPage, itemsPerPage));
+                    updatePaginationControls(paymentsPaginationControls, page, Math.ceil(totalPayments / itemsPerPage), (newPage) => loadPayments(newPage, itemsPerPage, filters));
                 } else {
-                    showMessage(paymentsTableContainer, 'placeholder', 'Không có giao dịch nào.');
+                    showMessage(paymentsTableContainer, 'placeholder', data?.message || 'Không có giao dịch nào.');
                     paymentsPaginationInfo.textContent = 'Hiển thị 0 của 0 giao dịch';
                     updatePaginationControls(paymentsPaginationControls, 0, 0, 0);
                 }
             } catch (error) {
                 console.error('Error loading payments:', error);
-                showMessage(paymentsTableContainer, 'error', `Lỗi tải thanh toán: ${error.message}`);
+                showMessage(paymentsTableContainer, 'error', `Lỗi tải thanh toán: ${error.message} (${error.status || 'Unknown'})`);
                 paymentsPaginationInfo.textContent = 'Lỗi tải dữ liệu';
                 updatePaginationControls(paymentsPaginationControls, 0, 0, 0);
             }
         }
 
         // Fetch and render Customers
-        async function loadCustomers(page = 1, itemsPerPage = 10) { // Add pagination support
-            const mockCustomerData = {
-                data: {
-                    stats: { total_customers: 1245, new_customers_30d: 87, vip_customers: 150 },
-                    customers: Array.from({ length: itemsPerPage }, (_, i) => {
-                        const tiers = ['Kim cương', 'Vàng', 'Bạc', 'Đồng', 'Thành viên'];
-                        const randomTier = tiers[Math.floor(Math.random() * tiers.length)];
-                        return {
-                            customer_code: `KH${10000 + (page - 1) * itemsPerPage + i}`,
-                            name: `Nguyễn Văn ${String.fromCharCode(65 + i)}${(page - 1) * itemsPerPage}`,
-                            avatar_url: `https://placehold.co/40x40/e2e8f0/334155?text=${String.fromCharCode(65 + i)}`,
-                            phone: `090xxxx${String(Math.random()).substring(2, 5)}`,
-                            total_points: Math.floor(Math.random() * 5000),
-                            last_transaction_date: `2025-07-${String(10 + i).padStart(2, '0')}`,
-                            tier: randomTier
-                        };
-                    }),
-                    total_customers: 1245 // Total items for pagination
-                }
-            };
+        async function loadCustomers(page = 1, itemsPerPage = 10) {
             try {
                 showMessage(customerStatsContainer, 'loading');
                 showMessage(customersTableContainer, 'loading');
                 customersPaginationInfo.textContent = 'Đang tải...';
                 updatePaginationControls(customersPaginationControls, 0, 0, 0);
 
-                // Add ?page=${page}&limit=${itemsPerPage} if needed
-                const data = await fetchData(`/user/get_customers/${BRAND_ID}?page=${page}&limit=${itemsPerPage}`, {}, mockCustomerData);
+                // Bước 1: Gọi API /user/get_customers lần đầu để lấy danh sách user_id
+                const initialData = await fetchData(`/user/get_customers`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        brand_id: BRAND_ID,
+                        page: page,
+                        limit: itemsPerPage
+                    })
+                });
 
-                // Render Customer Stats (Only needs to load once, ideally)
-                // Consider loading stats separately if they don't change with pagination
-                if (page === 1 && data && data.stats) {
+                // Bước 2: Gọi song song API /point/get_points/<user_id> cho từng khách hàng
+                const userPoints = await Promise.all(
+                    (initialData.customers || []).map(async (customer) => {
+                        try {
+                            const pointData = await fetchData(`/point/get_points/${customer.user_id}`);
+                            return { user_id: customer.user_id, total_points: pointData.total_points || 0 };
+                        } catch (error) {
+                            console.warn(`Lỗi khi lấy điểm user ${customer.user_id}:`, error);
+                            return { user_id: customer.user_id, total_points: 0 };
+                        }
+                    })
+                );
+
+                // Bước 3: Gọi lại API /user/get_customers để lấy dữ liệu đầy đủ (có điểm)
+                const finalData = await fetchData(`/user/get_customers`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        brand_id: BRAND_ID,
+                        page: page,
+                        limit: itemsPerPage,
+                        user_points: userPoints
+                    })
+                });
+
+                // Render thống kê nếu là trang đầu tiên
+                if (page === 1 && finalData.stats) {
                     customerStatsContainer.innerHTML = `
-                        <div class="bg-white rounded-xl p-6 shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-500">Tổng khách hàng</p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.total_customers || 0)}</h3>
-                                </div>
-                                <div class="bg-blue-100 text-blue-600 p-3 rounded-lg"> <i class="fas fa-users text-xl"></i> </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-500">KH mới (30 ngày)</p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.new_customers_30d || 0)}</h3>
-                                </div>
-                                <div class="bg-green-100 text-green-600 p-3 rounded-lg"> <i class="fas fa-user-plus text-xl"></i> </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-500">Khách VIP</p>
-                                    <h3 class="text-2xl font-bold mt-2 text-gray-800">${formatNumber(data.stats.vip_customers || 0)}</h3>
-                                </div>
-                                <div class="bg-purple-100 text-purple-600 p-3 rounded-lg"> <i class="fas fa-crown text-xl"></i> </div>
-                            </div>
-                        </div>
-                    `;
-                } else if (page === 1) {
-                    // Show placeholder/error for stats if load failed on first page
-                    showMessage(customerStatsContainer, 'placeholder', 'Không có dữ liệu thống kê.');
+                <div class="bg-white rounded-xl p-6 shadow-md">Tổng khách hàng: <strong>${formatNumber(finalData.stats.total_customers)}</strong></div>
+                <div class="bg-white rounded-xl p-6 shadow-md">KH mới (30 ngày): <strong>${formatNumber(finalData.stats.new_customers_30d)}</strong></div>
+                <div class="bg-white rounded-xl p-6 shadow-md">Khách VIP: <strong>${formatNumber(finalData.stats.vip_customers)}</strong></div>
+            `;
                 }
 
+                // Render bảng khách hàng
+                if (finalData.customers?.length > 0) {
+                    customersTableContainer.innerHTML = finalData.customers.map(c => `
+                <tr>
+                    <td class="px-4 py-3">${c.name}</td>
+                    <td class="px-4 py-3">${c.phone}</td>
+                    <td class="px-4 py-3 text-blue-600 font-semibold">${formatNumber(c.total_points || 0)}</td>
+                    <td class="px-4 py-3">${c.last_transaction_date || 'Chưa có GD'}</td>
+                    <td class="px-4 py-3">${c.tier || 'Thành viên'}</td>
+                    <td class="px-4 py-3 text-right"><button class="text-blue-600">Chi tiết</button></td>
+                </tr>
+            `).join('');
 
-                // Render Customer Table
-                if (data && data.customers && data.customers.length > 0) {
-                    customersTableContainer.innerHTML = data.customers.map(c => {
-                        // Tier color mapping
-                        const tierColors = { 'Kim cương': 'purple', 'Vàng': 'yellow', 'Bạc': 'gray', 'Đồng': 'orange', 'Thành viên': 'blue' };
-                        const tierColor = tierColors[c.tier] || 'blue'; // Default color
-
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4 text-sm flex items-center">
-                                    <img src="${c.avatar_url || 'https://placehold.co/40x40/e2e8f0/334155?text=KH'}" alt="Avatar ${c.name}" class="w-10 h-10 rounded-full mr-3 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/e0e7ff/3730a3?text=KH';">
-                                    <div>
-                                        <p class="font-medium text-gray-900">${c.name}</p>
-                                        <p class="text-xs text-gray-500">ID: ${c.customer_code || 'N/A'}</p>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-500">${c.phone || 'N/A'}</td>
-                                <td class="py-3 px-4 text-sm font-medium text-blue-600">${formatNumber(c.total_points)}</td>
-                                <td class="py-3 px-4 text-sm text-gray-500">${c.last_transaction_date || 'Chưa có GD'}</td>
-                                <td class="py-3 px-4 text-sm">
-                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-${tierColor}-100 text-${tierColor}-800">${c.tier || 'Thành viên'}</span>
-                                </td>
-                                <td class="py-3 px-4 text-right">
-                                    <button class="text-blue-600 hover:text-blue-800 focus:outline-none mr-2" title="Xem chi tiết"> <i class="fas fa-eye"></i> </button>
-                                    <button class="text-gray-500 hover:text-gray-700 focus:outline-none" title="Chỉnh sửa"> <i class="fas fa-edit"></i> </button>
-                                </td>
-                            </tr>
-                         `;
-                    }).join('');
-                    // Update pagination info
-                    const totalCustomers = data.total_customers || 0;
+                    const total = finalData.total_customers || 0;
                     const startIndex = (page - 1) * itemsPerPage + 1;
-                    const endIndex = startIndex + data.customers.length - 1;
-                    customersPaginationInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${formatNumber(totalCustomers)} khách hàng`;
-                    updatePaginationControls(customersPaginationControls, page, Math.ceil(totalCustomers / itemsPerPage), (newPage) => loadCustomers(newPage, itemsPerPage));
+                    const endIndex = Math.min(startIndex + finalData.customers.length - 1, total);
+                    customersPaginationInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${formatNumber(total)} khách hàng`;
+                    updatePaginationControls(customersPaginationControls, page, Math.ceil(total / itemsPerPage), (newPage) => loadCustomers(newPage, itemsPerPage));
                 } else {
                     showMessage(customersTableContainer, 'placeholder', 'Không có khách hàng nào.');
-                    customersPaginationInfo.textContent = 'Hiển thị 0 của 0 khách hàng';
-                    updatePaginationControls(customersPaginationControls, 0, 0, 0);
                 }
 
             } catch (error) {
-                console.error('Error loading customers:', error);
-                if (page === 1) showMessage(customerStatsContainer, 'error', `Lỗi tải thống kê: ${error.message}`);
+                console.error('Lỗi tải khách hàng:', error);
+                showMessage(customerStatsContainer, 'error', `Lỗi tải thống kê: ${error.message}`);
                 showMessage(customersTableContainer, 'error', `Lỗi tải khách hàng: ${error.message}`);
                 customersPaginationInfo.textContent = 'Lỗi tải dữ liệu';
-                updatePaginationControls(customersPaginationControls, 0, 0, 0);
             }
         }
+
 
         // Fetch and render Rewards
         async function loadRewards() {
@@ -1386,6 +1413,25 @@
             });
         });
 
+    </script>
+    <script>
+        document.getElementById('notificationBtn').addEventListener('click', function () {
+            document.getElementById('notificationDropdown').classList.toggle('hidden');
+        });
+
+        document.getElementById('profileBtn').addEventListener('click', function () {
+            document.getElementById('profileDropdown').classList.toggle('hidden');
+        });
+
+        // Ẩn dropdown khi click bên ngoài
+        window.addEventListener('click', function (e) {
+            if (!document.getElementById('notificationBtn').contains(e.target)) {
+                document.getElementById('notificationDropdown').classList.add('hidden');
+            }
+            if (!document.getElementById('profileBtn').contains(e.target)) {
+                document.getElementById('profileDropdown').classList.add('hidden');
+            }
+        });
     </script>
 </body>
 

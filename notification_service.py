@@ -6,15 +6,22 @@ from flask_cors import CORS
 notification_bp = Blueprint("notification", __name__)
 CORS(notification_bp)
 
+# def get_db_connection():
+#     return mysql.connector.connect(
+#         host="localhost",
+#         user="root",
+#         password="",
+#         database="notification_service"
+#     )
+
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="notification_service"
+        host="han312.mysql.pythonanywhere-services.com",
+        user="han312",
+        password="SOA2025@",
+        database= "han312$notification_service"
     )
 
-# 1. Trang chủ thông báo
 @notification_bp.route('/notification', methods=['GET'])
 def notification():
     try:
@@ -50,7 +57,7 @@ def create_notification():
         # Chuyển đổi định dạng thời gian
         created_at = datetime.strptime(created_at_str, "%Y-%m-%dT%H:%M") if created_at_str else None
         end_at = datetime.strptime(end_at_str, "%Y-%m-%dT%H:%M") if end_at_str else None
-        
+
         status = int(data.get('status'))
 
         connection = get_db_connection()

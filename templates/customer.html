@@ -40,7 +40,6 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Loading spinner */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
@@ -73,6 +72,38 @@
             text-align: center;
             padding: 1rem;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #666;
+        }
     </style>
 </head>
 
@@ -82,7 +113,7 @@
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <i class="fas fa-store text-2xl"></i>
-                <h1 class="text-xl font-bold">Mall Management</h1>
+                <h1 class="text-xl font-bold">Customer</h1>
             </div>
             <div class="flex items-center space-x-6">
                 <div class="relative group">
@@ -166,6 +197,8 @@
                 data-target="promotions">Ưu đãi</button>
             <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="points">Quản lý
                 điểm</button>
+            <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="vouchers">Voucher
+                của tôi</button>
             <button class="tab-btn px-4 py-2 font-medium text-gray-600 transition-all" data-target="history">Lịch sử
                 giao dịch</button>
         </div>
@@ -202,8 +235,7 @@
                     </div>
                     <div class="border-t pt-4">
                         <p class="text-sm text-gray-600"><span class="font-medium">Tỷ lệ quy đổi:</span> 100,000đ = 1
-                            điểm
-                        </p>
+                            điểm</p>
                         <p class="text-sm text-gray-600"><span class="font-medium">Cấp độ:</span> <span
                                 id="tier-summary">Đang tải...</span></p>
                     </div>
@@ -246,20 +278,45 @@
             </button>
         </div>
 
+        <!-- Vouchers Content -->
+        <div data-content id="vouchers">
+            <h3 class="text-xl font-bold mb-6">Voucher của tôi</h3>
+            <!-- Brand Vouchers Section -->
+            <div class="mb-8">
+                <h4 class="text-lg font-bold mb-4">Voucher của Brand</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="brand-vouchers-list">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mall Vouchers Section -->
+            <div>
+                <h4 class="text-lg font-bold mb-4">Voucher của Mall</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mall-vouchers-list">
+                    <div class="loading-overlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Transaction History Content -->
         <div data-content id="history">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <h3 class="text-xl font-bold mb-4 md:mb-0">Lịch sử giao dịch</h3>
                 <div class="flex space-x-2">
-                    <select
+                    <select id="transactionTypeFilter"
                         class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option>Tất cả</option>
-                        <option>Tích điểm</option>
-                        <option>Đổi điểm</option>
-                        <option>Mua sắm</option>
+                        <option value="all">Tất cả</option>
+                        <option value="EARN">Tích điểm</option>
+                        <option value="REDEEM">Đổi điểm</option>
+                        <option value="PURCHASE">Mua sắm</option>
                     </select>
-                    <input type="date"
+                    <input type="date" id="transactionDateFilter"
                         class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="applyFilterBtn"
+                        class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">Lọc</button>
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
@@ -300,7 +357,7 @@
                 </div>
             </div>
             <div class="flex justify-between items-center">
-                <p class="text-sm text-gray-600">Hiển thị 0 trên tổng số 0 giao dịch</p>
+                <p class="text-sm text-gray-600" id="transaction-count">Hiển thị 0 trên tổng số 0 giao dịch</p>
                 <div class="flex space-x-2">
                     <button
                         class="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg hover:bg-gray-50 transition-all">
@@ -316,6 +373,25 @@
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Voucher Details Modal -->
+        <div id="voucherModal" class="modal">
+            <div class="modal-content relative">
+                <span class="modal-close" onclick="closeVoucherModal()">×</span>
+                <h3 class="text-xl font-bold mb-4" id="voucherModalTitle"></h3>
+                <p class="text-gray-600 text-sm mb-2" id="voucherModalDescription"></p>
+                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Mã đổi:</span> <span
+                        id="voucherModalCode"></span></p>
+                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Điểm đã dùng:</span> <span
+                        id="voucherModalPoints"></span> điểm</p>
+                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Ngày đổi:</span> <span
+                        id="voucherModalDate"></span></p>
+                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Nguồn:</span> <span
+                        id="voucherModalSource"></span></p>
+                <p class="text-sm text-gray-500 mb-4"><span class="font-medium">Trạng thái:</span> <span
+                        id="voucherModalStatus"></span></p>
             </div>
         </div>
     </main>
@@ -336,7 +412,9 @@
                         <li><a href="#" class="text-gray-600 text-sm hover:text-blue-600 transition-all"><i
                                     class="fas fa-phone-alt mr-2"></i> 1900 1234</a></li>
                         <li><a href="#" class="text-gray-600 text-sm hover:text-blue-600 transition-all"><i
-                                    class="fas fa-envelope mr-2"></i> support@mallmanagement.com</a></li>
+                                    class="fas fa-envelope mr-2"></i> <span class="__cf_email__"
+                                    data-cfemail="93e0e6e3e3fce1e7d3fef2fffffef2fdfe9fef6fef5fabe">[email&#160;protected]</span></a>
+                        </li>
                     </ul>
                 </div>
                 <div>
@@ -370,6 +448,7 @@
         </div>
     </footer>
 
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
         // Configuration
         const USER_ID = 1;
@@ -386,10 +465,9 @@
             container.innerHTML = `<div class="${type}-message">${message}</div>`;
         }
 
-        // Fetch and render customer info (mock for now)
+        // Fetch and render customer info
         async function loadCustomerInfo() {
-            // Giả định thông tin khách hàng từ API hoặc session
-            const customerName = document.getElementById('customer-name-header').textContent; // Thay bằng API call nếu có
+            const customerName = document.getElementById('customer-name-header').textContent;
             const customerTier = document.getElementById('customer-tier-dropdown').textContent;
             document.getElementById('customer-name').textContent = `Xin chào, ${customerName}!`;
             document.getElementById('customer-tier').textContent = `${customerTier} - Ưu đãi 5% trên mọi hóa đơn`;
@@ -416,7 +494,7 @@
             }
         }
 
-        // Fetch and render promotions (campaigns)
+        // Fetch and render promotions
         async function loadPromotions() {
             const currentContainer = document.getElementById('current-promotions');
             const upcomingContainer = document.getElementById('upcoming-promotions');
@@ -425,7 +503,6 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Lỗi tải ưu đãi');
 
-                // Current promotions (Đang hoạt động)
                 const current = data.filter(c => c.status === 'Đang hoạt động');
                 if (current.length > 0) {
                     currentContainer.innerHTML = current.map(c => `
@@ -450,7 +527,6 @@
                     currentContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Không có ưu đãi hiện tại.</div>';
                 }
 
-                // Upcoming promotions (Sắp bắt đầu)
                 const upcoming = data.filter(c => c.status === 'Sắp bắt đầu');
                 if (upcoming.length > 0) {
                     upcomingContainer.innerHTML = upcoming.map(c => `
@@ -481,7 +557,7 @@
             }
         }
 
-        // Fetch and render rewards (vouchers)
+        // Fetch and render rewards
         async function loadRewards() {
             const rewardsContainer = document.getElementById('rewards-catalog');
             try {
@@ -514,11 +590,101 @@
             }
         }
 
+        // Fetch and render brand vouchers
+        async function loadUserBrandVouchers() {
+            const vouchersContainer = document.getElementById('brand-vouchers-list');
+            try {
+                const response = await fetch(`/campaign/user_brand_vouchers/${USER_ID}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải voucher');
+
+                if (data.length > 0) {
+                    vouchersContainer.innerHTML = data.map(v => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover cursor-pointer" onclick='showVoucherDetails(${JSON.stringify(v)}, "Brand")'>
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=${encodeURIComponent(v.title)}" alt="${v.title}" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h4 class="text-lg font-bold mb-2">${v.title}</h4>
+                                <p class="text-gray-600 text-sm mb-2">${v.description}</p>
+                                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Mã đổi:</span> ${v.redemption_code}</p>
+                                <p class="text-sm text-gray-500 mb-4"><span class="font-medium">Điểm đã dùng:</span> ${formatNumber(v.points_required)} điểm</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Brand ${BRAND_ID}</span>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${v.status === 'Chưa sử dụng' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${v.status || 'Chưa sử dụng'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    vouchersContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Bạn chưa có voucher nào từ Brand.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading brand vouchers:', error);
+                showMessage(vouchersContainer, `Lỗi tải voucher: ${error.message}`);
+            }
+        }
+
+        // Fetch and render mall vouchers
+        async function loadUserMallVouchers() {
+            const vouchersContainer = document.getElementById('mall-vouchers-list');
+            try {
+                const response = await fetch(`/voucher/user_mall_vouchers/${USER_ID}`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải voucher');
+
+                if (data.length > 0) {
+                    vouchersContainer.innerHTML = data.map(v => `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all card-hover cursor-pointer" onclick='showVoucherDetails(${JSON.stringify(v)}, "Mall")'>
+                            <img src="https://placehold.co/600x400/e0e7ff/3730a3?text=${encodeURIComponent(v.title)}" alt="${v.title}" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h4 class="text-lg font-bold mb-2">${v.title}</h4>
+                                <p class="text-gray-600 text-sm mb-2">${v.description}</p>
+                                <p class="text-sm text-gray-500 mb-2"><span class="font-medium">Mã đổi:</span> ${v.redemption_code}</p>
+                                <p class="text-sm text-gray-500 mb-4"><span class="font-medium">Điểm đã dùng:</span> ${formatNumber(v.points_required)} điểm</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500"><i class="fas fa-store-alt mr-1"></i> Mall</span>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${v.status === 'Chưa sử dụng' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${v.status || 'Chưa sử dụng'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    vouchersContainer.innerHTML = '<div class="text-gray-600 text-center col-span-full">Bạn chưa có voucher nào từ Mall.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading mall vouchers:', error);
+                showMessage(vouchersContainer, `Lỗi tải voucher: ${error.message}`);
+            }
+        }
+
+        // Load all user vouchers
+        async function loadUserVouchers() {
+            await Promise.all([
+                loadUserBrandVouchers(),
+                loadUserMallVouchers()
+            ]);
+        }
+
+        // Show voucher details in modal
+        function showVoucherDetails(voucher, source) {
+            document.getElementById('voucherModalTitle').textContent = voucher.title;
+            document.getElementById('voucherModalDescription').textContent = voucher.description;
+            document.getElementById('voucherModalCode').textContent = voucher.redemption_code;
+            document.getElementById('voucherModalPoints').textContent = formatNumber(voucher.points_required);
+            document.getElementById('voucherModalDate').textContent = new Date(voucher.redeemed_at || voucher.created_at).toLocaleString('vi-VN');
+            document.getElementById('voucherModalSource').textContent = source;
+            document.getElementById('voucherModalStatus').textContent = voucher.status || 'Chưa sử dụng';
+            document.getElementById('voucherModal').style.display = 'flex';
+        }
+
+        // Close voucher modal
+        function closeVoucherModal() {
+            document.getElementById('voucherModal').style.display = 'none';
+        }
+
         // Redeem campaign
         async function redeemCampaign(campaignId, pointsRequired) {
             try {
-                // Kiểm tra điểm đủ để đổi
-                const pointsResponse = await fetch(`/point/get_total_points/${BRAND_ID}`);
+                const pointsResponse = await fetch(`/point/get_user_points/${USER_ID}`);
                 const pointsData = await pointsResponse.json();
                 if (!pointsResponse.ok) throw new Error(pointsData.error || 'Lỗi kiểm tra điểm');
                 if (pointsData.total_points < pointsRequired) {
@@ -533,9 +699,23 @@
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Lỗi khi đổi ưu đãi');
+
+                await fetch('/point/redeem_points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        campaign_id: campaignId,
+                        points_required: pointsRequired,
+                        description: `Đổi ưu đãi với mã ${data.redemption_code}`,
+                        redemption_code: data.redemption_code
+                    })
+                });
+
                 alert(`Đổi ưu đãi thành công! Mã đổi: ${data.redemption_code}`);
-                loadTotalPoints(); // Refresh points
-                loadTransactionHistory(); // Refresh history
+                loadTotalPoints();
+                loadTransactionHistory();
+                loadUserBrandVouchers();
             } catch (error) {
                 console.error('Error redeeming campaign:', error);
                 alert(`Lỗi: ${error.message}`);
@@ -545,8 +725,11 @@
         // Redeem voucher
         async function redeemVoucher(voucherId, pointsRequired, voucherTitle) {
             try {
-                // Kiểm tra điểm đủ để đổi
-                const pointsResponse = await fetch(`/point/get_total_points/${BRAND_ID}`);
+                if (!USER_ID || isNaN(USER_ID)) {
+                    throw new Error('USER_ID không hợp lệ hoặc không được định nghĩa!');
+                }
+
+                const pointsResponse = await fetch(`/point/get_user_points/${USER_ID}`);
                 const pointsData = await pointsResponse.json();
                 if (!pointsResponse.ok) throw new Error(pointsData.error || 'Lỗi kiểm tra điểm');
                 if (pointsData.total_points < pointsRequired) {
@@ -554,7 +737,7 @@
                     return;
                 }
 
-                const redemptionCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Generate random code
+                const redemptionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 const response = await fetch(`/voucher/vouchers/${voucherId}/redeem`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -564,82 +747,116 @@
                         redemption_code: redemptionCode
                     })
                 });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || 'Lỗi khi đổi quà');
+
+                const responseText = await response.text();
+                if (!response.ok) {
+                    console.error('Raw response:', responseText);
+                    throw new Error(`Lỗi khi đổi quà: ${responseText}`);
+                }
+
+                const data = JSON.parse(responseText);
+
+                const redeemPointsResponse = await fetch('/point/redeem_points_by_voucher', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        points_required: pointsRequired,
+                        voucher_id: voucherId,
+                        description: `Đổi voucher "${voucherTitle}" với mã ${redemptionCode}`,
+                        redemption_code: redemptionCode
+                    })
+                });
+                const redeemPointsData = await redeemPointsResponse.json();
+                if (!redeemPointsResponse.ok) throw new Error(redeemPointsData.error || 'Lỗi khi trừ điểm');
+
                 alert(`Đổi quà "${voucherTitle}" thành công! Mã đổi: ${redemptionCode}`);
-                loadTotalPoints(); // Refresh points
-                loadTransactionHistory(); // Refresh history
+                loadTotalPoints();
+                loadTransactionHistory();
+                loadUserMallVouchers();
             } catch (error) {
                 console.error('Error redeeming voucher:', error);
                 alert(`Lỗi: ${error.message}`);
             }
         }
 
+        // Biến toàn cục để lưu trữ danh sách giao dịch gốc
+        let allTransactions = [];
+
         // Fetch and render transaction history
         async function loadTransactionHistory() {
             const historyContainer = document.getElementById('transaction-history');
             try {
-                // Load campaign redemptions
-                const campaignResponse = await fetch(`/campaign/${USER_ID}/redeemed_campaigns`);
-                const campaignData = await campaignResponse.json();
-                if (!campaignResponse.ok) throw new Error(campaignData.error || 'Lỗi tải lịch sử campaign');
+                const response = await fetch(`/point/${USER_ID}/transaction_history`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Lỗi tải lịch sử giao dịch');
 
-                // Load voucher redemptions (assuming an endpoint exists; mock for now)
-                let voucherData = [];
-                try {
-                    const voucherResponse = await fetch(`/voucher/${USER_ID}/redeemed_vouchers`);
-                    voucherData = await voucherResponse.json();
-                    if (!voucherResponse.ok) throw new Error(voucherData.error || 'Lỗi tải lịch sử voucher');
-                } catch (e) {
-                    console.warn('Voucher redemption history endpoint not implemented, skipping.');
-                }
+                allTransactions = data.transactions || [];
 
-                const transactions = [
-                    ...campaignData.map(c => ({
-                        date: new Date(c.redeemed_at).toLocaleString('vi-VN'),
-                        transaction_id: `CAM${c.campaign_id}`,
-                        store: `Brand ${c.brand_id}`,
-                        description: `Đổi ưu đãi: ${c.title}`,
-                        points: -c.points_spent,
-                        status: 'Hoàn thành'
-                    })),
-                    ...voucherData.map(v => ({
-                        date: new Date(v.redeemed_at).toLocaleString('vi-VN'),
-                        transaction_id: `VOU${v.voucher_id}`,
-                        store: `Brand ${v.brand_id}`,
-                        description: `Đổi quà: ${v.title}`,
-                        points: -v.points_spent,
-                        status: 'Hoàn thành'
-                    }))
-                ];
+                // Hiển thị giao dịch ban đầu (chưa lọc)
+                filterTransactions();
 
-                if (transactions.length > 0) {
-                    historyContainer.innerHTML = transactions.map(t => `
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.date}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${t.transaction_id}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.store}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.description}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm ${t.points < 0 ? 'text-red-600' : 'text-green-600'} font-medium">
-                                ${t.points < 0 ? '' : '+'}${formatNumber(t.points)}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">${t.status}</span>
-                            </td>
-                        </tr>
-                    `).join('');
-                } else {
-                    historyContainer.innerHTML = '<tr><td colspan="6" class="py-4 px-4 text-center text-gray-600">Không có giao dịch nào.</td></tr>';
-                }
             } catch (error) {
                 console.error('Error loading transaction history:', error);
                 showMessage(historyContainer, `Lỗi tải lịch sử: ${error.message}`);
             }
         }
 
+        // Filter and display transactions based on type and date
+        function filterTransactions() {
+            const historyContainer = document.getElementById('transaction-history');
+            const transactionCount = document.getElementById('transaction-count');
+            const typeFilter = document.getElementById('transactionTypeFilter').value;
+            const dateFilter = document.getElementById('transactionDateFilter').value;
+
+            // Lọc giao dịch
+            let filteredTransactions = allTransactions;
+
+            // Lọc theo loại giao dịch
+            if (typeFilter !== 'all') {
+                filteredTransactions = filteredTransactions.filter(t => {
+                    if (typeFilter === 'EARN') return t.points > 0; // Giả định tích điểm là points > 0
+                    if (typeFilter === 'REDEEM') return t.points < 0; // Giả định đổi điểm là points < 0
+                    if (typeFilter === 'PURCHASE') return t.description.toLowerCase().includes('mua sắm'); // Giả định giao dịch mua sắm có từ "mua sắm"
+                    return true;
+                });
+            }
+
+            // Lọc theo ngày
+            if (dateFilter) {
+                const selectedDate = new Date(dateFilter);
+                filteredTransactions = filteredTransactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate.toDateString() === selectedDate.toDateString();
+                });
+            }
+
+            // Hiển thị giao dịch đã lọc
+            if (filteredTransactions.length > 0) {
+                historyContainer.innerHTML = filteredTransactions.map(t => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(t.date).toLocaleString('vi-VN')}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${t.transaction_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.store}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${t.points < 0 ? 'text-red-600' : 'text-green-600'} font-medium">
+                            ${t.points < 0 ? '' : '+'}${formatNumber(t.points)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">${t.status}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                historyContainer.innerHTML = '<tr><td colspan="6" class="py-4 px-4 text-center text-gray-600">Không có giao dịch nào.</td></tr>';
+            }
+
+            // Cập nhật số lượng giao dịch
+            transactionCount.textContent = `Hiển thị ${filteredTransactions.length} trên tổng số ${allTransactions.length} giao dịch`;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Tab switching functionality
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('tab-active'));
@@ -650,7 +867,6 @@
                 });
             });
 
-            // Notification and profile dropdowns
             const notificationBtn = document.getElementById('notificationBtn');
             const notificationDropdown = document.getElementById('notificationDropdown');
             const profileBtn = document.getElementById('profileBtn');
@@ -669,17 +885,25 @@
             document.addEventListener('click', () => {
                 notificationDropdown.classList.add('hidden');
                 profileDropdown.classList.add('hidden');
+                closeVoucherModal();
             });
 
             notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
             profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+            document.querySelector('.modal-content').addEventListener('click', (e) => e.stopPropagation());
 
-            // Load initial data
+            // Gắn sự kiện lọc cho phần lịch sử giao dịch
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            applyFilterBtn.addEventListener('click', filterTransactions);
+            document.getElementById('transactionTypeFilter').addEventListener('change', filterTransactions);
+            document.getElementById('transactionDateFilter').addEventListener('change', filterTransactions);
+
             Promise.allSettled([
                 loadCustomerInfo(),
                 loadTotalPoints(),
                 loadPromotions(),
                 loadRewards(),
+                loadUserVouchers(),
                 loadTransactionHistory()
             ]).then(results => {
                 results.forEach((result, index) => {
