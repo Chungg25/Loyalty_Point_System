@@ -180,7 +180,7 @@ def infor():
 
 @user_bp.route('/logout')
 def logout():
-    return redirect(url_for("user.login_page"))
+    return render_template("login.html")
 
 @user_bp.route('/manage_account', methods=['GET'])
 def manage_account():
