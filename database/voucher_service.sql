@@ -3,7 +3,7 @@ use Voucher_Service;
 CREATE TABLE Voucher 
 (
   voucher_id INT AUTO_INCREMENT PRIMARY KEY,
-  brand_id INT DEFAULT NULL,
+  brand_id INT,
   title VARCHAR(255),
   description TEXT,
   points_required INT,
@@ -13,7 +13,7 @@ CREATE TABLE Voucher
   end_at DATETIME,
   approval_comment TEXT,
   stock INT DEFAULT 100,
-  initial_stock INT DEFAULT 100;
+  initial_stock INT DEFAULT 100
 
 );
 

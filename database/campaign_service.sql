@@ -43,3 +43,32 @@ VALUES
 
 ALTER TABLE Campaign_Redemption
 ADD COLUMN status ENUM('Chưa sử dụng', 'Đã sử dụng', 'Hết hạn') DEFAULT 'Chưa sử dụng';
+
+ALTER TABLE Campaign
+ADD COLUMN campaign_cost DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+ADD COLUMN brand_ratio DECIMAL(5, 2) NOT NULL DEFAULT 50.00 CHECK (brand_ratio >= 0 AND brand_ratio <= 100),
+ADD COLUMN mall_ratio DECIMAL(5, 2) NOT NULL DEFAULT 50.00 CHECK (mall_ratio >= 0 AND mall_ratio <= 100),
+ADD CONSTRAINT ratio_sum CHECK (brand_ratio + mall_ratio = 100);
+
+UPDATE Campaign
+SET 
+    campaign_cost = CASE
+        WHEN campaign_id = 1 THEN 50000000  -- Chiến dịch Mùa Hè
+        WHEN campaign_id = 2 THEN 70000000  -- Chiến dịch Noel
+        WHEN campaign_id = 3 THEN 40000000  -- Back to School
+        WHEN campaign_id = 4 THEN 80000000  -- Mừng Sinh Nhật
+        WHEN campaign_id = 5 THEN 30000000  -- Tích điểm đổi quà
+        WHEN campaign_id = 6 THEN 20000000  -- Flash Sale 11.11
+        WHEN campaign_id = 7 THEN 100000000 -- Khách VIP ưu đãi
+        WHEN campaign_id = 8 THEN 60000000  -- Cuối năm rộn ràng
+        WHEN campaign_id = 9 THEN 50000000  -- Black Friday
+        WHEN campaign_id = 10 THEN 90000000 -- Tết Nguyên Đán
+    END,
+    brand_ratio = CASE
+        WHEN campaign_id IN (1, 3, 5, 7, 9) THEN 60.00
+        ELSE 50.00
+    END,
+    mall_ratio = CASE
+        WHEN campaign_id IN (1, 3, 5, 7, 9) THEN 40.00
+        ELSE 50.00
+    END;

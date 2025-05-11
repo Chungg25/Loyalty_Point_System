@@ -281,71 +281,73 @@
         <!-- Header -->
         <header class="gradient-bg text-white shadow-lg w-full">
             <div class="w-full px-4 py-4 flex justify-between items-center">
-              <!-- Logo và tiêu đề -->
-              <div class="flex items-center space-x-2">
-              </div>
-          
-              <!-- Khu vực bên phải: Thông báo + Tài khoản -->
-              <div class="flex items-center space-x-6">
-                <!-- Biểu tượng thông báo -->
-                <div class="relative group">
-                  <button id="notificationBtn" class="relative">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      3
-                    </span>
-                  </button>
-                  <!-- Dropdown thông báo -->
-                  <div id="notificationDropdown"
-                    class="hidden absolute right-0 mt-2 w-64 bg-white text-black rounded-md shadow-lg z-50">
-                    <div class="p-4 border-b">
-                      <h3 class="font-bold text-gray-800">Thông báo</h3>
-                    </div>
-                    <div class="divide-y divide-gray-200">
-                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                        <p class="text-sm font-medium text-gray-900">Hợp đồng với Nike sắp hết hạn</p>
-                        <p class="text-xs text-gray-500">2 giờ trước</p>
-                      </a>
-                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                        <p class="text-sm font-medium text-gray-900">Chiến dịch Black Friday đã được tạo</p>
-                        <p class="text-xs text-gray-500">1 ngày trước</p>
-                      </a>
-                      <a href="#" class="block px-4 py-3 hover:bg-gray-100">
-                        <p class="text-sm font-medium text-gray-900">5 tài khoản mới đăng ký</p>
-                        <p class="text-xs text-gray-500">2 ngày trước</p>
-                      </a>
-                    </div>
-                    <div class="p-2 text-center bg-gray-50">
-                      <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
-                    </div>
-                  </div>
+                <!-- Logo và tiêu đề -->
+                <div class="flex items-center space-x-2">
                 </div>
-          
-                <!-- Tài khoản -->
-                <div class="relative group">
-                  <button id="profileBtn" class="flex items-center space-x-2">
-                    <span class="font-medium hidden md:block">{{ user.user_name | default('Admin') }}</span>
-                    <i class="fas fa-chevron-down"></i>
-                  </button>
-                  <!-- Dropdown tài khoản -->
-                  <div id="profileDropdown"
-                    class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
-                    <div class="p-4 border-b">
-                      <h3 class="font-bold text-gray-800">{{ user.user_name | default('Admin') }}</h3>
-                      <p class="text-xs text-gray-500">admin@mallmanagement.com</p>
+
+                <!-- Khu vực bên phải: Thông báo + Tài khoản -->
+                <div class="flex items-center space-x-6">
+                    <!-- Biểu tượng thông báo -->
+                    <div class="relative group">
+                        <button id="notificationBtn" class="relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span
+                                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                3
+                            </span>
+                        </button>
+                        <!-- Dropdown thông báo -->
+                        <div id="notificationDropdown"
+                            class="hidden absolute right-0 mt-2 w-64 bg-white text-black rounded-md shadow-lg z-50">
+                            <div class="p-4 border-b">
+                                <h3 class="font-bold text-gray-800">Thông báo</h3>
+                            </div>
+                            <div class="divide-y divide-gray-200">
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                                    <p class="text-sm font-medium text-gray-900">Hợp đồng với Nike sắp hết hạn</p>
+                                    <p class="text-xs text-gray-500">2 giờ trước</p>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                                    <p class="text-sm font-medium text-gray-900">Chiến dịch Black Friday đã được tạo</p>
+                                    <p class="text-xs text-gray-500">1 ngày trước</p>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-100">
+                                    <p class="text-sm font-medium text-gray-900">5 tài khoản mới đăng ký</p>
+                                    <p class="text-xs text-gray-500">2 ngày trước</p>
+                                </a>
+                            </div>
+                            <div class="p-2 text-center bg-gray-50">
+                                <a href="#" class="text-sm text-blue-600 font-medium">Xem tất cả</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="py-1">
-                      <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
-                      <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+
+                    <!-- Tài khoản -->
+                    <div class="relative group">
+                        <button id="profileBtn" class="flex items-center space-x-2">
+                            <span class="font-medium hidden md:block">{{ user.user_name | default('Admin') }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <!-- Dropdown tài khoản -->
+                        <div id="profileDropdown"
+                            class="hidden absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                            <div class="p-4 border-b">
+                                <h3 class="font-bold text-gray-800">{{ user.user_name | default('Admin') }}</h3>
+                                <p class="text-xs text-gray-500">admin@mallmanagement.com</p>
+                            </div>
+                            <div class="py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hồ sơ</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cài đặt</a>
+                            </div>
+                            <div class="py-1 border-t">
+                                <a href="/user/logout"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="py-1 border-t">
-                      <a href="/user/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Đăng xuất</a>
-                    </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </header>          
+        </header>
 
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-4 md:p-8">
@@ -719,7 +721,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Hợp đồng đang hoạt động</p>
-                                <h3 class="text-2xl font-bold mt-2">72</h3>
+                                <h3 class="text-2xl font-bold mt-2">5</h3>
                             </div>
                             <div class="bg-green-100 text-green-600 p-3 rounded-lg">
                                 <i class="fas fa-file-signature text-xl"></i>
@@ -732,7 +734,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Hợp đồng đã hết hạn</p>
-                                <h3 class="text-2xl font-bold mt-2">8</h3>
+                                <h3 class="text-2xl font-bold mt-2">4</h3>
                             </div>
                             <div class="bg-red-100 text-red-600 p-3 rounded-lg">
                                 <i class="fas fa-file-excel text-xl"></i>
@@ -745,13 +747,13 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Hợp đồng mới tháng này</p>
-                                <h3 class="text-2xl font-bold mt-2">6</h3>
+                                <h3 class="text-2xl font-bold mt-2">0</h3>
                             </div>
                             <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
                                 <i class="fas fa-file-import text-xl"></i>
                             </div>
                         </div>
-                        <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 2 so với tháng trước
+                        <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 0 so với tháng trước
                         </p>
                     </div>
                 </div>
@@ -763,85 +765,36 @@
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Mã hợp đồng</th>
+                                        Mã hợp đồng
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Brand</th>
+                                        Brand
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ngày bắt đầu</th>
+                                        Ngày bắt đầu
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ngày kết thúc</th>
+                                        Ngày kết thúc
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Giá trị</th>
+                                        Giá trị hợp đồng
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Trạng thái</th>
+                                        Trạng thái
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Hành động</th>
+                                        Hành động
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12345
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Nike Store</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/05/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14/05/2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">120 triệu/tháng</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
-                                            hoạt động</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Xem</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Gia hạn</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12344
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Starbucks</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/03/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28/02/2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">85 triệu/tháng</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
-                                            hoạt động</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Xem</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Gia hạn</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON12333
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Apple Store</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10/01/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">09/01/2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">150 triệu/tháng</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
-                                            hết hạn</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Xem</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Gia hạn</a>
-                                    </td>
-                                </tr>
+                            <tbody id="contract-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -1097,20 +1050,20 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Chiến dịch đang chạy</p>
-                                <h3 class="text-2xl font-bold mt-2">12</h3>
+                                <h3 class="text-2xl font-bold mt-2">2</h3>
                             </div>
                             <div class="bg-green-100 text-green-600 p-3 rounded-lg">
                                 <i class="fas fa-play-circle text-xl"></i>
                             </div>
                         </div>
-                        <p class="text-gray-500 text-sm mt-4">3 chiến dịch sắp kết thúc</p>
+                        <p class="text-gray-500 text-sm mt-4">0 chiến dịch sắp kết thúc</p>
                     </div>
 
                     <div class="bg-white rounded-xl p-6 shadow-md transition-all card-hover">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Chiến dịch đã kết thúc</p>
-                                <h3 class="text-2xl font-bold mt-2">24</h3>
+                                <h3 class="text-2xl font-bold mt-2">0</h3>
                             </div>
                             <div class="bg-gray-100 text-gray-600 p-3 rounded-lg">
                                 <i class="fas fa-stop-circle text-xl"></i>
@@ -1123,7 +1076,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-gray-500">Chiến dịch sắp tới</p>
-                                <h3 class="text-2xl font-bold mt-2">5</h3>
+                                <h3 class="text-2xl font-bold mt-2">2</h3>
                             </div>
                             <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
                                 <i class="fas fa-clock text-xl"></i>
@@ -1140,116 +1093,48 @@
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tên chiến dịch</th>
+                                        Tên chiến dịch
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Brand tham gia</th>
+                                        Brand tham gia
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ngày bắt đầu</th>
+                                        Ngày bắt đầu
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ngày kết thúc</th>
+                                        Ngày kết thúc
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Trạng thái</th>
+                                        Tổng tiền chiến dịch
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Hiệu quả</th>
+                                        Tỷ lệ Brand
+                                    </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Hành động</th>
+                                        Tỷ lệ Mall
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Trạng thái
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Hiệu quả
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Hành động
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">Black Friday</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">32 Brand</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24/11/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26/11/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
-                                            diễn ra</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">-</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">Sinh nhật thương hiệu</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Tất cả Brand</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/10/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/11/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
-                                            chạy</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-green-600 font-medium">+15%</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">Giáng sinh</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Tất cả Brand</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24/12/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26/12/2023</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sắp
-                                            diễn ra</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">-</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">Tết Nguyên Đán</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">Tất cả Brand</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/01/2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/01/2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Đang
-                                            chạy</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-green-600 font-medium">+20%</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
-                                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
-                                    </td>
-                                </tr>
+                            <tbody id="campaign-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -1410,6 +1295,9 @@
                 <p><strong>Điểm yêu cầu:</strong> <span id="modal-campaign-points"></span></p>
                 <p><strong>Phần thưởng:</strong> <span id="modal-campaign-reward"></span></p>
                 <p><strong>Thời gian:</strong> <span id="modal-campaign-time"></span></p>
+                <p><strong>Tổng tiền chiến dịch:</strong> <span id="modal-campaign-cost"></span></p>
+                <p><strong>Tỷ lệ chi phí:</strong> Brand <span id="modal-brand-ratio"></span>% - Mall <span
+                        id="modal-mall-ratio"></span>%</p>
             </div>
             <form id="review-form" class="space-y-4">
                 <div>
@@ -1434,7 +1322,7 @@
                         <i class="fas fa-check mr-2"></i> Gửi quyết định
                     </button>
                 </div>
-                </formLIB>
+            </form>
         </div>
     </div>
 
@@ -1856,6 +1744,8 @@
                         <p class="text-sm text-gray-500 mb-1"><strong>Điểm yêu cầu:</strong> ${campaign.points_required}</p>
                         <p class="text-sm text-gray-500 mb-1"><strong>Phần thưởng:</strong> ${campaign.reward}</p>
                         <p class="text-sm text-gray-500 mb-1"><strong>Thời gian:</strong> ${campaign.start_at} - ${campaign.end_at}</p>
+                        <p class="text-sm text-gray-500 mb-1"><strong>Tổng tiền chiến dịch:</strong> ${formatCurrency(campaign.campaign_cost)}</p>
+                        <p class="text-sm text-gray-500 mb-1"><strong>Tỷ lệ chi phí:</strong> Brand ${campaign.brand_ratio}% - Mall ${campaign.mall_ratio}%</p>
                     </div>
                     <div class="mt-4 flex justify-end">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all" onclick="openReviewModal(${campaign.campaign_id})">
@@ -1881,11 +1771,13 @@
         document.getElementById('modal-campaign-points').textContent = campaign.points_required;
         document.getElementById('modal-campaign-reward').textContent = campaign.reward;
         document.getElementById('modal-campaign-time').textContent = `${campaign.start_at} - ${campaign.end_at}`;
+        document.getElementById('modal-campaign-cost').textContent = formatCurrency(campaign.campaign_cost);
+        document.getElementById('modal-brand-ratio').textContent = campaign.brand_ratio;
+        document.getElementById('modal-mall-ratio').textContent = campaign.mall_ratio;
         document.getElementById('modal-message').classList.add('hidden');
         document.getElementById('review-modal').style.display = 'flex';
         document.getElementById('review-form').setAttribute('data-campaign-id', campaignId);
     }
-
     function closeModal() {
         document.getElementById('review-modal').style.display = 'none';
     }
@@ -1931,6 +1823,128 @@
             messageDiv.classList.add('error-message');
         }
     });
+    function formatCurrency(amount) {
+        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    }
+
+    // Format ngày
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    // Load hợp đồng
+    async function loadContracts() {
+        const tbody = document.getElementById('contract-table-body');
+        tbody.innerHTML = '<tr><td colspan="7" class="py-4 px-4 text-center"><div class="loading-overlay"><div class="spinner"></div></div></td></tr>';
+
+        try {
+            const response = await fetch('/brand/get_contracts');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Lỗi tải hợp đồng');
+
+            const contracts = data.contracts;
+            const brandResponse = await fetch('/brand/get_brand');
+            const brandData = await brandResponse.json();
+            const brands = brandData.brands;
+
+            if (contracts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-4 px-4 text-center text-gray-600">Không có hợp đồng nào.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            contracts.forEach(contract => {
+                const brand = brands.find(b => b.brand_id === contract.brand_id);
+                const status = contract.status === 1 ? 'Đang hoạt động' : 'Hết hạn';
+                const statusColor = contract.status === 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+
+                const row = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#CON${contract.contract_id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${brand ? brand.brandname : 'Không xác định'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(contract.start_at)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(contract.end_at)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(contract.total_amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${status}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Xem</a>
+                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Gia hạn</a>
+                    </td>
+                </tr>
+            `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (error) {
+            console.error('Error loading contracts:', error);
+            tbody.innerHTML = `<tr><td colspan="7" class="py-4 px-4 text-center text-gray-600">Lỗi tải hợp đồng: ${error.message}</td></tr>`;
+        }
+    }
+
+    // Load chiến dịch
+    async function loadCampaigns() {
+        const tbody = document.getElementById('campaign-table-body');
+        tbody.innerHTML = '<tr><td colspan="10" class="py-4 px-4 text-center"><div class="loading-overlay"><div class="spinner"></div></div></td></tr>';
+
+        try {
+            const response = await fetch('/campaign/get_campaigns');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Lỗi tải chiến dịch');
+
+            const campaigns = data.campaigns;
+            const brandResponse = await fetch('/brand/get_brand');
+            const brandData = await brandResponse.json();
+            const brands = brandData.brands;
+
+            if (campaigns.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="py-4 px-4 text-center text-gray-600">Không có chiến dịch nào.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            campaigns.forEach(campaign => {
+                const brand = brands.find(b => b.brand_id === campaign.brand_id);
+                const statusColor = campaign.status === 'Đang chạy' ? 'bg-green-100 text-green-800' : campaign.status === 'Sắp diễn ra' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800';
+
+                const row = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${campaign.title}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${brand ? brand.brandname : 'Tất cả Brand'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(campaign.start_at)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(campaign.end_at)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(campaign.campaign_cost)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${campaign.brand_ratio}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${campaign.mall_ratio}%</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${campaign.status}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">-</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Chi tiết</a>
+                        <a href="#" class="text-yellow-600 hover:text-yellow-900">Chỉnh sửa</a>
+                    </td>
+                </tr>
+            `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (error) {
+            console.error('Error loading campaigns:', error);
+            tbody.innerHTML = `<tr><td colspan="10" class="py-4 px-4 text-center text-gray-600">Lỗi tải chiến dịch: ${error.message}</td></tr>`;
+        }
+    }
 
     // Gọi hàm khi trang được tải
     document.addEventListener('DOMContentLoaded', function () {
@@ -1947,47 +1961,49 @@
         fetchCountUser();
         loadBrands();
         loadPendingCampaigns();
+        loadContracts();
+        loadCampaigns();
     });
 
     const revenueMonthlyCtx = document.getElementById("revenueReportChart").getContext("2d");
     const revenueMonthlyChart = new Chart(revenueMonthlyCtx, {
-    type: "bar",
-    data: {
-        labels: ["Tháng 1", "Tháng 2", "Tháng 3"],
-        datasets: [{
-        label: "Tổng doanh thu (triệu VND)",
-        data: [
-            400 + 300 + 250, // Tháng 1
-            350 + 350 + 300, // Tháng 2
-            450 + 350 + 250  // Tháng 3
-        ],
-        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"], // Màu khác nhau cho từng cột
-        borderRadius: 6,
-        }],
-    },
-    options: {
-        responsive: true,
-        plugins: {
-        legend: {
-            display: false, // Ẩn chú thích vì đã rõ
+        type: "bar",
+        data: {
+            labels: ["Tháng 1", "Tháng 2", "Tháng 3"],
+            datasets: [{
+                label: "Tổng doanh thu (triệu VND)",
+                data: [
+                    400 + 300 + 250, // Tháng 1
+                    350 + 350 + 300, // Tháng 2
+                    450 + 350 + 250  // Tháng 3
+                ],
+                backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"], // Màu khác nhau cho từng cột
+                borderRadius: 6,
+            }],
         },
-        tooltip: {
-            callbacks: {
-            label: function (context) {
-                return context.parsed.y + " triệu VND";
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false, // Ẩn chú thích vì đã rõ
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.parsed.y + " triệu VND";
+                        },
+                    },
+                },
             },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Triệu VND",
+                    },
+                },
             },
         },
-        },
-        scales: {
-        y: {
-            beginAtZero: true,
-            title: {
-            display: true,
-            text: "Triệu VND",
-            },
-        },
-        },
-    },
     });
 </script>

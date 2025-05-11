@@ -37,10 +37,7 @@ CREATE TABLE Contract
   FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
 );
 
-CREATE TABLE Category (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
-);
+
 
 INSERT INTO Brand (brand_id, brandname, email, status, coefficient,category_id)
 VALUES
@@ -63,8 +60,19 @@ VALUES
 (8, 3, 6, '2020-04-21', '2021-04-21', 0, '2020-04-20 11:00:00'),
 (9, 4, 6, '2021-04-21', '2022-04-21', 0, '2021-03-31 12:00:00');
 
-INSERT INTO Category (name) VALUES
-('Thời trang'),
-('F&B'),
-('Điện tử'),
-('Mỹ Phẩm');
+ALTER TABLE Contract
+ADD COLUMN total_amount DECIMAL(15, 2) NOT NULL DEFAULT 0.00;
+
+-- Cập nhật total_amount cho các hợp đồng hiện có trong bảng Contract
+UPDATE Contract
+SET total_amount = CASE
+    WHEN contract_id = 1 THEN 120000000 -- 120 triệu
+    WHEN contract_id = 2 THEN 85000000  -- 85 triệu
+    WHEN contract_id = 3 THEN 150000000 -- 150 triệu
+    WHEN contract_id = 4 THEN 90000000  -- 90 triệu
+    WHEN contract_id = 5 THEN 200000000 -- 200 triệu
+    WHEN contract_id = 6 THEN 110000000 -- 110 triệu (hết hạn)
+    WHEN contract_id = 7 THEN 80000000  -- 80 triệu (hết hạn)
+    WHEN contract_id = 8 THEN 130000000 -- 130 triệu (hết hạn)
+    WHEN contract_id = 9 THEN 95000000  -- 95 triệu (hết hạn)
+END;

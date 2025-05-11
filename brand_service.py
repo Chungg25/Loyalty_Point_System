@@ -183,3 +183,20 @@ def brand_by_type_chart():
         return jsonify({"brand_by_type": result}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
+    
+@brand_bp.route('/get_contracts', methods=['GET'])
+def get_contracts():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT contract_id, brand_id, start_at, end_at, status, created_at, total_amount
+            FROM Contract
+            ORDER BY created_at DESC
+        """)
+        contracts = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({"contracts": contracts}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500

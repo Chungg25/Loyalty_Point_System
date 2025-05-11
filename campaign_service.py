@@ -49,7 +49,7 @@ def create_campaign_page():
 @campaign_bp.route('/campaigns', methods=['POST'])
 def create_campaign():
     data = request.json
-    required_fields = ['brand_id', 'title', 'description', 'points_required', 'reward', 'start_at', 'end_at']
+    required_fields = ['brand_id', 'title', 'description', 'points_required', 'reward', 'start_at', 'end_at', 'campaign_cost', 'brand_ratio', 'mall_ratio']
     for field in required_fields:
         if field not in data or isinstance(data[field], list):
             return jsonify({"error": f"Thiếu hoặc sai kiểu dữ liệu trường: {field}"}), 400
@@ -57,6 +57,12 @@ def create_campaign():
     brand_id = data['brand_id']
     if not brand_id:
         return jsonify({"error": "Bạn chưa đăng nhập hoặc không có quyền tạo chiến dịch."}), 401
+
+    # Kiểm tra tổng tỷ lệ
+    brand_ratio = float(data['brand_ratio'])
+    mall_ratio = float(data['mall_ratio'])
+    if abs(brand_ratio + mall_ratio - 100) > 0.01:  # Cho phép sai số nhỏ
+        return jsonify({"error": "Tổng tỷ lệ Brand và Mall phải bằng 100%."}), 400
 
     try:
         conn = get_db_connection()
@@ -68,8 +74,8 @@ def create_campaign():
                 break
 
         query = """
-        INSERT INTO Campaign (brand_id, title, description, points_required, reward, created_at, start_at, end_at, status, redemption_code)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'DRAFT', %s)
+        INSERT INTO Campaign (brand_id, title, description, points_required, reward, created_at, start_at, end_at, status, redemption_code, campaign_cost, brand_ratio, mall_ratio)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'DRAFT', %s, %s, %s, %s)
         """
         cursor.execute(query, (
             brand_id,
@@ -80,7 +86,10 @@ def create_campaign():
             datetime.now(),
             datetime.strptime(data['start_at'], '%Y-%m-%dT%H:%M'),
             datetime.strptime(data['end_at'], '%Y-%m-%dT%H:%M'),
-            redemption_code
+            redemption_code,
+            float(data['campaign_cost']),
+            brand_ratio,
+            mall_ratio
         ))
         campaign_id = cursor.lastrowid
         conn.commit()
@@ -155,7 +164,10 @@ def get_pending_campaigns():
                 points_required,
                 reward,
                 DATE_FORMAT(start_at, '%H:%i %d/%m/%Y ') AS start_at,
-                DATE_FORMAT(end_at, '%H:%i %d/%m/%Y ') AS end_at
+                DATE_FORMAT(end_at, '%H:%i %d/%m/%Y ') AS end_at,
+                campaign_cost,
+                brand_ratio,
+                mall_ratio
             FROM Campaign
             WHERE status = 'PENDING_APPROVAL'
         """)
@@ -371,7 +383,7 @@ def pending_campaign_list():
 
 # New APIs for Dashboard
 @campaign_bp.route('/get_campaigns/<int:brand_id>', methods=['GET'])
-def get_campaigns(brand_id):
+def get_campaigns_by_brand(brand_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -461,5 +473,21 @@ def get_user_brand_vouchers(user_id):
         cursor.close()
         conn.close()
         return jsonify(vouchers), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+@campaign_bp.route('/get_campaigns', methods=['GET'])
+def get_campaigns():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT * FROM Campaign
+            ORDER BY created_at DESC
+        """)
+        campaigns = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({"campaigns": campaigns}), 200
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
